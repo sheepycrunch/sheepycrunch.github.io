@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npx tailwindcss -i ./src/input.css -o ./docs/output.css --watch",
+    "build": "npx tailwindcss -i ./src/input.css -o ./docs/output.css && node export-docs.js",
+    "export:docs": "node export-docs.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
