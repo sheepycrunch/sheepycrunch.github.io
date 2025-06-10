@@ -1,4 +1,45 @@
 /*! tailwindcss v4.1.8 | MIT License | https://tailwindcss.com */
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "tropical";
+  default: true; /* 기본 테마로 설정 */
+  prefersdark: false; /* 기본 다크 모드 설정 */
+  color-scheme: light; /* 브라우저 UI 색상 */
+
+  --color-base-100: #f0f8ff; /* 밝은 하늘색 */
+  --color-base-200: #e0ffff; /* 밝은 청록색 */
+  --color-base-300: #afeeee; /* 연한 청록색 */
+  --color-base-content: #2f4f4f; /* 어두운 청록색 */
+  --color-primary: #ff7f50; /* 코랄 */
+  --color-primary-content: #ffffff; /* 흰색 */
+  --color-secondary: #ff6347; /* 토마토 */
+  --color-secondary-content: #ffffff; /* 흰색 */
+  --color-accent: #ffd700; /* 금색 */
+  --color-accent-content: #ffffff; /* 흰색 */
+  --color-neutral: #20b2aa; /* 연한 청록색 */
+  --color-neutral-content: #ffffff; /* 흰색 */
+  --color-info: #87ceeb; /* 하늘색 */
+  --color-info-content: #ffffff; /* 흰색 */
+  --color-success: #32cd32; /* 라임 그린 */
+  --color-success-content: #ffffff; /* 흰색 */
+  --color-warning: #ffa500; /* 오렌지 */
+  --color-warning-content: #ffffff; /* 흰색 */
+  --color-error: #dc143c; /* 크림슨 */
+  --color-error-content: #ffffff; /* 흰색 */
+
+  --radius-selector: 1rem; /* 선택기 테두리 반경 */
+  --radius-field: 0.25rem; /* 필드 테두리 반경 */
+  --radius-box: 0.5rem; /* 박스 테두리 반경 */
+
+  --size-selector: 0.25rem; /* 선택기 기본 크기 */
+  --size-field: 0.25rem; /* 필드 기본 크기 */
+
+  --border: 1px; /* 테두리 크기 */
+
+  --depth: 1; /* 컴포넌트에 그림자와 미세한 3D 효과 추가 */
+  --noise: 0; /* 컴포넌트에 미세한 노이즈 효과 추가 */
+}
 @media @plugin "daisyui" {
   @layer theme, base, components, utilities;
   @layer theme {
