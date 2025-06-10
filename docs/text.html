@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="tropical">
+<head>
+  <meta charset="UTF-8">
+  <link href="output.css" rel="stylesheet">
+  <title>Wireframe Layout</title>
+  <style>
+    /* 이 스타일은 와이어프레임의 회색 블록을 시각적으로 나타내기 위한 것입니다. */
+    .placeholder-block {
+      background-color: oklch(90% 0 0); /* 밝은 회색 */
+    }
+    .placeholder-text-line {
+      background-color: oklch(70% 0 0); /* 약간 더 어두운 회색 */
+    }
+  </style>
+</head>
+<body class="p-4 bg-base-200">
+  <div class="mockup-browser border bg-base-300 shadow-lg overflow-hidden">
+    <!-- 브라우저 툴바 -->
+    <div class="mockup-browser-toolbar bg-base-200 p-2 border-b border-base-300">
+      <input class="input w-full bg-base-100 rounded-md p-1 text-xs" placeholder="http://example.com" />
+    </div>
+    
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="bg-base-100 p-4">
+      <!-- 상단 캐러셀/히어로 섹션 -->
+      <div class="relative w-full h-64 bg-base-200 flex items-center justify-between px-8 py-4 mb-8 rounded-lg">
+        <button class="btn btn-circle btn-sm bg-base-300 border-none">❮</button>
+        <div class="flex gap-2 absolute bottom-4 left-1/2 -translate-x-1/2">
+          <span class="w-3 h-3 rounded-full bg-primary"></span>
+          <span class="w-3 h-3 rounded-full bg-neutral"></span>
+          <span class="w-3 h-3 rounded-full bg-neutral"></span>
+        </div>
+        <button class="btn btn-circle btn-sm bg-base-300 border-none">❯</button>
+      </div>
+
+      <!-- 캐러셀 아래 세 개의 컬럼 (카드 형태) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-24 bg-base-300 rounded mb-4"></div>
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-5/6"></div>
+        </div>
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-24 bg-base-300 rounded mb-4"></div>
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-5/6"></div>
+        </div>
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-24 bg-base-300 rounded mb-4"></div>
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-5/6"></div>
+        </div>
+      </div>
+
+      <!-- 하단 세 개의 텍스트 블록 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-11/12 mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-10/12"></div>
+        </div>
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-11/12 mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-10/12"></div>
+        </div>
+        <div class="bg-base-200 p-4 rounded-lg shadow">
+          <div class="h-4 bg-neutral rounded mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-11/12 mb-2"></div>
+          <div class="h-4 bg-neutral rounded w-10/12"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 
