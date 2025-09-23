@@ -173,13 +173,29 @@
     // JSON 데이터 로드 및 메뉴 생성
     async function loadMenuData() {
       try {
+        console.log('메뉴 데이터 로드 시작...');
+        
         // 각 섹션별 데이터 로드
         const [aboutData, textData, archiveData, galleryData] = await Promise.all([
-          fetch('./data/about-data.json').then(res => res.json()),
-          fetch('./data/text-data.json').then(res => res.json()),
-          fetch('./data/archive-data.json').then(res => res.json()),
-          fetch('./gallery/gallery-data.json').then(res => res.json())
+          fetch('./data/about-data.json').then(res => {
+            console.log('about-data.json 로드 완료');
+            return res.json();
+          }),
+          fetch('./data/text-data.json').then(res => {
+            console.log('text-data.json 로드 완료');
+            return res.json();
+          }),
+          fetch('./data/archive-data.json').then(res => {
+            console.log('archive-data.json 로드 완료');
+            return res.json();
+          }),
+          fetch('./data/gallery-data.json').then(res => {
+            console.log('gallery-data.json 로드 완료');
+            return res.json();
+          })
         ]);
+        
+        console.log('모든 데이터 로드 완료, 섹션 생성 시작...');
         
         // 각 섹션 생성
         generateAboutSection(aboutData);
@@ -187,8 +203,15 @@
         generateArchiveSection(archiveData);
         generateGallerySection(galleryData);
         
+        console.log('모든 섹션 생성 완료');
+        
       } catch (error) {
         console.error('메뉴 데이터 로드 실패:', error);
+        // 에러 발생 시 기본 메시지 표시
+        document.getElementById('aboutcontent').innerHTML = '<p>데이터를 불러오는 중 오류가 발생했습니다.</p>';
+        document.getElementById('textcontainer').innerHTML = '<p>데이터를 불러오는 중 오류가 발생했습니다.</p>';
+        document.getElementById('archivecontainer').innerHTML = '<p>데이터를 불러오는 중 오류가 발생했습니다.</p>';
+        document.getElementById('galleryhtml').innerHTML = '<p>데이터를 불러오는 중 오류가 발생했습니다.</p>';
       }
     }
     
