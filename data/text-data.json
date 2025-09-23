@@ -1,0 +1,58 @@
+{
+  "sections": [
+    {
+      "title": "글 모음",
+      "content": "다양한 주제의 글들과 일기들을 모아둔 곳입니다."
+    },
+    {
+      "title": "문서",
+      "items": [
+        {
+          "id": "intro",
+          "title": "100%health 소개",
+          "description": "이 사이트에 대한 소개글입니다.",
+          "category": "documents",
+          "date": "2024-01-15",
+          "link": "txt/100phealth_introduction.html"
+        },
+        {
+          "id": "webdev",
+          "title": "웹 개발 노트",
+          "description": "웹 개발 과정에서 배운 것들을 정리한 노트입니다.",
+          "category": "documents",
+          "date": "2024-01-20",
+          "link": "txt/web_development_notes.html"
+        },
+        {
+          "id": "design",
+          "title": "디자인 생각",
+          "description": "디자인에 대한 생각과 경험을 담은 글입니다.",
+          "category": "documents",
+          "date": "2024-01-25",
+          "link": "txt/design_thoughts.html"
+        }
+      ]
+    },
+    {
+      "title": "일기",
+      "items": [
+        {
+          "id": "diary2024",
+          "title": "2024년 일기",
+          "description": "2024년에 작성한 일기 모음입니다.",
+          "category": "diary",
+          "date": "2024-12-31",
+          "link": "txt/diary_2024.html"
+        },
+        {
+          "id": "diary2025",
+          "title": "2025년 일기",
+          "description": "2025년에 작성한 일기 모음입니다.",
+          "category": "diary",
+          "date": "2025-01-01",
+          "link": "txt/diary_2025.html"
+        }
+      ]
+    }
+  ]
+}

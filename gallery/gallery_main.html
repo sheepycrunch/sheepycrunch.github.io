@@ -49,80 +49,101 @@
     </div>
     
     <script>
-        // 이미지 데이터 (실제로는 서버에서 가져와야 함)
-        const imageData = [
-            {
-                id: 'sample1',
-                filename: 'sample1.jpg',
-                title: '샘플 작품 1',
-                description: '디지털 아트로 제작된 작품입니다.',
-                category: 'digital_art',
-                date: '2024-01-15'
-            },
-            {
-                id: 'sample2',
-                filename: 'sample2.jpg',
-                title: '샘플 작품 2',
-                description: '스케치 스타일로 그려진 작품입니다.',
-                category: 'sketch',
-                date: '2024-01-20'
-            },
-            {
-                id: 'sample3',
-                filename: 'sample3.jpg',
-                title: '샘플 작품 3',
-                description: '낙서 스타일의 작품입니다.',
-                category: 'doodle',
-                date: '2024-01-25'
-            }
-        ];
-        
-        // 라이트박스 관련 변수
-        let currentImageIndex = 0;
+        let galleryData = null;
         let lightboxImages = [];
+        let currentImageIndex = 0;
         
-        // 갤러리 생성
-        function generateGallery() {
+        // JSON 데이터 로드
+        async function loadGalleryData() {
+            try {
+                const response = await fetch('../data/gallery-data.json');
+                galleryData = await response.json();
+                generateGalleryMenu();
+            } catch (error) {
+                console.error('갤러리 데이터 로드 실패:', error);
+            }
+        }
+        
+        // 갤러리 메뉴 생성
+        function generateGalleryMenu() {
             const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
             
-            imageData.forEach((image, index) => {
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item';
-                galleryItem.innerHTML = `
-                    <div class="gallery-item-content" data-index="${index}">
-                        <img src="../img/${image.filename}" class="gallery-thumbnail">
-                        <p><strong>${image.title}</strong></p>
-                        <p>${image.description}</p>
-                        <p class="gallery-date">${image.date}</p>
-                    </div>
+            galleryData.categories.forEach(category => {
+                // 카테고리 섹션 생성
+                const categorySection = document.createElement('div');
+                categorySection.className = 'gallery-category';
+                categorySection.innerHTML = `
+                    <h3 class="category-title">
+                        <a href="${category.link}" class="category-link">${category.name}</a>
+                    </h3>
+                    <div class="category-items"></div>
                 `;
-                container.appendChild(galleryItem);
                 
-                // 라이트박스용 이미지 데이터 저장
-                lightboxImages.push({
-                    src: `../img/${image.filename}`,
-                    title: image.title,
-                    description: image.description
-                });
-            });
-            
-            // 이미지 클릭 이벤트 추가
-            container.addEventListener('click', function(e) {
-                const galleryItem = e.target.closest('.gallery-item-content');
-                if (galleryItem) {
-                    currentImageIndex = parseInt(galleryItem.dataset.index);
-                    openLightbox();
+                const itemsContainer = categorySection.querySelector('.category-items');
+                
+                // 카테고리 아이템들 생성
+                if (category.items) {
+                    category.items.forEach(item => {
+                        const itemElement = createGalleryItem(item);
+                        itemsContainer.appendChild(itemElement);
+                    });
                 }
+                
+                container.appendChild(categorySection);
             });
         }
         
+        // 갤러리 아이템 생성
+        function createGalleryItem(item) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'gallery-item';
+            
+            let thumbnailHtml = '';
+            if (item.thumbnail) {
+                thumbnailHtml = `<img src="../${item.thumbnail}" class="gallery-thumbnail" alt="${item.name}">`;
+            }
+            
+            let subItemsHtml = '';
+            if (item.subItems && item.subItems.length > 0) {
+                subItemsHtml = '<div class="sub-items">';
+                item.subItems.forEach(subItem => {
+                    let subThumbnailHtml = '';
+                    if (subItem.thumbnail) {
+                        subThumbnailHtml = `<img src="../${subItem.thumbnail}" class="sub-thumbnail" alt="${subItem.name}">`;
+                    }
+                    subItemsHtml += `
+                        <div class="sub-item">
+                            <a href="${subItem.link}" class="sub-link">
+                                ${subThumbnailHtml}
+                                <span class="sub-name">${subItem.name}</span>
+                            </a>
+                        </div>
+                    `;
+                });
+                subItemsHtml += '</div>';
+            }
+            
+            itemDiv.innerHTML = `
+                <div class="gallery-item-content">
+                    <a href="${item.link}" class="item-link">
+                        ${thumbnailHtml}
+                        <p><strong>${item.name}</strong></p>
+                    </a>
+                    ${subItemsHtml}
+                </div>
+            `;
+            
+            return itemDiv;
+        }
+        
         // 라이트박스 열기
-        function openLightbox() {
+        function openLightbox(imageSrc, imageTitle) {
             const lightbox = document.getElementById('lightbox');
             const img = lightbox.querySelector('.lum-img');
             
-            const currentImage = lightboxImages[currentImageIndex];
-            img.src = currentImage.src;
+            img.src = imageSrc;
+            img.alt = imageTitle;
             
             lightbox.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -135,20 +156,9 @@
             document.body.style.overflow = 'auto';
         }
         
-        // 라이트박스 이미지 업데이트
-        function updateLightboxImage() {
-            const img = document.querySelector('.lum-img');
-            const caption = document.querySelector('.lum-lightbox-caption');
-            
-            const currentImage = lightboxImages[currentImageIndex];
-            img.src = currentImage.src;
-
-            caption.textContent = currentImage.title;
-        }
-        
         // 이벤트 리스너 추가
         document.addEventListener('DOMContentLoaded', function() {
-            generateGallery();
+            loadGalleryData();
             
             // 라이트박스 이벤트
             document.querySelector('.lum-close-button').addEventListener('click', closeLightbox);

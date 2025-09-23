@@ -319,13 +319,17 @@ summary {
   }
 }
 
-#item2 #simple-gallery {
+#item2 {
   flex: 0 1 100%;
   order: 1;
+  margin-left: var(--margin-left);
+  max-width: 100%;
+}
+
+#item2 #simple-gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, var(--grid-item-min-width));
   gap: var(--grid-gap);
-  margin-left: var(--margin-left);
 }
 
 #about {
@@ -741,6 +745,106 @@ button:hover {
 }
 
 .card-link:hover {
+  background-color: #f0f0f0;
+}
+
+/* 갤러리 카테고리 스타일 */
+.gallery-category {
+  margin-bottom: 30px;
+  border: 2px solid #000;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.category-title {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: #000;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.category-link {
+  color: #000;
+  text-decoration: none;
+}
+
+.category-link:hover {
+  background-color: #000;
+  color: #fff;
+  padding: 2px 5px;
+}
+
+.category-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.gallery-item {
+  border: 1px solid #ccc;
+  padding: 15px;
+  background-color: #fff;
+  transition: all 0.3s;
+}
+
+.gallery-item:hover {
+  border-color: #000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.gallery-thumbnail {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.sub-items {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.sub-item {
+  margin: 5px 0;
+}
+
+.sub-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+}
+
+.sub-link:hover {
+  background-color: #f0f0f0;
+}
+
+.sub-thumbnail {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.sub-name {
+  font-size: 0.9rem;
+}
+
+.item-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.item-link:hover {
   background-color: #f0f0f0;
 }
 

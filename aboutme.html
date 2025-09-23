@@ -37,59 +37,52 @@
     </div>
     
     <script>
-        // 소개 카드 데이터
-        const aboutData = [
-            {
-                id: 'profile',
-                title: '프로필',
-                description: '웹 개발과 디자인을 좋아하는 사람입니다.',
-                category: 'profile',
-                icon: '👤'
-            },
-            {
-                id: 'skills',
-                title: '기술',
-                description: 'HTML, CSS, JavaScript, 웹 디자인',
-                category: 'skills',
-                icon: '💻'
-            },
-            {
-                id: 'interests',
-                title: '관심사',
-                description: '간단하고 깔끔한 디자인을 선호합니다.',
-                category: 'interests',
-                icon: '🎨'
-            },
-            {
-                id: 'contact',
-                title: '연락처',
-                description: '궁금한 것이 있으시면 언제든 연락해주세요!',
-                category: 'contact',
-                icon: '📧'
-            }
-        ];
+        let aboutData = null;
         
-        // 소개 카드 생성
-        function generateAboutCards() {
-            const container = document.getElementById('about-container');
+        // JSON 데이터 로드
+        async function loadAboutData() {
+            try {
+                const response = await fetch('./data/about-data.json');
+                aboutData = await response.json();
+                generateAboutContent();
+            } catch (error) {
+                console.error('소개 데이터 로드 실패:', error);
+            }
+        }
+        
+        // 소개 콘텐츠 생성
+        function generateAboutContent() {
+            const container = document.querySelector('.content');
+            let html = '';
             
-            aboutData.forEach((item) => {
-                const cardItem = document.createElement('div');
-                cardItem.className = 'gallery-item';
-                cardItem.innerHTML = `
-                    <div class="gallery-item-content">
-                        <div class="card-icon">${item.icon}</div>
-                        <p><strong>${item.title}</strong></p>
-                        <p>${item.description}</p>
-                    </div>
-                `;
-                container.appendChild(cardItem);
+            aboutData.sections.forEach(section => {
+                if (section.content) {
+                    html += `<p>${section.content.replace(/\n/g, '<br>')}</p>`;
+                }
+                if (section.cards) {
+                    html += `<h3>${section.title}</h3>`;
+                    html += `<div class="simple-gallery" id="about-container">`;
+                    section.cards.forEach(card => {
+                        html += `
+                            <div class="gallery-item">
+                                <div class="gallery-item-content">
+                                    <div class="card-icon">${card.icon}</div>
+                                    <p><strong>${card.title}</strong></p>
+                                    <p>${card.description}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
             });
+            
+            container.innerHTML = html;
         }
         
         // 이벤트 리스너 추가
         document.addEventListener('DOMContentLoaded', function() {
-            generateAboutCards();
+            loadAboutData();
         });
     </script>
 </body>

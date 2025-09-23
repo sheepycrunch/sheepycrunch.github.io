@@ -1,0 +1,41 @@
+{
+  "sections": [
+    {
+      "title": "자기소개",
+      "content": "안녕하세요! 저는 yuinoid / いど子입니다.\n여기는 yuinoid의 웹페이지 「100%health」입니다."
+    },
+    {
+      "title": "소개 카드",
+      "cards": [
+        {
+          "id": "profile",
+          "title": "프로필",
+          "description": "웹 개발과 디자인을 좋아하는 사람입니다.",
+          "category": "profile",
+          "icon": "👤"
+        },
+        {
+          "id": "skills",
+          "title": "기술",
+          "description": "HTML, CSS, JavaScript, 웹 디자인",
+          "category": "skills",
+          "icon": "💻"
+        },
+        {
+          "id": "interests",
+          "title": "관심사",
+          "description": "간단하고 깔끔한 디자인을 선호합니다.",
+          "category": "interests",
+          "icon": "🎨"
+        },
+        {
+          "id": "contact",
+          "title": "연락처",
+          "description": "궁금한 것이 있으시면 언제든 연락해주세요!",
+          "category": "contact",
+          "icon": "📧"
+        }
+      ]
+    }
+  ]
+}
