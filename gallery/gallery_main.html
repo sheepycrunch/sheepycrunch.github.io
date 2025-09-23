@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>낙서 - 100%health</title>
+    <link rel="stylesheet" href="../style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes">
+</head>
+<body class="centered">
+    <div id="wrapper">
+        <header id="header">
+            <div id="header-flex">
+                <nav id="back" aria-label="뒤로가기 네비게이션">
+                    <a id="backicon" href="../index.html">&lt;</a>
+                </nav>
+                <nav id="address" class="addressbar" aria-label="경로 네비게이션">
+                    <a class="addressbar" href="../index.html">100%health</a>&nbsp;/
+                    <a class="addressbar" href="gallery_main.html">낙서</a>
+                </nav>
+            </div>
+        </header>
+
+        <main id="main">
+            <div class="section">
+                <div class="content">
+                    <h3>그림 모음</h3>
+                    <p>간단한 낙서와 그림들을 모아둔 곳입니다.</p>
+                    
+                    <h3>최근 작품</h3>
+                    <div class="simple-gallery" id="gallery-container">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 라이트박스 -->
+    <div class="lum-lightbox" id="lightbox">
+        <div class="lum-lightbox-inner">
+            <div class="lum-lightbox-loader"></div>
+            <div class="lum-lightbox-image-wrapper">
+                <span class="lum-lightbox-position-helper">
+                    <img class="lum-img" src="" alt="">
+                </span>
+            </div>
+        </div>
+        <div class="lum-close-button"></div>
+    </div>
+    
+    <script>
+        // 이미지 데이터 (실제로는 서버에서 가져와야 함)
+        const imageData = [
+            {
+                id: 'sample1',
+                filename: 'sample1.jpg',
+                title: '샘플 작품 1',
+                description: '디지털 아트로 제작된 작품입니다.',
+                category: 'digital_art',
+                date: '2024-01-15'
+            },
+            {
+                id: 'sample2',
+                filename: 'sample2.jpg',
+                title: '샘플 작품 2',
+                description: '스케치 스타일로 그려진 작품입니다.',
+                category: 'sketch',
+                date: '2024-01-20'
+            },
+            {
+                id: 'sample3',
+                filename: 'sample3.jpg',
+                title: '샘플 작품 3',
+                description: '낙서 스타일의 작품입니다.',
+                category: 'doodle',
+                date: '2024-01-25'
+            }
+        ];
+        
+        // 라이트박스 관련 변수
+        let currentImageIndex = 0;
+        let lightboxImages = [];
+        
+        // 갤러리 생성
+        function generateGallery() {
+            const container = document.getElementById('gallery-container');
+            
+            imageData.forEach((image, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.innerHTML = `
+                    <div class="gallery-item-content" data-index="${index}">
+                        <img src="../img/${image.filename}" class="gallery-thumbnail">
+                        <p><strong>${image.title}</strong></p>
+                        <p>${image.description}</p>
+                        <p class="gallery-date">${image.date}</p>
+                    </div>
+                `;
+                container.appendChild(galleryItem);
+                
+                // 라이트박스용 이미지 데이터 저장
+                lightboxImages.push({
+                    src: `../img/${image.filename}`,
+                    title: image.title,
+                    description: image.description
+                });
+            });
+            
+            // 이미지 클릭 이벤트 추가
+            container.addEventListener('click', function(e) {
+                const galleryItem = e.target.closest('.gallery-item-content');
+                if (galleryItem) {
+                    currentImageIndex = parseInt(galleryItem.dataset.index);
+                    openLightbox();
+                }
+            });
+        }
+        
+        // 라이트박스 열기
+        function openLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const img = lightbox.querySelector('.lum-img');
+            
+            const currentImage = lightboxImages[currentImageIndex];
+            img.src = currentImage.src;
+            
+            lightbox.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 라이트박스 닫기
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // 라이트박스 이미지 업데이트
+        function updateLightboxImage() {
+            const img = document.querySelector('.lum-img');
+            const caption = document.querySelector('.lum-lightbox-caption');
+            
+            const currentImage = lightboxImages[currentImageIndex];
+            img.src = currentImage.src;
+
+            caption.textContent = currentImage.title;
+        }
+        
+        // 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            generateGallery();
+            
+            // 라이트박스 이벤트
+            document.querySelector('.lum-close-button').addEventListener('click', closeLightbox);
+            
+            // ESC 키로 닫기
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                }
+            });
+            
+            // 배경 클릭으로 닫기
+            document.getElementById('lightbox').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLightbox();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

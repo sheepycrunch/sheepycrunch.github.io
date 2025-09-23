@@ -1,13 +1,69 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not Found</title>
-    <link href="/style.css" rel="stylesheet" type="text/css" media="all">
-  </head>
-  <body>
-    <h1>Page Not Found</h1>
-    <p>The requested page was not found.</p>
-  </body>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>페이지를 찾을 수 없습니다 - 100%health</title>
+  <link href="style.css" rel="stylesheet" type="text/css" media="all">
+  <meta http-equiv="refresh" content="5;url=index.html">
+</head>
+<body>
+  <div id="wrapper">
+    <div id="flexrayout">
+      <div id="item1">
+        <h1 id="sitetitle" title="site title">100%health</h1>
+        <br>
+      </div>
+      <div id="item2">
+        <nav class="section" id="error" aria-label="오류 섹션">
+          <div class="highlight_logo">
+            <div class="highlight">
+              <h2><span title="error" lang="ko">오류</span> / <small>404 Not Found</small></h2>
+            </div>
+          </div>
+          <div id="errorcontent">
+            <h3>페이지를 찾을 수 없습니다</h3>
+            <p>요청하신 페이지가 존재하지 않거나 이동되었습니다.</p>
+            <p>5초 후 자동으로 메인 페이지로 이동합니다.</p>
+            <p><a href="index.html">메인 페이지로 바로 이동</a></p>
+            
+            <h3>사용 가능한 페이지</h3>
+            <ul>
+              <li><a href="aboutme.html">소개</a></li>
+              <li><a href="txt/txt_main.html">글</a></li>
+              <li><a href="gallery/gallery_main.html">낙서</a></li>
+              <li><a href="archive/archive_main.html">아카이브</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 5초 후 자동 리디렉션
+    setTimeout(function() {
+      window.location.href = 'index.html';
+    }, 5000);
+    
+    // 카운트다운 표시
+    let countdown = 5;
+    const countdownElement = document.createElement('p');
+    countdownElement.id = 'countdown';
+    countdownElement.style.fontWeight = 'bold';
+    countdownElement.style.color = '#000';
+    countdownElement.style.backgroundColor = '#fff';
+    countdownElement.style.padding = '5px';
+    countdownElement.style.display = 'inline-block';
+    document.getElementById('errorcontent').appendChild(countdownElement);
+    
+    const countdownInterval = setInterval(function() {
+      countdown--;
+      countdownElement.textContent = countdown + '초 후 메인 페이지로 이동합니다...';
+      if (countdown <= 0) {
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+  </script>
+</body>
 </html>

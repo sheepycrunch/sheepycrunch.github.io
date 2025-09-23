@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>아카이브 - 100%health</title>
+    <link rel="stylesheet" href="../style.css">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes">
+</head>
+<body class="centered">
+    <div id="wrapper">
+        <header id="header">
+            <div id="header-flex">
+                <nav id="back" aria-label="뒤로가기 네비게이션">
+                    <a id="backicon" href="../index.html">&lt;</a>
+                </nav>
+                <nav id="address" class="addressbar" aria-label="경로 네비게이션">
+                    <a class="addressbar" href="../index.html">100%health</a>&nbsp;/
+                    <a class="addressbar" href="archive_main.html">아카이브</a>
+                </nav>
+            </div>
+        </header>
+
+        <main id="main">
+            <div class="section">
+                <div class="content">
+                    <h3>과거 자료</h3>
+                    <p>이전에 작성한 글들과 자료들을 모아둔 곳입니다.</p>
+                    
+                    <h3>연도별 아카이브</h3>
+                    <div class="simple-gallery" id="yearly-container">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                    
+                    <h3>카테고리별 아카이브</h3>
+                    <div class="simple-gallery" id="category-container">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 연도별 아카이브 데이터
+        const yearlyData = [
+            {
+                id: 'archive2024',
+                title: '2024년',
+                description: '2024년에 작성한 모든 자료들입니다.',
+                category: 'yearly',
+                date: '2024-12-31',
+                link: 'archive_2024.html',
+                icon: '📅'
+            },
+            {
+                id: 'archive2023',
+                title: '2023년',
+                description: '2023년에 작성한 모든 자료들입니다.',
+                category: 'yearly',
+                date: '2023-12-31',
+                link: 'archive_2023.html',
+                icon: '📅'
+            },
+            {
+                id: 'archive2022',
+                title: '2022년',
+                description: '2022년에 작성한 모든 자료들입니다.',
+                category: 'yearly',
+                date: '2022-12-31',
+                link: 'archive_2022.html',
+                icon: '📅'
+            }
+        ];
+        
+        // 카테고리별 아카이브 데이터
+        const categoryData = [
+            {
+                id: 'projects',
+                title: '이전 프로젝트',
+                description: '과거에 진행했던 프로젝트들의 모음입니다.',
+                category: 'projects',
+                date: '2024-01-01',
+                link: 'old_projects.html',
+                icon: '💻'
+            },
+            {
+                id: 'writings',
+                title: '이전 글들',
+                description: '과거에 작성했던 글들의 모음입니다.',
+                category: 'writings',
+                date: '2024-01-01',
+                link: 'old_writings.html',
+                icon: '📝'
+            },
+            {
+                id: 'artworks',
+                title: '이전 작품들',
+                description: '과거에 제작했던 작품들의 모음입니다.',
+                category: 'artworks',
+                date: '2024-01-01',
+                link: 'old_artworks.html',
+                icon: '🎨'
+            }
+        ];
+        
+        // 연도별 카드 생성
+        function generateYearlyCards() {
+            const container = document.getElementById('yearly-container');
+            
+            yearlyData.forEach((item) => {
+                const cardItem = document.createElement('div');
+                cardItem.className = 'gallery-item';
+                cardItem.innerHTML = `
+                    <div class="gallery-item-content">
+                        <a href="${item.link}" class="card-link">
+                            <div class="card-icon">${item.icon}</div>
+                            <p><strong>${item.title}</strong></p>
+                            <p>${item.description}</p>
+                            <p class="gallery-date">${item.date}</p>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(cardItem);
+            });
+        }
+        
+        // 카테고리별 카드 생성
+        function generateCategoryCards() {
+            const container = document.getElementById('category-container');
+            
+            categoryData.forEach((item) => {
+                const cardItem = document.createElement('div');
+                cardItem.className = 'gallery-item';
+                cardItem.innerHTML = `
+                    <div class="gallery-item-content">
+                        <a href="${item.link}" class="card-link">
+                            <div class="card-icon">${item.icon}</div>
+                            <p><strong>${item.title}</strong></p>
+                            <p>${item.description}</p>
+                            <p class="gallery-date">${item.date}</p>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(cardItem);
+            });
+        }
+        
+        // 이벤트 리스너 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            generateYearlyCards();
+            generateCategoryCards();
+        });
+    </script>
+</body>
+</html>
