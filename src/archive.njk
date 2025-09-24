@@ -1,111 +1,35 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.sections.siteInfo | t(lang) }}"
-description: "{{ i18n_kr.sections.siteInfo | t(lang) }}"
+title: "{{ i18n_kr.archive.title | t(lang) }}"
+description: "{{ i18n_kr.archive.description | t(lang) }}"
 lang: "kr"
 ---
 
 <section>
-  <h1>{{ i18n_kr.sections.siteInfo | t(lang) }}</h1>
-  <p>{{ i18n_kr.aboutSite.text1 | t(lang) }}</p>
+  <h1>{{ i18n_kr.archive.title | t(lang) }}</h1>
   
-  <div class="archive-timeline">
-    {% for timeline in archive.timeline %}
-    <div class="timeline-item">
-      <div class="timeline-date">{{ timeline.year }}년 {{ timeline.month }}월</div>
-      <div class="timeline-content">
-        <h3>{{ timeline.month }}월 {{ timeline.date }}일</h3>
-        <ul>
-          {% for event in timeline.events %}
-          <li>
-            {% if event.url %}
-            <a href="{{ event.url }}">{{ event.description }}</a>
-            {% else %}
-            {{ event.description }}
-            {% endif %}
-            <span class="event-type">{{ event.type }}</span>
-          </li>
-          {% endfor %}
-        </ul>
+  <div class="archive-list">
+    {% for item in posts.posts %}
+      {% if item.category == "archive" %}
+      <div class="archive-item">
+        <div class="archive-thumbnail">
+          {% if item.image %}
+          <img src="{{ item.image }}" alt="{{ item.description }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          {% endif %}
+          <div class="thumbnail-placeholder" {% if item.image %}style="display: none;"{% endif %}>
+          </div>
+        </div>
+        <div class="archive-content">
+          <h3><a href="{{ item.description }}" class="archive-title-link" target="_blank">{{ item.description }}</a></h3>
+          <div class="archive-tags">
+            {% for tag in item.tags %}
+            <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
+            {% endfor %}
+          </div>
+        </div>
       </div>
-    </div>
+      {% endif %}
     {% endfor %}
   </div>
 </section>
 
-<style>
-.archive-timeline {
-  margin-top: var(--spacing-xl);
-  position: relative;
-  padding-left: var(--spacing-xl);
-}
-
-.archive-timeline::before {
-  content: '';
-  position: absolute;
-  left: var(--spacing-lg);
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--border-light);
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: var(--spacing-3xl);
-  padding-left: var(--spacing-xl);
-}
-
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  left: -var(--spacing-lg);
-  top: var(--spacing-sm);
-  width: 12px;
-  height: 12px;
-  background: var(--accent-primary);
-  border-radius: 50%;
-  border: 3px solid var(--bg-primary);
-}
-
-.timeline-date {
-  font-weight: bold;
-  color: var(--accent-primary);
-  margin-bottom: var(--spacing-sm);
-  font-size: var(--font-size-large);
-}
-
-.timeline-content h3 {
-  margin: 0 0 var(--spacing-sm) 0;
-  color: var(--text-primary);
-  font-size: var(--font-size-base);
-}
-
-.timeline-content ul {
-  margin: 0;
-  padding-left: var(--spacing-lg);
-}
-
-.timeline-content li {
-  margin-bottom: var(--spacing-xs);
-  color: var(--text-secondary);
-}
-
-.timeline-content a {
-  color: var(--accent-primary);
-  text-decoration: none;
-}
-
-.timeline-content a:hover {
-  color: var(--accent-secondary);
-}
-
-.event-type {
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-small);
-  margin-left: var(--spacing-sm);
-}
-</style>

@@ -74,7 +74,7 @@ class AdminPanel {
         width: 300px;
         background: #fff;
         border: 2px solid #425fb6;
-        border-radius: 8px;
+        border-radius: var(--border-radius-sm);
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         z-index: 10000;
         font-family: '맑은 고딕', sans-serif;
@@ -88,7 +88,7 @@ class AdminPanel {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-radius: 6px 6px 0 0;
+        border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
       }
       
       .admin-header h3 {
@@ -138,10 +138,10 @@ class AdminPanel {
         padding: 8px 12px;
         background: #f8f9fa;
         border: 1px solid #ddd;
-        border-radius: 4px;
+        border-radius: var(--border-radius-sm);
         cursor: pointer;
         font-size: 12px;
-        transition: all 0.2s ease;
+        transition: var(--transition-fast);
       }
       
       .admin-section button:hover {
@@ -156,7 +156,7 @@ class AdminPanel {
       #current-stats {
         background: #f8f9fa;
         padding: 10px;
-        border-radius: 4px;
+        border-radius: var(--border-radius-sm);
         font-family: monospace;
         font-size: 12px;
         white-space: pre-wrap;
@@ -463,7 +463,7 @@ class AdminPanel {
           <div class="form-group">
             <label for="post-category">카테고리</label>
             <select id="post-category">
-              <option value="posts">일반 글 (txt)</option>
+              <option value="posts">일반</option>
               <option value="gallery">갤러리</option>
               <option value="archive">아카이브</option>
             </select>
@@ -527,7 +527,7 @@ class AdminPanel {
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         border-left: none;
         border-right: none;
-        border-radius: 0;
+        border-radius: var(--border-radius-sm);
         z-index: 10001;
         font-family: var(--font-family-base);
         font-size: var(--font-size-base);
@@ -543,7 +543,7 @@ class AdminPanel {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-radius: 0;
+        border-radius: var(--border-radius-sm);
       }
       
       .writer-header h3 {
@@ -1091,7 +1091,7 @@ eleventyExcludeFromCollections: false
     .post-meta { font-size: 12px; color: #666; margin-bottom: 10px; }
     .post-content { line-height: 1.6; }
     .tags { margin-top: 10px; }
-    .tag { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-right: 5px; }
+    .tag { background: #f0f0f0; padding: 2px 6px; border-radius: var(--border-radius-sm); font-size: 11px; margin-right: 5px; }
   </style>
 </head>
 <body>

@@ -1,0 +1,631 @@
+---
+layout: layout.njk
+title: "{{ i18n_kr.sections.write | t(lang) }}"
+description: "{{ i18n_kr.sections.write | t(lang) }}"
+lang: "kr"
+---
+
+<section>
+  <h1>{{ i18n_kr.write.title | t(lang) }}</h1>
+  
+  <div class="write-container">
+    <div id="i18n-data" style="display: none;">{{ i18n_kr | dump | safe }}</div>
+    <div class="write-form">
+      <div class="form-group">
+        <label for="post-category">{{ i18n_kr.write.form.category | t(lang) }}</label>
+        <select id="post-category" class="form-input">
+          <option value="txt">{{ i18n_kr.write.categories.txt | t(lang) }}</option>
+          <option value="gallery">{{ i18n_kr.write.categories.gallery | t(lang) }}</option>
+          <option value="archive">{{ i18n_kr.write.categories.archive | t(lang) }}</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="post-image">{{ i18n_kr.write.form.image | t(lang) }}</label>
+        <div class="image-upload-area" id="image-upload-area">
+          <div class="upload-method" id="file-upload-method">
+            <div class="drag-drop-zone" id="drag-drop-zone">
+              <p>{{ i18n_kr.write.placeholders.dragDrop | t(lang) }}</p>
+              <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
+            </div>
+          </div>
+          
+          <div class="image-preview" id="image-preview" style="display: none;">
+            <div class="image-container">
+              <div class="image-crop-container">
+                <img id="preview-img" src="" alt="{{ i18n_kr.write.preview.title | t(lang) }}" />
+                <div class="crop-overlay" id="crop-overlay"></div>
+              </div>
+            </div>
+            <button type="button" id="remove-image">{{ i18n_kr.write.form.removeImage | t(lang) }}</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="post-content">{{ i18n_kr.write.form.content | t(lang) }}</label>
+        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n_kr.write.placeholders.content | t(lang) }}" rows="10"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="post-tags">{{ i18n_kr.write.form.tags | t(lang) }}</label>
+        <input type="text" id="post-tags" class="form-input" placeholder="{{ i18n_kr.write.placeholders.tags | t(lang) }}" />
+        <div class="tag-suggestions" id="tag-suggestions"></div>
+      </div>
+      
+      <div class="writer-actions">
+        <button id="save-draft-writer" class="button secondary">{{ i18n_kr.write.form.saveDraft | t(lang) }}</button>
+        <button id="load-draft-writer" class="button secondary">{{ i18n_kr.write.form.loadDraft | t(lang) }}</button>
+        <button id="save-post" class="button">{{ i18n_kr.write.form.save | t(lang) }}</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+// i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
+const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
+
+// 이미지 업로드 기능 (admin-panel.js 스타일)
+function setupImageUpload() {
+  const dragDropZone = document.getElementById('drag-drop-zone');
+  const fileInput = document.getElementById('image-file-input');
+  const imagePreview = document.getElementById('image-preview');
+  const previewImg = document.getElementById('preview-img');
+  const removeImageBtn = document.getElementById('remove-image');
+  const fileUploadMethod = document.getElementById('file-upload-method');
+  
+  // 드래그앤드랍 이벤트 (admin-panel.js 스타일)
+  dragDropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dragDropZone.classList.add('dragover');
+  });
+  
+  dragDropZone.addEventListener('dragleave', () => {
+    dragDropZone.classList.remove('dragover');
+  });
+  
+  dragDropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragDropZone.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type.startsWith('image/')) {
+      handleImageFile(files[0]);
+    }
+  });
+  
+  // 클릭으로 파일 선택
+  dragDropZone.addEventListener('click', () => {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+      handleImageFile(e.target.files[0]);
+    }
+  });
+  
+  // 이미지 제거
+  removeImageBtn.addEventListener('click', () => {
+    imagePreview.style.display = 'none';
+    fileUploadMethod.style.display = 'block';
+    previewImg.src = '';
+    fileInput.value = '';
+    // 이미지 제거 시 미리보기 업데이트
+    updatePreview();
+  });
+  
+  function handleImageFile(file) {
+    if (!file.type.startsWith('image/')) {
+      alert(i18nData.write.messages.imageOnly);
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Data URL로 설정
+      previewImg.src = e.target.result;
+      imagePreview.style.display = 'block';
+      fileUploadMethod.style.display = 'none';
+      // 카테고리에 맞게 이미지 크롭 적용
+      applyImageCrop();
+      // 이미지 로드 후 드래그 기능 설정
+      setTimeout(() => {
+        setupImageDrag();
+      }, 100);
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  
+}
+
+// 카테고리에 맞게 이미지 크롭 적용
+function applyImageCrop() {
+  const category = document.getElementById('post-category').value;
+  const previewImg = document.getElementById('preview-img');
+  
+  if (!previewImg.src) return;
+  
+  // 기존 스타일 초기화
+  previewImg.style.objectFit = '';
+  previewImg.style.objectPosition = '';
+  previewImg.style.aspectRatio = '';
+  previewImg.style.width = '';
+  previewImg.style.height = '';
+  
+  switch(category) {
+    case 'gallery':
+      // 갤러리: 정사각형 크롭 (실제 갤러리와 동일)
+      previewImg.style.objectFit = 'cover';
+      previewImg.style.objectPosition = '50% 50%';
+      previewImg.style.aspectRatio = '1 / 1';
+      previewImg.style.width = '200px';
+      previewImg.style.height = '200px';
+      break;
+    case 'txt':
+      // 일반: 가로형 크롭 (실제 txt 포스트와 동일)
+      previewImg.style.objectFit = 'cover';
+      previewImg.style.objectPosition = '50% 50%';
+      previewImg.style.aspectRatio = '3 / 2';
+      previewImg.style.width = '300px';
+      previewImg.style.height = '200px';
+      break;
+    case 'archive':
+      // 아카이브: 썸네일 크롭 (실제 아카이브와 동일)
+      previewImg.style.objectFit = 'cover';
+      previewImg.style.objectPosition = '50% 50%';
+      previewImg.style.aspectRatio = '4 / 3';
+      previewImg.style.width = '120px';
+      previewImg.style.height = '90px';
+      break;
+  }
+  
+  console.log('이미지 크롭 적용:', category, previewImg.style.objectPosition);
+  
+  // 드래그 기능 설정
+  setupImageDrag();
+  
+  // 드래그 오버레이 텍스트 설정
+  const cropOverlay = document.getElementById('crop-overlay');
+  if (cropOverlay) {
+    cropOverlay.setAttribute('data-text', i18nData.write.messages.dragToCrop);
+  }
+}
+
+// 이미지 드래그로 크롭 위치 조정
+function setupImageDrag() {
+  const previewImg = document.getElementById('preview-img');
+  const cropOverlay = document.getElementById('crop-overlay');
+  
+  if (!previewImg.src) return;
+  
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startObjectPosition = '';
+  
+  function startDrag(e) {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startObjectPosition = previewImg.style.objectPosition || '50% 50%';
+    
+    // 드래그 중 클래스 추가
+    cropOverlay.classList.add('dragging');
+    
+    console.log('드래그 시작:', startObjectPosition);
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  function drag(e) {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    // 현재 object-position 파싱
+    const [currentX, currentY] = startObjectPosition.split(' ').map(p => parseFloat(p.replace('%', '')));
+    
+    // 드래그 감도 조정 (방향 반대로)
+    const sensitivity = 0.4;
+    const newX = currentX - (deltaX * sensitivity);
+    const newY = currentY - (deltaY * sensitivity);
+    
+    // 범위 제한 (0% ~ 100%)
+    const clampedX = Math.max(0, Math.min(100, newX));
+    const clampedY = Math.max(0, Math.min(100, newY));
+    
+    const newPosition = `${clampedX}% ${clampedY}%`;
+    previewImg.style.objectPosition = newPosition;
+    
+    console.log('드래그 중:', newPosition);
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  function stopDrag() {
+    isDragging = false;
+    
+    // 드래그 중 클래스 제거
+    cropOverlay.classList.remove('dragging');
+    
+    console.log('드래그 종료:', previewImg.style.objectPosition);
+  }
+  
+  // 기존 이벤트 리스너 제거
+  cropOverlay.removeEventListener('mousedown', startDrag);
+  document.removeEventListener('mousemove', drag);
+  document.removeEventListener('mouseup', stopDrag);
+  
+  // 새로운 이벤트 리스너 설정
+  cropOverlay.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', stopDrag);
+  
+  // 터치 이벤트도 추가
+  cropOverlay.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startDrag(e.touches[0]);
+  });
+  
+  document.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    drag(e.touches[0]);
+  });
+  
+  document.addEventListener('touchend', stopDrag);
+}
+
+// 임시저장 기능 (admin-panel.js 스타일)
+function saveDraft() {
+  const content = document.getElementById('post-content').value;
+  const tags = document.getElementById('post-tags').value;
+  const category = document.getElementById('post-category').value;
+  
+  // 이미지 URL 가져오기 (미리보기에서)
+  const previewImg = document.getElementById('preview-img');
+  const image = previewImg && previewImg.src ? previewImg.src : '';
+  
+  const draft = { 
+    content, 
+    tags, 
+    image, 
+    category,
+    savedAt: new Date().toISOString() 
+  };
+  
+  localStorage.setItem('write-draft', JSON.stringify(draft));
+  showTopMessage(i18nData.write.messages.draftSaved);
+}
+
+// 임시저장 불러오기 (admin-panel.js 스타일)
+function loadDraft() {
+  const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
+  
+  if (draft.content) {
+    document.getElementById('post-content').value = draft.content || '';
+    document.getElementById('post-tags').value = draft.tags || '';
+    document.getElementById('post-category').value = draft.category || 'txt';
+    
+    // 이미지 복원
+    if (draft.image) {
+      const imagePreview = document.getElementById('image-preview');
+      const previewImg = document.getElementById('preview-img');
+      const fileUploadMethod = document.getElementById('file-upload-method');
+      
+      previewImg.src = draft.image;
+      imagePreview.style.display = 'block';
+      fileUploadMethod.style.display = 'none';
+      // 이미지 크롭 적용
+      applyImageCrop();
+    }
+    
+    // 임시저장 불러오기 후 드래그 기능 설정
+    setTimeout(() => {
+      setupImageDrag();
+    }, 100);
+    
+    // 상단 메시지 표시
+    showTopMessage(i18nData.write.messages.draftLoaded);
+  } else {
+    alert(i18nData.write.messages.noDraft);
+  }
+}
+
+// 태그 제안 기능 (기존 태그에서 추출)
+function setupTagSuggestions() {
+  const tagInput = document.getElementById('post-tags');
+  const suggestions = document.getElementById('tag-suggestions');
+  
+  // 기존 포스트에서 모든 태그 추출
+  function getAllExistingTags() {
+    const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    const allTags = new Set();
+    
+    console.log('전체 포스트 데이터:', posts);
+    
+    posts.forEach(post => {
+      console.log('포스트 태그:', post.tags, '타입:', typeof post.tags);
+      if (post.tags) {
+        if (Array.isArray(post.tags)) {
+          // 배열인 경우
+          post.tags.forEach(tag => {
+            if (tag && tag.trim()) {
+              allTags.add(tag.trim());
+            }
+          });
+        } else if (typeof post.tags === 'string') {
+          // 문자열인 경우 (쉼표로 구분)
+          const tags = post.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+          tags.forEach(tag => allTags.add(tag));
+        }
+      }
+    });
+    
+    console.log('추출된 태그들:', Array.from(allTags));
+    return Array.from(allTags);
+  }
+  
+  // 기존 태그 표시
+  function showExistingTags() {
+    const existingTags = getAllExistingTags();
+    if (existingTags.length > 0) {
+      suggestions.innerHTML = `
+        <div class="existing-tags-list">
+          ${existingTags.map(tag => 
+            `<span class="tag-button" onclick="addTag('${tag}')">${tag}</span>`
+          ).join('')}
+        </div>
+      `;
+      suggestions.style.display = 'block';
+    } else {
+      suggestions.innerHTML = `
+        <div class="existing-tags-title">${i18nData.write.messages.existingTags}</div>
+        <div class="no-results">${i18nData.write.messages.noTagsAvailable}</div>
+      `;
+      suggestions.style.display = 'block';
+    }
+  }
+  
+  // 초기 로드 시 기존 태그 표시 (항상 보이도록)
+  showExistingTags();
+  
+  tagInput.addEventListener('input', () => {
+    const value = tagInput.value.toLowerCase();
+    const existingTags = getAllExistingTags();
+    const currentTags = tagInput.value.split(',').map(t => t.trim()).filter(t => t);
+    
+    if (value.length > 0) {
+      const filteredTags = existingTags.filter(tag => 
+        tag.toLowerCase().includes(value) && !currentTags.includes(tag)
+      );
+      
+      if (filteredTags.length > 0) {
+        suggestions.innerHTML = `
+          <div class="filtered-tags-title">${i18nData.write.messages.searchResults}</div>
+          <div class="filtered-tags-list">
+            ${filteredTags.slice(0, 10).map(tag => 
+              `<span class="tag-button" onclick="addTag('${tag}')">${tag}</span>`
+            ).join('')}
+          </div>
+        `;
+        suggestions.style.display = 'block';
+      } else {
+        suggestions.innerHTML = `<div class="no-results">${i18nData.write.messages.noResults}</div>`;
+        suggestions.style.display = 'block';
+      }
+    } else {
+      showExistingTags();
+    }
+  });
+  
+  // 포커스 시 기존 태그 다시 표시
+  tagInput.addEventListener('focus', () => {
+    showExistingTags();
+  });
+}
+
+function addTag(tag) {
+  const tagInput = document.getElementById('post-tags');
+  const currentTags = tagInput.value.split(',').map(t => t.trim()).filter(t => t);
+  
+  if (!currentTags.includes(tag)) {
+    currentTags.push(tag);
+    tagInput.value = currentTags.join(', ');
+  }
+  
+  document.getElementById('tag-suggestions').style.display = 'none';
+  tagInput.focus();
+}
+
+
+function savePost() {
+  const category = document.getElementById('post-category').value;
+  const content = document.getElementById('post-content').value;
+  const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+  const imageSrc = document.getElementById('preview-img').src;
+  
+  if (!content.trim()) {
+    alert(i18nData.write.messages.noContent);
+    return;
+  }
+  
+  // 실제로는 서버에 저장해야 함
+  const newPost = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.').replace(/\s/g, ''),
+    category: category,
+    image: imageSrc || null,
+    description: content,
+    tags: tags
+  };
+  
+  console.log('새 포스트:', newPost);
+  alert(i18nData.write.messages.saveSuccess);
+}
+
+function clearForm() {
+  document.getElementById('post-category').value = 'txt';
+  document.getElementById('post-content').value = '';
+  document.getElementById('post-tags').value = '';
+  
+  // 이미지 관련 초기화
+  document.getElementById('image-preview').style.display = 'none';
+  document.getElementById('file-upload-method').style.display = 'block';
+  document.getElementById('image-file-input').value = '';
+  document.getElementById('preview-img').src = '';
+}
+
+// 카테고리 동적 로드
+function loadCategories() {
+  const categorySelect = document.getElementById('post-category');
+  const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+  
+  // 기존 카테고리 추출
+  const existingCategories = new Set();
+  posts.forEach(post => {
+    if (post.category) {
+      existingCategories.add(post.category);
+    }
+  });
+  
+  // 기본 카테고리와 기존 카테고리 결합
+  const allCategories = [
+    { value: 'txt', label: i18nData.write.categories.txt },
+    { value: 'gallery', label: i18nData.write.categories.gallery },
+    { value: 'archive', label: i18nData.write.categories.archive }
+  ];
+  
+  // 기존 카테고리 추가 (중복 제거)
+  Array.from(existingCategories).forEach(category => {
+    if (!allCategories.find(cat => cat.value === category)) {
+      const label = category === 'gallery' ? i18nData.write.categories.gallery : 
+                   category === 'archive' ? i18nData.write.categories.archive : 
+                   category === 'txt' ? i18nData.write.categories.txt : "";
+      
+      // 빈 라벨이 아닌 경우만 추가
+      if (label !== "") {
+        allCategories.push({ value: category, label: label });
+      }
+    }
+  });
+  
+  // 셀렉트 옵션 업데이트
+  categorySelect.innerHTML = allCategories.map(cat => 
+    `<option value="${cat.value}">${cat.label}</option>`
+  ).join('');
+}
+
+// 상단 메시지 표시
+function showTopMessage(message) {
+  // 기존 메시지 제거
+  const existingMessage = document.getElementById('top-message');
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+  
+  // 새 메시지 생성
+  const messageDiv = document.createElement('div');
+  messageDiv.id = 'top-message';
+  messageDiv.textContent = message;
+  
+  // body 맨 앞에 추가
+  document.body.insertBefore(messageDiv, document.body.firstChild);
+  
+  // 트랜지션을 위해 약간의 지연 후 show 클래스 추가
+  setTimeout(() => {
+    messageDiv.classList.add('show');
+  }, 10);
+  
+  // 1초 후 사라지는 애니메이션 시작
+  setTimeout(() => {
+    if (messageDiv.parentNode) {
+      messageDiv.classList.remove('show');
+      
+      // 트랜지션 완료 후 제거
+      setTimeout(() => {
+        if (messageDiv.parentNode) {
+          messageDiv.remove();
+        }
+      }, 300);
+    }
+  }, 2000);
+}
+
+// 자동 저장 기능 (1분 단위)
+function setupAutoSave() {
+  let autoSaveInterval;
+  
+  // 1분마다 자동 저장 (알림 없음)
+  autoSaveInterval = setInterval(() => {
+    const content = document.getElementById('post-content').value;
+    if (content.trim()) {
+      saveDraft();
+      // 알림 없이 조용히 저장
+    }
+  }, 60000); // 1분 = 60000ms
+}
+
+// 이벤트 리스너 설정
+document.addEventListener('DOMContentLoaded', function() {
+  // 카테고리 로드
+  loadCategories();
+  
+  // 이미지 업로드 설정
+  setupImageUpload();
+  
+  // 태그 제안 설정
+  setupTagSuggestions();
+  
+  // 자동 저장 설정
+  setupAutoSave();
+  
+  // 버튼 이벤트 연결
+  document.getElementById('save-draft-writer').addEventListener('click', saveDraft);
+  document.getElementById('load-draft-writer').addEventListener('click', loadDraft);
+  document.getElementById('save-post').addEventListener('click', savePost);
+  
+  // 카테고리 변경 이벤트
+  const categorySelect = document.getElementById('post-category');
+  
+  categorySelect.addEventListener('change', () => {
+    // 카테고리 변경 시 이미지 크롭 적용
+    if (document.getElementById('preview-img').src) {
+      applyImageCrop();
+    }
+  });
+  
+  // 페이지 로드 시 임시저장 자동 불러오기
+  const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
+  if (draft.content) {
+    loadDraft();
+  }
+  
+  // 텍스트 영역 자동 크기 조정
+  setupTextareaAutoResize();
+});
+
+// 텍스트 영역 자동 크기 조정 함수
+function setupTextareaAutoResize() {
+  const textarea = document.getElementById('post-content');
+  if (!textarea) return;
+  
+  function autoResize() {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+  
+  // 초기 크기 설정
+  autoResize();
+  
+  // 입력 시마다 크기 조정
+  textarea.addEventListener('input', autoResize);
+  textarea.addEventListener('paste', () => {
+    setTimeout(autoResize, 10);
+  });
+}
+</script>

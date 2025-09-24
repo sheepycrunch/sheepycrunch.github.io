@@ -45,9 +45,8 @@ lang: "kr"
     {% for nav in i18n_kr.navigation %}
     <li>
       <a href="{{ nav.url | localizedUrl(lang) }}" class="text-button">
-        {% if ".title" in nav.name %}
-          {% set categoryKey = nav.name | replace(".title", "") %}
-          {{ i18n_kr[categoryKey].title | t(lang) }}
+        {% if nav.name contains ".title" %}
+          {{ i18n_kr[nav.name] | t(lang) }}
         {% else %}
           {{ nav.name }}
         {% endif %}

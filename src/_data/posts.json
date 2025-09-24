@@ -1,3 +1,28 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "id": 1,
+      "date": "2024.12.19",
+      "category": "gallery",
+      "image": "/images/art1.jpg",
+      "description": "첫 번째 디지털 아트 작품입니다.",
+      "tags": ["digital", "art", "first"]
+    },
+    {
+      "id": 2,
+      "date": "2024.12.18",
+      "category": "txt",
+      "image": "/images/sketch1.jpg",
+      "description": "두 번째 스케치 작품입니다.",
+      "tags": ["sketch", "second"]
+    },
+    {
+      "id": 3,
+      "date": "2024.12.17",
+      "category": "archive",
+      "image": "/images/color1.jpg",
+      "description": "example.com",
+      "tags": ["coloring", "third"]
+    }
+  ]
 }

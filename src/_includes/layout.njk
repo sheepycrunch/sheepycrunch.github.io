@@ -7,7 +7,6 @@
   <link rel="icon" href="neocities.png">
   <link href="/css/reset.css" rel="stylesheet" type="text/css" media="all">
   <link href="/style.css" rel="stylesheet" type="text/css" media="all">
-  <link href="/index.css" rel="stylesheet" type="text/css" media="all">
   {% if description %}
   <meta name="description" content="{{ description }}">
   {% endif %}
@@ -52,5 +51,13 @@
   <script>{{ script | safe }}</script>
   {% endfor %}
   {% endif %}
+  
+  <script>
+  // 공통 태그 검색 함수
+  function searchByTag(tag) {
+    // 검색 페이지로 이동하여 해당 태그로 검색
+    window.location.href = '/search/?tag=' + encodeURIComponent(tag);
+  }
+  </script>
 </body>
 </html>

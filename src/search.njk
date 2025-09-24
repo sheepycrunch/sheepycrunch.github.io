@@ -1,0 +1,97 @@
+---
+layout: layout.njk
+title: "{{ i18n_kr.sections.search | t(lang) }}"
+description: "{{ i18n_kr.sections.search | t(lang) }}"
+lang: "kr"
+---
+
+<section>
+  <h1>{{ i18n_kr.sections.search | t(lang) }}</h1>
+  
+  <div class="search-controls">
+    <input type="text" id="searchInput" placeholder="{{ i18n_kr.search.placeholder | t(lang) }}" class="search-input">
+    <button onclick="clearSearch()" class="clear-button">{{ i18n_kr.search.clearButton | t(lang) }}</button>
+  </div>
+  
+  <div class="search-results" id="searchResults">
+    <!-- 검색 결과가 여기에 표시됩니다 -->
+  </div>
+</section>
+
+
+<script>
+// 포스트 데이터를 JSON으로 출력
+const postsData = {{ posts.posts | dump | safe }};
+// i18n 데이터를 JSON으로 출력
+const i18nData = {{ i18n_kr | dump | safe }};
+
+let currentSearchTerm = '';
+
+function searchPosts() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  currentSearchTerm = searchTerm;
+  const results = postsData.filter(post => {
+    const description = post.description.toLowerCase();
+    const tags = post.tags.join(' ').toLowerCase();
+    return description.includes(searchTerm) || tags.includes(searchTerm);
+  });
+  
+  displayResults(results);
+}
+
+function searchByTag(tag) {
+  document.getElementById('searchInput').value = tag;
+  searchPosts();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  currentSearchTerm = '';
+  displayResults(postsData);
+}
+
+function displayResults(results) {
+  const container = document.getElementById('searchResults');
+  
+  if (results.length === 0) {
+    container.innerHTML = '<div class="no-results">' + i18nData.search.noResults + '</div>';
+    return;
+  }
+  
+  container.innerHTML = results.map(post => `
+    <div class="search-item">
+      <div class="search-thumbnail">
+        ${post.image ? `<img src="${post.image}" alt="${post.description}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+        <div class="thumbnail-placeholder" ${post.image ? 'style="display: none;"' : ''}>
+        </div>
+      </div>
+      <div class="search-content">
+        <div class="search-description">${post.description}</div>
+        <div class="search-tags">
+          ${post.tags.map(tag => `<button class="tag-button" onclick="searchByTag('${tag}')">#${tag}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// URL 파라미터에서 태그 가져오기
+function getTagFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('tag');
+}
+
+// 초기 로드 시 모든 포스트 표시
+document.addEventListener('DOMContentLoaded', function() {
+  const tagFromURL = getTagFromURL();
+  if (tagFromURL) {
+    document.getElementById('searchInput').value = tagFromURL;
+    searchPosts();
+  } else {
+    displayResults(postsData);
+  }
+  
+  // 검색 입력 이벤트 리스너
+  document.getElementById('searchInput').addEventListener('input', searchPosts);
+});
+</script>

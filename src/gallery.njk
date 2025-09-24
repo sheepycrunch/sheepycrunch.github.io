@@ -1,110 +1,37 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.sections.content | t(lang) }}"
-description: "{{ i18n_kr.sections.content | t(lang) }}"
+title: "{{ i18n_kr.gallery.title | t(lang) }}"
+description: "{{ i18n_kr.gallery.description | t(lang) }}"
 lang: "kr"
 ---
 
 <section>
-  <h1>{{ i18n_kr.sections.content | t(lang) }}</h1>
-  <p>{{ i18n_kr.aboutSite.text2 | t(lang) }}</p>
+  <h1>{{ i18n_kr.gallery.title | t(lang) }}</h1>
   
   <div class="gallery-grid">
-    {% for item in gallery.gallery %}
-    <div class="gallery-item">
-      <div class="image-container">
+    {% for item in posts.posts %}
+      {% if item.category == "gallery" %}
+      <div class="gallery-item">
         {% if item.image %}
-        <img src="{{ item.image }}" alt="{{ item.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <img src="{{ item.image }}" alt="{{ item.description }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
         {% endif %}
         <div class="image-placeholder" {% if item.image %}style="display: none;"{% endif %}>
-          <p>이미지 {{ item.id }}</p>
         </div>
+        {% if item.tags %}
+        <div class="gallery-tags">
+          {% if item.description %}
+          <div class="gallery-description">{{ item.description }}</div>
+          {% endif %}
+          <div class="tag-list">
+            {% for tag in item.tags %}
+            <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
       </div>
-      <p class="gallery-meta">{{ item.date }} | {{ item.category }}</p>
-      {% if item.description %}
-      <p class="gallery-description">{{ item.description }}</p>
       {% endif %}
-      {% if item.tags %}
-      <div class="gallery-tags">
-        {% for tag in item.tags %}
-        <span class="tag">{{ tag }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
-    </div>
     {% endfor %}
   </div>
 </section>
 
-<style>
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-xl);
-  margin-top: var(--spacing-xl);
-}
-
-.gallery-item {
-  background: var(--bg-secondary);
-  border-radius: var(--border-radius-sm);
-  overflow: hidden;
-  border: 1px solid var(--border-light);
-}
-
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-}
-
-.image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.image-placeholder {
-  width: 100%;
-  height: 200px;
-  background: var(--bg-tertiary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: var(--font-size-large);
-}
-
-.gallery-item h4 {
-  margin: var(--spacing-md) var(--spacing-md) var(--spacing-sm) var(--spacing-md);
-  color: var(--text-primary);
-}
-
-.gallery-meta {
-  margin: 0 var(--spacing-md) var(--spacing-sm) var(--spacing-md);
-  font-size: var(--font-size-small);
-  color: var(--text-secondary);
-}
-
-.gallery-description {
-  margin: 0 var(--spacing-md) var(--spacing-sm) var(--spacing-md);
-  font-size: var(--font-size-small);
-  color: var(--text-primary);
-  line-height: var(--line-height-base);
-}
-
-.gallery-tags {
-  margin: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
-  display: flex;
-  gap: var(--spacing-xs);
-  flex-wrap: wrap;
-}
-
-.tag {
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-small);
-}
-</style>
