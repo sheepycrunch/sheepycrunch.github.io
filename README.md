@@ -1,4 +1,4 @@
-# 100%health 블로그
+# DIY Hamster Dungeon 블로그
 
 11ty(Static Site Generator)를 사용한 개인 블로그입니다.
 
