@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title }} - DIY Hamster Dungeon</title>
-  <link rel="stylesheet" href="/style.css" type="text/css" media="all">
+  <title>{{ title }} - {{ site.title }}</title>
+  <link rel="icon" href="/favicon.png">
+  <link href="/css/reset.css" rel="stylesheet" type="text/css" media="all">
+  <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  {% if page.css %}
+  <link href="{{ page.css }}" rel="stylesheet" type="text/css" media="all">
+  {% endif %}
   {% if description %}
   <meta name="description" content="{{ description }}">
   {% endif %}
@@ -12,38 +17,31 @@
   <meta http-equiv="refresh" content="{{ refresh }}">
   {% endif %}
 </head>
-<body class="y2k-body">
-  <div class="page-shell">
-    <aside class="side-strip">
-      <img src="/images/1998/strip-01.jpg" alt="" class="strip-img">
-      <img src="/images/1998/strip-02.jpg" alt="" class="strip-img">
-      <img src="/images/1998/strip-03.jpg" alt="" class="strip-img">
-    </aside>
-
-    <main class="main-pane">
-      <header class="cloud-header">
-        <h1>DIY Hamster Dungeon</h1>
-        <h2>Welcome to My Creative Space</h2>
-        <p class="greeting">WELCOME! 안녕하세요! 환영합니다!</p>
-      </header>
-
-      <section class="content-paper">
-        {{ content | safe }}
-      </section>
-
-      <nav class="bubble-nav">
-        <a href="/" class="bubble">Home</a>
-        <a href="/gallery" class="bubble">Gallery</a>
-        <a href="/about" class="bubble">About</a>
-        <a href="/contact" class="bubble">Contact</a>
-        <a href="/links" class="bubble">Links</a>
-        <a href="/projects" class="bubble">Projects</a>
-      </nav>
-    </main>
-  </div>
-
-  {% if scripts %}
-  {% for script in scripts %}
+<body>
+  <article>
+    <header class="bordered">
+      <h1>{{ site.title }}</h1>
+    </header>
+    
+    {{ content | safe }}
+    
+    {% if page.showNavigation %}
+    <nav class="bubble-nav">
+      {% for nav in site.navigation %}
+      <a href="{{ nav.url }}" class="bubble">{{ nav.name }}</a>
+      {% endfor %}
+    </nav>
+    {% endif %}
+  </article>
+  
+  {% if page.scripts %}
+  {% for script in page.scripts %}
+  <script src="{{ script }}"></script>
+  {% endfor %}
+  {% endif %}
+  
+  {% if page.customScripts %}
+  {% for script in page.customScripts %}
   <script>{{ script | safe }}</script>
   {% endfor %}
   {% endif %}

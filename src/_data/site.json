@@ -2,23 +2,59 @@
   "title": "DIY Hamster Dungeon",
   "description": "DIY Hamster Dungeon - 개인 블로그",
   "url": "https://sheepycrunch.github.io",
-  "author": "sheepycrunch",
+  "author": {
+    "name": "sheepycrunch",
+    "introduction": "안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!",
+    "hobbies": ["그림 그리기", "게임", "DIY 프로젝트"],
+    "currentProject": "2024년부터 블로그 운영 중"
+  },
+  "social": {
+    "twitter": "https://twitter.com/sheepycrunch",
+    "github": "https://github.com/sheepycrunch",
+    "pixiv": "https://pixiv.net/users/sheepycrunch"
+  },
   "navigation": [
     {
-      "title": "소개",
+      "name": "소개",
       "url": "/aboutme.html"
     },
     {
-      "title": "글",
-      "url": "/txt/txt_main.html"
+      "name": "글",
+      "url": "/txt/index.html"
     },
     {
-      "title": "낙서",
-      "url": "/gallery/gallery_main.html"
+      "name": "낙서",
+      "url": "/gallery/index.html"
     },
     {
-      "title": "아카이브",
-      "url": "/archive/archive_main.html"
+      "name": "아카이브",
+      "url": "/archive/index.html"
+    },
+    {
+      "name": "링크",
+      "url": "/links/index.html"
+    }
+  ],
+  "stats": {
+    "posts": 42,
+    "visitors": 1337,
+    "lastUpdate": "오늘"
+  },
+  "features": [
+    {
+      "icon": "✎",
+      "title": "Art Gallery",
+      "description": "최신 그림들을 확인해보세요!"
+    },
+    {
+      "icon": "✐",
+      "title": "Blog Posts", 
+      "description": "생각과 이야기를 읽어보세요"
+    },
+    {
+      "icon": "⌂",
+      "title": "Projects",
+      "description": "DIY와 창작 프로젝트들"
     }
   ]
 }
