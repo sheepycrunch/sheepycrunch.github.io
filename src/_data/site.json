@@ -2,6 +2,7 @@
   "title": "DIY Hamster Dungeon",
   "description": "DIY Hamster Dungeon - 개인 블로그",
   "url": "https://sheepycrunch.github.io",
+  "neocitiesUrl": "https://sheepycrunch.neocities.org",
   "author": {
     "name": "sheepycrunch",
     "introduction": "안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!",
@@ -36,9 +37,9 @@
     }
   ],
   "stats": {
-    "posts": 42,
+    "posts": 0,
     "visitors": 1337,
-    "lastUpdate": "오늘"
+    "lastUpdate": "마지막 업데이트 (2024-12-19)"
   },
   "features": [
     {

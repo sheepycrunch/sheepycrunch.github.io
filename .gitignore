@@ -25,3 +25,13 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Images (uploaded to Neocities only)
+src/images/
+images/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.svg

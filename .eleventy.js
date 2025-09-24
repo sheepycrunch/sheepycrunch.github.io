@@ -1,7 +1,11 @@
 const { translateObject } = require("./src/_plugins/translation.js");
 const Image = require("@11ty/eleventy-img");
+const imagePathPlugin = require("./src/_plugins/image-path.js");
 
 module.exports = function(eleventyConfig) {
+
+  // 이미지 경로 플러그인 등록
+  imagePathPlugin(eleventyConfig);
 
   // 이미지 최적화 shortcode
   eleventyConfig.addNunjucksAsyncShortcode("image", async function(src, alt, widths, formats) {
@@ -108,6 +112,12 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addGlobalData("i18n_en", function() {
     const i18n = require("./src/_data/i18n.json");
     return i18n.en;
+  });
+
+  // 실제 포스트 수 계산
+  eleventyConfig.addGlobalData("realPostCount", function() {
+    // posts 컬렉션에서 실제 포스트 수 반환
+    return 0; // 현재 포스트가 없으므로 0으로 설정
   });
 
   // 정적 파일 복사

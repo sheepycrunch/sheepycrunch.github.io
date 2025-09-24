@@ -10,22 +10,24 @@ lang: "kr"
 <!-- 아이콘 쇼케이스 섹션 -->
 <section id="icon-showcase">
   <ol>
-    <li><img src="/images/icons/icon1.png" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="/images/icons/icon2.png" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="/images/icons/icon3.png" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="/images/icons/icon4.png" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="/images/icons/icon5.png" alt="icon" onerror="this.style.display='none'"></li>
+    <li><img src="{{ '/images/icons/icon1.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
+    <li class="hidden"><img src="{{ '/images/icons/icon2.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
+    <li class="hidden"><img src="{{ '/images/icons/icon3.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
+    <li class="hidden"><img src="{{ '/images/icons/icon4.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
+    <li class="hidden"><img src="{{ '/images/icons/icon5.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
   </ol>
-  <img id="misuzu-button" class="clickable" src="/images/button.png" alt="click to change icon" onerror="this.style.display='none'">
+  <img id="misuzu-button" class="clickable" src="{{ '/images/button.png' | neocitiesImage }}" alt="click to change icon" onerror="this.style.display='none'">
 </section>
 
 <!-- 자기소개 섹션 -->
 <section>
   <h2>{{ i18n_kr.sections.selfIntroduction | t(lang) }}</h2>
-  <dl id="name-display">
-    <dt>{{ i18n_kr.author.name | t(lang) }}</dt>
-    <dd>{{ site.author.name }}</dd>
-  </dl>
+  <table>
+    <tr>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.author.name | t(lang) }}</font></font></th>
+      <td><span class="fn nickname" itemprop="name"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.author.name }}</font></font></span></td>
+    </tr>
+  </table>
   <p>{{ i18n_kr.author.introduction | t(lang) }}</p>
   <p>{{ i18n_kr.author.hobbies | t(lang) }}: {{ site.author.hobbies | join(', ') }}</p>
   <p>{{ i18n_kr.author.currentProject | t(lang) }}</p>
@@ -45,21 +47,21 @@ lang: "kr"
     {% if site.social.twitter %}
     <li>
       <a href="{{ site.social.twitter }}" target="_blank">
-        <img src="/images/social/twitter.png" alt="Twitter" class="link-icon clickable" onerror="this.style.display='none'">
+        <img src="{{ '/images/social/twitter.png' | neocitiesImage }}" alt="Twitter" class="link-icon clickable" onerror="this.style.display='none'">
       </a>
     </li>
     {% endif %}
     {% if site.social.github %}
     <li>
       <a href="{{ site.social.github }}" target="_blank">
-        <img src="/images/social/github.png" alt="GitHub" class="link-icon clickable" onerror="this.style.display='none'">
+        <img src="{{ '/images/social/github.png' | neocitiesImage }}" alt="GitHub" class="link-icon clickable" onerror="this.style.display='none'">
       </a>
     </li>
     {% endif %}
     {% if site.social.pixiv %}
     <li>
       <a href="{{ site.social.pixiv }}" target="_blank">
-        <img src="/images/social/pixiv.png" alt="Pixiv" class="link-icon clickable" onerror="this.style.display='none'">
+        <img src="{{ '/images/social/pixiv.png' | neocitiesImage }}" alt="Pixiv" class="link-icon clickable" onerror="this.style.display='none'">
       </a>
     </li>
     {% endif %}
@@ -82,50 +84,48 @@ lang: "kr"
   </ul>
 </section>
 
-<!-- 통계 정보 섹션 -->
-<section>
-  <h2>{{ i18n_kr.sections.siteInfo | t(lang) }}</h2>
-  <div class="info-stats">
-    <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.posts | t(lang) }}:</span>
-      <span class="stat-value">{{ site.stats.posts }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.visitors | t(lang) }}:</span>
-      <span class="stat-value">{{ site.stats.visitors }}</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.lastUpdate | t(lang) }}:</span>
-      <span class="stat-value">{{ site.stats.lastUpdate }}</span>
-    </div>
-  </div>
-</section>
 
 <!-- 최신 업데이트 섹션 -->
 <section>
   <h2>{{ i18n_kr.sections.latestUpdates | t(lang) }}</h2>
-    <div class="update-list">
-      {% for update in i18n_kr.updates %}
-      <div class="update-item">
-        <span class="update-date">{{ update.date }}</span>
-        <span class="update-text">{{ update.text | t(lang) }}</span>
-      </div>
-      {% endfor %}
-    </div>
+  <table>
+    {% for update in i18n_kr.updates %}
+    <tr>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ update.date }}</font></font></th>
+      <td><span class="update-text"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ update.text | t(lang) }}</font></font></span></td>
+    </tr>
+    {% endfor %}
+  </table>
 </section>
 
-<!-- 기능 소개 섹션 -->
-<section>
-  <h2>{{ i18n_kr.sections.mainFeatures | t(lang) }}</h2>
-    <div class="feature-list">
-    {% for feature in i18n_kr.features %}
-      <div class="feature-item">
-      <span class="feature-icon">{{ feature.icon }}</span>
-      <span class="feature-title">{{ feature.title }}</span>
-      <span class="feature-desc">{{ feature.description | t(lang) }}</span>
-    </div>
-    {% endfor %}
-  </div>
+
+<!-- 작은 섹션들 -->
+<section class="small-section">
+  <h2>사이트 정보</h2>
+  <table>
+    <tr>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.posts | t(lang) }}</font></font></th>
+      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ realPostCount }}</font></font></span></td>
+    </tr>
+    <tr>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.visitors | t(lang) }}</font></font></th>
+      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.stats.visitors }}</font></font></span></td>
+    </tr>
+    <tr>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.lastUpdate | t(lang) }}</font></font></th>
+      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.stats.lastUpdate }}</font></font></span></td>
+    </tr>
+  </table>
+</section>
+
+<section class="small-section">
+  <h2>최근 활동</h2>
+  <p>블로그 업데이트와 새로운 프로젝트 소식을 확인해보세요.</p>
+</section>
+
+<section class="small-section">
+  <h2>연락처</h2>
+  <p>궁금한 점이 있으시면 언제든 연락해주세요!</p>
 </section>
 
 <!-- 방문자 메시지 -->

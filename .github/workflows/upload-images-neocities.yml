@@ -1,0 +1,23 @@
+name: Upload Images to Neocities
+
+on:
+  push:
+    paths:
+      - 'src/images/**'
+      - 'images/**'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  upload-images:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Upload images to Neocities
+      uses: bcomnes/deploy-to-neocities@v1
+      with:
+        api_token: ${{ secrets.NEOCITIES_API_KEY }}
+        cleanup: false # 기존 파일 유지
+        dist_dir: src/images # 이미지 폴더만 업로드

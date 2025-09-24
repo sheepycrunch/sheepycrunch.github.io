@@ -1,10 +1,9 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages and Neocities
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch: # 수동 실행 가능
 
 jobs:
   build-and-deploy:
@@ -25,8 +24,6 @@ jobs:
       
     - name: Build with 11ty
       run: npx @11ty/eleventy
-      env:
-        ELEVENTY_ENV: production
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
@@ -35,3 +32,11 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
         publish_dir: ./_site
+        
+    - name: Deploy to Neocities
+      uses: bcomnes/deploy-to-neocities@v1
+      if: github.ref == 'refs/heads/main'
+      with:
+        api_token: ${{ secrets.NEOCITIES_API_KEY }}
+        cleanup: true
+        dist_dir: _site
