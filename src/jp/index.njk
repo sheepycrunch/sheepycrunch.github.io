@@ -1,10 +1,10 @@
 ---
 layout: layout.njk
 title: "DIY Hamster Dungeon"
-description: "DIY Hamster Dungeon - 개인 블로그"
+description: "DIY Hamster Dungeon - 個人ブログ"
 showNavigation: true
 css: "/index.css"
-lang: "kr"
+lang: "jp"
 ---
 
 <!-- 아이콘 쇼케이스 섹션 -->
@@ -21,26 +21,26 @@ lang: "kr"
 
 <!-- 자기소개 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.selfIntroduction | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.selfIntroduction }}</h2>
   <dl id="name-display">
-    <dt>{{ i18n_kr.author.name | t(lang) }}</dt>
+    <dt>{{ i18n_jp.author.name }}</dt>
     <dd>{{ site.author.name }}</dd>
   </dl>
-  <p>{{ i18n_kr.author.introduction | t(lang) }}</p>
-  <p>{{ i18n_kr.author.hobbies | t(lang) }}: {{ site.author.hobbies | join(', ') }}</p>
-  <p>{{ i18n_kr.author.currentProject | t(lang) }}</p>
+  <p>{{ i18n_jp.author.introduction }}</p>
+  <p>{{ i18n_jp.author.hobbies }}: {{ i18n_jp.hobbies | join(', ') }}</p>
+  <p>{{ i18n_jp.author.currentProject }}</p>
 </section>
 
 <!-- 사이트 소개 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.aboutSite | t(lang) }}</h2>
-  <p>{{ i18n_kr.aboutSite.text1 | t(lang) }}</p>
-  <p>{{ i18n_kr.aboutSite.text2 | t(lang) }}</p>
+  <h2>{{ i18n_jp.sections.aboutSite }}</h2>
+  <p>{{ i18n_jp.aboutSite.text1 }}</p>
+  <p>{{ i18n_jp.aboutSite.text2 }}</p>
 </section>
 
 <!-- SNS 링크 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.snsLinks | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.snsLinks }}</h2>
   <ul class="horizontal-layout">
     {% if site.social.twitter %}
     <li>
@@ -68,13 +68,13 @@ lang: "kr"
 
 <!-- 콘텐츠 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.content | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.content }}</h2>
   <ul class="horizontal-layout">
-    {% for nav in i18n_kr.navigation %}
+    {% for nav in i18n_jp.navigation %}
     <li>
-      <a href="{{ nav.url | localizedUrl(lang) }}">
+      <a href="{{ nav.url | localizedUrl('jp') }}">
         <div class="clickable button-like-decoration">
-          <p>{{ nav.name | t(lang) }}</p>
+          <p>{{ nav.name }}</p>
         </div>
       </a>
     </li>
@@ -84,18 +84,18 @@ lang: "kr"
 
 <!-- 통계 정보 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.siteInfo | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.siteInfo }}</h2>
   <div class="info-stats">
     <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.posts | t(lang) }}:</span>
+      <span class="stat-label">{{ i18n_jp.stats.posts }}:</span>
       <span class="stat-value">{{ site.stats.posts }}</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.visitors | t(lang) }}:</span>
+      <span class="stat-label">{{ i18n_jp.stats.visitors }}:</span>
       <span class="stat-value">{{ site.stats.visitors }}</span>
     </div>
     <div class="stat-item">
-      <span class="stat-label">{{ i18n_kr.stats.lastUpdate | t(lang) }}:</span>
+      <span class="stat-label">{{ i18n_jp.stats.lastUpdate }}:</span>
       <span class="stat-value">{{ site.stats.lastUpdate }}</span>
     </div>
   </div>
@@ -103,12 +103,12 @@ lang: "kr"
 
 <!-- 최신 업데이트 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.latestUpdates | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.latestUpdates }}</h2>
     <div class="update-list">
-      {% for update in i18n_kr.updates %}
+      {% for update in i18n_jp.updates %}
       <div class="update-item">
         <span class="update-date">{{ update.date }}</span>
-        <span class="update-text">{{ update.text | t(lang) }}</span>
+        <span class="update-text">{{ update.text }}</span>
       </div>
       {% endfor %}
     </div>
@@ -116,13 +116,13 @@ lang: "kr"
 
 <!-- 기능 소개 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.mainFeatures | t(lang) }}</h2>
+  <h2>{{ i18n_jp.sections.mainFeatures }}</h2>
     <div class="feature-list">
-    {% for feature in i18n_kr.features %}
+    {% for feature in i18n_jp.features %}
       <div class="feature-item">
       <span class="feature-icon">{{ feature.icon }}</span>
       <span class="feature-title">{{ feature.title }}</span>
-      <span class="feature-desc">{{ feature.description | t(lang) }}</span>
+      <span class="feature-desc">{{ feature.description }}</span>
     </div>
     {% endfor %}
   </div>
@@ -130,11 +130,11 @@ lang: "kr"
 
 <!-- 방문자 메시지 -->
 <section class="visitor-message">
-  <h3>{{ i18n_kr.visitorMessage.title | t(lang) }}</h3>
-  <p>{{ i18n_kr.visitorMessage.text | t(lang) }}</p>
+  <h3>{{ i18n_jp.visitorMessage.title }}</h3>
+  <p>{{ i18n_jp.visitorMessage.text }}</p>
   <div class="message-actions">
-    <a href="/contact" class="button">{{ i18n_kr.visitorMessage.actions.sendMessage | t(lang) }}</a>
-    <a href="/gallery" class="button secondary">{{ i18n_kr.visitorMessage.actions.viewGallery | t(lang) }}</a>
+    <a href="/contact" class="button">{{ i18n_jp.visitorMessage.actions.sendMessage }}</a>
+    <a href="/gallery" class="button secondary">{{ i18n_jp.visitorMessage.actions.viewGallery }}</a>
   </div>
 </section>
 

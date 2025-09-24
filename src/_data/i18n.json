@@ -1,0 +1,293 @@
+{
+  "kr": {
+    "site": {
+      "title": "DIY Hamster Dungeon",
+      "description": "DIY Hamster Dungeon - 개인 블로그"
+    },
+    "sections": {
+      "selfIntroduction": "자기소개",
+      "aboutSite": "이 사이트에 대해",
+      "snsLinks": "각 SNS 링크",
+      "content": "콘텐츠",
+      "siteInfo": "사이트 정보",
+      "latestUpdates": "최신 업데이트",
+      "mainFeatures": "주요 기능",
+      "visitorMessage": "방문해주셔서 감사합니다"
+    },
+    "author": {
+      "name": "이름",
+      "introduction": "안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!",
+      "hobbies": "주요 취미",
+      "currentProject": "2024년부터 블로그 운영 중"
+    },
+    "hobbies": ["그림 그리기", "게임", "DIY 프로젝트"],
+    "aboutSite": {
+      "text1": "2024년 현재, 전반적으로 새롭게 만들고 싶지만 작업이 전혀 진행되지 않고 있습니다.",
+      "text2": "이 사이트의 내용도 그다지 업데이트하지 못해서 정말 죄송합니다."
+    },
+    "navigation": [
+      {
+        "name": "소개",
+        "url": "/aboutme.html"
+      },
+      {
+        "name": "글",
+        "url": "/txt/index.html"
+      },
+      {
+        "name": "낙서",
+        "url": "/gallery/index.html"
+      },
+      {
+        "name": "아카이브",
+        "url": "/archive/index.html"
+      },
+      {
+        "name": "링크",
+        "url": "/links/index.html"
+      }
+    ],
+    "stats": {
+      "posts": "포스트",
+      "visitors": "방문자",
+      "lastUpdate": "마지막 업데이트"
+    },
+    "updates": [
+      {
+        "date": "2024.01.15",
+        "text": "새로운 갤러리 업데이트!"
+      },
+      {
+        "date": "2024.01.10",
+        "text": "블로그 디자인 개선"
+      },
+      {
+        "date": "2024.01.05",
+        "text": "첫 번째 포스트 작성"
+      }
+    ],
+    "features": [
+      {
+        "icon": "✎",
+        "title": "Art Gallery",
+        "description": "최신 그림들을 확인해보세요!"
+      },
+      {
+        "icon": "✐",
+        "title": "Blog Posts",
+        "description": "생각과 이야기를 읽어보세요"
+      },
+      {
+        "icon": "⌂",
+        "title": "Projects",
+        "description": "DIY와 창작 프로젝트들"
+      }
+    ],
+    "visitorMessage": {
+      "title": "방문해주셔서 감사합니다",
+      "text": "DIY Hamster Dungeon에 오신 것을 환영합니다! 자유롭게 둘러보시고 즐거운 시간 보내세요!",
+      "actions": {
+        "sendMessage": "메시지 보내기",
+        "viewGallery": "갤러리 보기"
+      }
+    },
+    "language": {
+      "current": "한국어",
+      "switch": "언어 변경"
+    }
+  },
+  "jp": {
+    "site": {
+      "title": "DIY Hamster Dungeon",
+      "description": "DIY Hamster Dungeon - 個人ブログ"
+    },
+    "sections": {
+      "selfIntroduction": "自己紹介",
+      "aboutSite": "このサイトについて",
+      "snsLinks": "各SNSリンク",
+      "content": "コンテンツ",
+      "siteInfo": "サイト情報",
+      "latestUpdates": "最新アップデート",
+      "mainFeatures": "主な機能",
+      "visitorMessage": "ご訪問ありがとうございます"
+    },
+    "author": {
+      "name": "名前",
+      "introduction": "こんにちは！DIY Hamster Dungeonブログへようこそ！",
+      "hobbies": "主な趣味",
+      "currentProject": "2024年からブログ運営中"
+    },
+    "hobbies": ["絵を描く", "ゲーム", "DIYプロジェクト"],
+    "aboutSite": {
+      "text1": "2024年現在、全体的に新しく作りたいですが、作業が全く進んでいません。",
+      "text2": "このサイトの内容もあまり更新できず、本当に申し訳ありません。"
+    },
+    "navigation": [
+      {
+        "name": "紹介",
+        "url": "/aboutme.html"
+      },
+      {
+        "name": "記事",
+        "url": "/txt/index.html"
+      },
+      {
+        "name": "落書き",
+        "url": "/gallery/index.html"
+      },
+      {
+        "name": "アーカイブ",
+        "url": "/archive/index.html"
+      },
+      {
+        "name": "リンク",
+        "url": "/links/index.html"
+      }
+    ],
+    "stats": {
+      "posts": "ポスト",
+      "visitors": "訪問者",
+      "lastUpdate": "最終更新"
+    },
+    "updates": [
+      {
+        "date": "2024.01.15",
+        "text": "新しいギャラリーアップデート！"
+      },
+      {
+        "date": "2024.01.10",
+        "text": "ブログデザイン改善"
+      },
+      {
+        "date": "2024.01.05",
+        "text": "最初のポスト作成"
+      }
+    ],
+    "features": [
+      {
+        "icon": "✎",
+        "title": "Art Gallery",
+        "description": "最新の絵をチェックしてみてください！"
+      },
+      {
+        "icon": "✐",
+        "title": "Blog Posts",
+        "description": "考えや話を読んでみてください"
+      },
+      {
+        "icon": "⌂",
+        "title": "Projects",
+        "description": "DIYと創作プロジェクト"
+      }
+    ],
+    "visitorMessage": {
+      "title": "ご訪問ありがとうございます",
+      "text": "DIY Hamster Dungeonへようこそ！自由に見回して楽しい時間をお過ごしください！",
+      "actions": {
+        "sendMessage": "メッセージを送る",
+        "viewGallery": "ギャラリーを見る"
+      }
+    },
+    "language": {
+      "current": "日本語",
+      "switch": "言語変更"
+    }
+  },
+  "en": {
+    "site": {
+      "title": "DIY Hamster Dungeon",
+      "description": "DIY Hamster Dungeon - Personal Blog"
+    },
+    "sections": {
+      "selfIntroduction": "About Me",
+      "aboutSite": "About This Site",
+      "snsLinks": "SNS Links",
+      "content": "Content",
+      "siteInfo": "Site Information",
+      "latestUpdates": "Latest Updates",
+      "mainFeatures": "Main Features",
+      "visitorMessage": "Thank You for Visiting"
+    },
+    "author": {
+      "name": "Name",
+      "introduction": "Hello! Welcome to the DIY Hamster Dungeon blog!",
+      "hobbies": "Main Hobbies",
+      "currentProject": "Running blog since 2024"
+    },
+    "hobbies": ["Drawing", "Gaming", "DIY Projects"],
+    "aboutSite": {
+      "text1": "As of 2024, I want to completely rebuild this site, but work hasn't progressed at all.",
+      "text2": "I haven't been able to update the site content much, and I'm really sorry about that."
+    },
+    "navigation": [
+      {
+        "name": "About",
+        "url": "/aboutme.html"
+      },
+      {
+        "name": "Posts",
+        "url": "/txt/index.html"
+      },
+      {
+        "name": "Gallery",
+        "url": "/gallery/index.html"
+      },
+      {
+        "name": "Archive",
+        "url": "/archive/index.html"
+      },
+      {
+        "name": "Links",
+        "url": "/links/index.html"
+      }
+    ],
+    "stats": {
+      "posts": "Posts",
+      "visitors": "Visitors",
+      "lastUpdate": "Last Update"
+    },
+    "updates": [
+      {
+        "date": "2024.01.15",
+        "text": "New gallery update!"
+      },
+      {
+        "date": "2024.01.10",
+        "text": "Blog design improvements"
+      },
+      {
+        "date": "2024.01.05",
+        "text": "First post written"
+      }
+    ],
+    "features": [
+      {
+        "icon": "✎",
+        "title": "Art Gallery",
+        "description": "Check out the latest drawings!"
+      },
+      {
+        "icon": "✐",
+        "title": "Blog Posts",
+        "description": "Read thoughts and stories"
+      },
+      {
+        "icon": "⌂",
+        "title": "Projects",
+        "description": "DIY and creative projects"
+      }
+    ],
+    "visitorMessage": {
+      "title": "Thank You for Visiting",
+      "text": "Welcome to DIY Hamster Dungeon! Feel free to look around and have a great time!",
+      "actions": {
+        "sendMessage": "Send Message",
+        "viewGallery": "View Gallery"
+      }
+    },
+    "language": {
+      "current": "English",
+      "switch": "Change Language"
+    }
+  }
+}

@@ -21,6 +21,15 @@
   <article>
     <header class="bordered">
       <h1>{{ site.title }}</h1>
+      {% if page.lang %}
+      <div class="language-switcher">
+        {% for lang in languageLinks(page.lang) %}
+        <a href="{{ lang.url }}" class="lang-link {% if lang.current %}current{% endif %}">
+          {{ lang.name }}
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
     </header>
     
     {{ content | safe }}
