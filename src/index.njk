@@ -1,67 +1,23 @@
 ---
 layout: layout.njk
-title: "Kawaii Anime Paradise"
-description: "🌸 Welcome to my magical anime world! ✨"
+title: "DIY Hamster Dungeon"
+description: "DIY Hamster Dungeon - 개인 블로그"
 ---
 
 <div class="box">
-  <h2>🌸 Welcome to Kawaii Anime Paradise! 🌸</h2>
-  <div class="box secondary">
-    <h3 class="anime-heart">💖 안녕하세요! Hello! Konnichiwa! 💖</h3>
-    <p>Welcome to my super kawaii anime paradise! ✨ This is where all the magic happens! 🌟</p>
-    <p>Here you can find all my favorite anime, manga, and kawaii things! 🎌💕</p>
-    <p class="anime-star">Don't forget to check out my visitor counter! You're special! ✨</p>
+  <h2>✦ 홈 / Welcome</h2>
+  <div class="card">
+    <h3>안녕하세요!</h3>
+    <p>DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!</p>
+    <p>여기서 다양한 글과 낙서를 만나보실 수 있습니다.</p>
   </div>
   
-  <div class="box accent">
-    <h3 class="anime-sparkle">🎨 What's New? 🎨</h3>
+  <div class="box secondary">
+    <h3>사용 가능한 페이지</h3>
     <ul>
-      <li>🌸 Added new anime reviews!</li>
-      <li>💖 Updated my kawaii gallery!</li>
-      <li>✨ New manga recommendations!</li>
-      <li>🎌 Special Tokyo style updates!</li>
+      {% for item in site.navigation %}
+      <li><a href="{{ item.url }}" class="button">{{ item.title }}</a></li>
+      {% endfor %}
     </ul>
-  </div>
-  
-  <div class="box secondary">
-    <h3 class="anime-heart">🌟 Quick Links 🌟</h3>
-    <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
-      <a href="/gallery" class="button">🎨 Gallery</a>
-      <a href="/anime" class="button secondary">🎌 Anime</a>
-      <a href="/manga" class="button accent">📚 Manga</a>
-      <a href="/about" class="button">💖 About</a>
-    </div>
-  </div>
-  
-  <div class="box">
-    <h3 class="anime-star">💫 Today's Kawaii Quote 💫</h3>
-    <blockquote style="background: linear-gradient(135deg, #fff0f5, #f0f8ff); border: 3px solid #ff69b4; border-radius: 15px; padding: 20px; margin: 20px 0; text-align: center; font-style: italic;">
-      "Life is like anime - full of colorful adventures and magical moments! ✨🌸"
-    </blockquote>
-  </div>
-  
-  <div class="box accent">
-    <h3 class="anime-sparkle">🎵 Current Obsessions 🎵</h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-      <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 10px; text-align: center;">
-        <h4 class="anime-heart">🎌 Anime</h4>
-        <p>Currently watching: My Hero Academia! 💪</p>
-      </div>
-      <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 10px; text-align: center;">
-        <h4 class="anime-star">📚 Manga</h4>
-        <p>Reading: One Piece! 🏴‍☠️</p>
-      </div>
-      <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 10px; text-align: center;">
-        <h4 class="anime-sparkle">🎵 Music</h4>
-        <p>Listening to: J-Pop hits! 🎶</p>
-      </div>
-    </div>
-  </div>
-  
-  <div class="box secondary">
-    <h3 class="anime-heart">💌 Contact Me! 💌</h3>
-    <p>Want to chat about anime? Have kawaii recommendations? Just want to say hi?</p>
-    <p>Don't be shy! I love making new friends! ✨</p>
-    <a href="/contact" class="button">📞 Get in Touch! 📞</a>
   </div>
 </div>

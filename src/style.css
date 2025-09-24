@@ -1,28 +1,23 @@
 /* ===================
-   GEOCITIES + ANIME STYLE
+   GEOCITIES + ANIME STYLE (레퍼런스 기반)
    =================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Comic+Neue:wght@300;400;700&display=swap');
 
 :root {
-  --anime-pink: #ff69b4;
-  --anime-purple: #9370db;
-  --anime-blue: #00bfff;
-  --anime-yellow: #ffff00;
-  --anime-green: #00ff7f;
-  --anime-orange: #ff6347;
-  --anime-red: #ff1493;
-  --anime-cyan: #00ffff;
-  --anime-magenta: #ff00ff;
-  --anime-lime: #32cd32;
+  --geocities-purple: #9370db;
+  --geocities-pink: #ff69b4;
+  --geocities-blue: #4169e1;
+  --geocities-cyan: #00ffff;
+  --geocities-yellow: #ffff00;
+  --geocities-green: #32cd32;
+  --geocities-orange: #ffa500;
+  --geocities-red: #ff1493;
   
-  --bg-gradient: linear-gradient(45deg, #ff69b4, #9370db, #00bfff, #ffff00, #00ff7f);
-  --text-shadow-anime: 2px 2px 0 #ff1493, 4px 4px 0 #00bfff, 6px 6px 0 #ffff00;
-  --border-anime: 4px solid #ff69b4;
-  --shadow-anime: 8px 8px 0 #ff1493, 16px 16px 0 #00bfff;
+  --bg-pattern: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="stars" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="%23ff69b4" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="%23f0f8ff"/><rect width="100" height="100" fill="url(%23stars)"/></svg>');
   
-  --font-anime: 'Fredoka One', cursive;
-  --font-cute: 'Comic Neue', cursive;
+  --font-display: 'Fredoka One', cursive;
+  --font-body: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
 }
 
 * {
@@ -32,84 +27,39 @@
 }
 
 body {
-  font-family: var(--font-cute);
-  background: var(--bg-gradient);
-  background-size: 400% 400%;
-  animation: gradientShift 8s ease infinite;
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, #f0f8ff 0%, #e6e6fa 50%, #dda0dd 100%);
+  background-image: var(--bg-pattern);
+  background-attachment: fixed;
   min-height: 100vh;
-  overflow-x: hidden;
-}
-
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  color: #333;
 }
 
 /* ===================
-   ANIME BACKGROUND EFFECTS
-   =================== */
-
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(255, 105, 180, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 191, 255, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(255, 255, 0, 0.2) 0%, transparent 50%);
-  animation: float 6s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
-}
-
-/* ===================
-   MAIN CONTAINER
+   MAIN CONTAINER (Geocities 스타일)
    =================== */
 
 #wrapper {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 20px auto;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.95);
-  border: var(--border-anime);
-  border-radius: 30px;
-  box-shadow: var(--shadow-anime);
+  padding: 20px;
+  background: #ffffff;
+  border: 4px solid var(--geocities-purple);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 var(--geocities-pink);
   position: relative;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
 }
 
 #wrapper::before {
-  content: '✦ ✧ ✦ ✧ ✦';
+  content: '';
   position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--anime-pink);
-  color: white;
-  padding: 5px 20px;
-  border-radius: 20px;
-  font-family: var(--font-anime);
-  font-size: 16px;
-  animation: sparkle 1.5s linear infinite;
-}
-
-@keyframes sparkle {
-  0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-  50% { opacity: 0.7; transform: translateX(-50%) scale(1.1); }
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  background: linear-gradient(45deg, var(--geocities-purple), var(--geocities-pink), var(--geocities-blue));
+  z-index: -1;
+  border-radius: 4px;
 }
 
 /* ===================
@@ -118,35 +68,28 @@ body::before {
 
 .main-layout {
   display: flex;
-  gap: 30px;
+  gap: 20px;
   align-items: flex-start;
 }
 
 .sidebar {
-  flex: 0 0 280px;
-  background: linear-gradient(135deg, #ff69b4, #9370db);
-  border: 5px solid #ff1493;
-  border-radius: 25px;
-  padding: 25px;
+  flex: 0 0 200px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+  border: 3px solid var(--geocities-blue);
+  border-radius: 0;
+  padding: 15px;
   position: sticky;
   top: 20px;
-  box-shadow: 10px 10px 0 #ff1493;
-  animation: wiggle 3s ease-in-out infinite;
-}
-
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(1deg); }
-  75% { transform: rotate(-1deg); }
+  box-shadow: 4px 4px 0 var(--geocities-blue);
 }
 
 .main-content {
   flex: 1;
-  background: linear-gradient(135deg, #ffffff, #f0f8ff);
-  border: 4px solid #00bfff;
-  border-radius: 25px;
-  padding: 30px;
-  box-shadow: 8px 8px 0 #00bfff;
+  background: #ffffff;
+  border: 3px solid var(--geocities-pink);
+  border-radius: 0;
+  padding: 20px;
+  box-shadow: 4px 4px 0 var(--geocities-pink);
   position: relative;
 }
 
@@ -155,91 +98,57 @@ body::before {
    =================== */
 
 .logo-text {
-  font-family: var(--font-anime);
-  font-size: 28px;
-  color: white;
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--geocities-purple);
   text-align: center;
-  margin-bottom: 20px;
-  text-shadow: 3px 3px 0 #ff1493, 6px 6px 0 #00bfff;
-  animation: rainbow 2s linear infinite;
-}
-
-@keyframes rainbow {
-  0% { color: #ff69b4; }
-  16% { color: #9370db; }
-  33% { color: #00bfff; }
-  50% { color: #ffff00; }
-  66% { color: #00ff7f; }
-  83% { color: #ff6347; }
-  100% { color: #ff69b4; }
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 0 var(--geocities-pink);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .tagline {
-  background: #ffff00;
-  color: #ff1493;
-  padding: 10px;
-  border-radius: 15px;
+  background: var(--geocities-yellow);
+  color: var(--geocities-purple);
+  padding: 8px;
+  border: 2px solid var(--geocities-purple);
   text-align: center;
   font-weight: bold;
-  margin-bottom: 25px;
-  border: 3px solid #ff1493;
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  margin-bottom: 20px;
+  font-size: 14px;
 }
 
 .nav ul {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 }
 
 .nav li {
-  background: linear-gradient(45deg, #ffffff, #f0f8ff);
-  border: 3px solid #00bfff;
-  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+  border: 2px solid var(--geocities-cyan);
   text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav li::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-  transition: left 0.5s ease;
-}
-
-.nav li:hover::before {
-  left: 100%;
+  transition: all 0.2s ease;
 }
 
 .nav li:hover {
-  transform: scale(1.05) rotate(2deg);
-  box-shadow: 5px 5px 0 #ff1493;
+  background: linear-gradient(180deg, var(--geocities-yellow) 0%, #ffffff 100%);
+  transform: translateX(2px);
 }
 
 .nav a {
   display: block;
-  padding: 15px;
-  color: #ff1493;
+  padding: 10px;
+  color: var(--geocities-purple);
   text-decoration: none;
   font-weight: bold;
-  font-size: 16px;
-  text-shadow: 1px 1px 0 #ffffff;
+  font-size: 14px;
 }
 
 .nav a:hover {
-  color: #00bfff;
+  color: var(--geocities-red);
 }
 
 /* ===================
@@ -247,168 +156,137 @@ body::before {
    =================== */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-anime);
-  color: #ff1493;
-  text-shadow: var(--text-shadow-anime);
-  margin-bottom: 20px;
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-  from { text-shadow: var(--text-shadow-anime); }
-  to { text-shadow: var(--text-shadow-anime), 0 0 20px #ff69b4; }
+  font-family: var(--font-display);
+  color: var(--geocities-purple);
+  text-shadow: 2px 2px 0 var(--geocities-pink);
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 h1 {
-  font-size: 36px;
+  font-size: 32px;
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 h2 {
-  font-size: 28px;
-  border-bottom: 4px dashed #00bfff;
-  padding-bottom: 10px;
+  font-size: 24px;
+  border-bottom: 3px dashed var(--geocities-blue);
+  padding-bottom: 8px;
 }
 
 h3 {
-  font-size: 24px;
-  color: #9370db;
+  font-size: 20px;
+  color: var(--geocities-red);
 }
 
 p {
-  margin-bottom: 15px;
-  line-height: 1.6;
+  margin-bottom: 12px;
+  line-height: 1.5;
   color: #333;
 }
 
 a {
-  color: #ff1493;
-  text-decoration: none;
+  color: var(--geocities-blue);
+  text-decoration: underline;
   font-weight: bold;
-  transition: all 0.3s ease;
-  position: relative;
 }
 
 a:hover {
-  color: #00bfff;
-  text-shadow: 2px 2px 0 #ff69b4;
-  transform: scale(1.1);
-}
-
-a::after {
-  content: ' ✨';
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-a:hover::after {
-  opacity: 1;
+  color: var(--geocities-red);
+  background: var(--geocities-yellow);
 }
 
 /* ===================
-   BOX COMPONENTS
+   BOX COMPONENTS (Geocities 스타일)
    =================== */
 
 .box {
-  background: linear-gradient(135deg, #ffffff, #f0f8ff);
-  border: 4px solid #ff69b4;
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 25px;
-  box-shadow: 6px 6px 0 #ff1493;
+  background: #ffffff;
+  border: 3px solid var(--geocities-purple);
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 4px 4px 0 var(--geocities-purple);
   position: relative;
-  animation: floatBox 4s ease-in-out infinite;
-}
-
-@keyframes floatBox {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
 }
 
 .box::before {
   content: '★';
   position: absolute;
-  top: -10px;
-  right: -10px;
-  background: #ffff00;
-  color: #ff1493;
-  width: 30px;
-  height: 30px;
+  top: -8px;
+  right: -8px;
+  background: var(--geocities-yellow);
+  color: var(--geocities-purple);
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  font-size: 12px;
+  border: 2px solid var(--geocities-purple);
 }
 
 .box.secondary {
-  background: linear-gradient(135deg, #e6f3ff, #f0f8ff);
-  border-color: #00bfff;
-  box-shadow: 6px 6px 0 #00bfff;
+  border-color: var(--geocities-blue);
+  box-shadow: 4px 4px 0 var(--geocities-blue);
+}
+
+.box.secondary::before {
+  background: var(--geocities-cyan);
+  color: var(--geocities-blue);
+  border-color: var(--geocities-blue);
 }
 
 .box.accent {
-  background: linear-gradient(135deg, #fff0f5, #ffe4e1);
-  border-color: #ff6347;
-  box-shadow: 6px 6px 0 #ff6347;
+  border-color: var(--geocities-pink);
+  box-shadow: 4px 4px 0 var(--geocities-pink);
+}
+
+.box.accent::before {
+  background: var(--geocities-pink);
+  color: #ffffff;
+  border-color: var(--geocities-pink);
 }
 
 /* ===================
-   BUTTONS
+   BUTTONS (Geocities 스타일)
    =================== */
 
 .button {
   display: inline-block;
-  background: linear-gradient(45deg, #ff69b4, #ff1493);
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 25px;
-  font-family: var(--font-anime);
-  font-size: 16px;
+  background: linear-gradient(180deg, var(--geocities-yellow) 0%, var(--geocities-orange) 100%);
+  color: var(--geocities-purple);
+  padding: 8px 16px;
+  border: 2px solid var(--geocities-purple);
   text-decoration: none;
-  box-shadow: 4px 4px 0 #ff1493;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.5s ease;
-}
-
-.button:hover::before {
-  left: 100%;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 3px 3px 0 var(--geocities-purple);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
 }
 
 .button:hover {
-  transform: scale(1.1) rotate(-2deg);
-  box-shadow: 6px 6px 0 #00bfff;
+  background: linear-gradient(180deg, var(--geocities-pink) 0%, var(--geocities-red) 100%);
+  color: #ffffff;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--geocities-purple);
 }
 
 .button.secondary {
-  background: linear-gradient(45deg, #00bfff, #1e90ff);
-  box-shadow: 4px 4px 0 #00bfff;
+  background: linear-gradient(180deg, var(--geocities-cyan) 0%, var(--geocities-blue) 100%);
+  color: #ffffff;
+  border-color: var(--geocities-blue);
+  box-shadow: 3px 3px 0 var(--geocities-blue);
 }
 
 .button.accent {
-  background: linear-gradient(45deg, #ffff00, #ffd700);
-  color: #ff1493;
-  box-shadow: 4px 4px 0 #ffff00;
+  background: linear-gradient(180deg, var(--geocities-pink) 0%, var(--geocities-red) 100%);
+  color: #ffffff;
+  border-color: var(--geocities-pink);
+  box-shadow: 3px 3px 0 var(--geocities-pink);
 }
 
 /* ===================
@@ -418,17 +296,10 @@ a:hover::after {
 img {
   max-width: 100%;
   height: auto;
-  border: 5px solid #ff69b4;
-  border-radius: 15px;
-  box-shadow: 8px 8px 0 #ff1493;
-  margin: 20px auto;
+  border: 3px solid var(--geocities-purple);
+  margin: 15px auto;
   display: block;
-  transition: all 0.3s ease;
-}
-
-img:hover {
-  transform: scale(1.05) rotate(2deg);
-  box-shadow: 12px 12px 0 #00bfff;
+  box-shadow: 4px 4px 0 var(--geocities-pink);
 }
 
 /* ===================
@@ -437,20 +308,22 @@ img:hover {
 
 ul, ol {
   margin-left: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 li {
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   color: #333;
 }
 
 ul li::marker {
-  content: '🌸 ';
+  content: '✦ ';
+  color: var(--geocities-pink);
 }
 
 ol li::marker {
-  content: '✨ ';
+  content: '★ ';
+  color: var(--geocities-blue);
 }
 
 /* ===================
@@ -459,37 +332,38 @@ ol li::marker {
 
 input, textarea, select {
   width: 100%;
-  padding: 12px;
-  border: 3px solid #ff69b4;
-  border-radius: 15px;
+  padding: 8px;
+  border: 2px solid var(--geocities-purple);
   background: #ffffff;
-  font-family: var(--font-cute);
-  font-size: 16px;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
+  font-family: var(--font-body);
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #00bfff;
-  box-shadow: 0 0 10px #00bfff;
-  transform: scale(1.02);
+  border-color: var(--geocities-pink);
+  box-shadow: 0 0 5px var(--geocities-pink);
 }
 
 label {
   display: block;
   font-weight: bold;
-  color: #ff1493;
+  color: var(--geocities-purple);
   margin-bottom: 5px;
-  text-shadow: 1px 1px 0 #ffffff;
 }
 
 /* ===================
-   SPECIAL EFFECTS
+   SPECIAL EFFECTS (Geocities 스타일)
    =================== */
 
 .blink {
   animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }
 
 .scanline {
@@ -511,7 +385,7 @@ label {
     rgba(255, 105, 180, 0.1) 4px
   );
   pointer-events: none;
-  animation: scan 2s linear infinite;
+  animation: scan 3s linear infinite;
 }
 
 @keyframes scan {
@@ -524,17 +398,17 @@ label {
 }
 
 .glitter::after {
-  content: '✨ ✨ ✨';
+  content: '✨';
   position: absolute;
-  top: -20px;
-  right: 10px;
-  font-size: 18px;
-  animation: sparkle 1.5s ease-in-out infinite;
+  top: -15px;
+  right: 5px;
+  font-size: 16px;
+  animation: sparkle 2s ease-in-out infinite;
 }
 
 @keyframes sparkle {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
+  0%, 100% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
 }
 
 /* ===================
@@ -542,24 +416,23 @@ label {
    =================== */
 
 .footer {
-  margin-top: 40px;
-  padding: 20px;
-  background: linear-gradient(135deg, #ff69b4, #9370db);
-  border: 4px solid #ff1493;
-  border-radius: 20px;
+  margin-top: 30px;
+  padding: 15px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f8ff 100%);
+  border: 3px solid var(--geocities-purple);
   text-align: center;
-  color: white;
-  box-shadow: 6px 6px 0 #ff1493;
-  animation: wiggle 4s ease-in-out infinite;
+  color: var(--geocities-purple);
+  box-shadow: 4px 4px 0 var(--geocities-purple);
+  font-size: 14px;
 }
 
 .footer a {
-  color: #ffff00;
-  text-shadow: 2px 2px 0 #ff1493;
+  color: var(--geocities-red);
 }
 
 .footer a:hover {
-  color: #00ffff;
+  color: var(--geocities-blue);
+  background: var(--geocities-yellow);
 }
 
 /* ===================
@@ -578,70 +451,71 @@ label {
   
   #wrapper {
     margin: 10px;
-    padding: 20px;
+    padding: 15px;
   }
   
   .logo-text {
-    font-size: 24px;
+    font-size: 20px;
   }
   
   h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
   
   h2 {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 
 /* ===================
-   ANIME DECORATIONS
+   GEOCITIES DECORATIONS
    =================== */
 
-.anime-heart {
-  color: #ff1493;
-  animation: heartbeat 1s ease-in-out infinite;
+.visitor-counter {
+  background: #ffffff;
+  border: 2px solid var(--geocities-red);
+  padding: 8px;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--geocities-purple);
 }
 
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+.visitor-counter::before {
+  content: '🔴';
+  margin-right: 5px;
 }
 
-.anime-star {
-  color: #ffff00;
-  animation: twinkle 1.5s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 1; transform: rotate(0deg); }
-  50% { opacity: 0.5; transform: rotate(180deg); }
-}
-
-.anime-sparkle {
-  color: #00bfff;
-  animation: sparkle 1s ease-in-out infinite;
+.geocities-banner {
+  background: linear-gradient(90deg, var(--geocities-purple), var(--geocities-pink), var(--geocities-blue));
+  color: #ffffff;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
 /* ===================
-   CUSTOM SCROLLBAR
+   CUSTOM SCROLLBAR (Geocities 스타일)
    =================== */
 
 ::-webkit-scrollbar {
-  width: 15px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #ff69b4;
-  border-radius: 10px;
+  background: var(--geocities-purple);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(45deg, #ff1493, #00bfff);
-  border-radius: 10px;
-  border: 2px solid #ffffff;
+  background: linear-gradient(180deg, var(--geocities-pink), var(--geocities-blue));
+  border: 1px solid #ffffff;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(45deg, #00bfff, #ff1493);
+  background: linear-gradient(180deg, var(--geocities-blue), var(--geocities-pink));
 }
