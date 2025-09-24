@@ -150,8 +150,6 @@ body {
 .button:hover {
   background: var(--color-accent);
   color: var(--color-text);
-  transform: translate(2px, 2px);
-  box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--color-border);
 }
 
 .button.secondary {
@@ -175,7 +173,6 @@ body {
 }
 
 .card:hover {
-  transform: translate(-2px, -2px);
   box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0 var(--color-border);
 }
 
@@ -285,7 +282,6 @@ img {
 }
 
 .gallery-item:hover {
-  transform: translate(-2px, -2px);
   box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0 var(--color-border);
 }
 
