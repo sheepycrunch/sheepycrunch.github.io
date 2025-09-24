@@ -1,0 +1,24 @@
+{
+  "title": "100%health",
+  "description": "100%health - 개인 블로그",
+  "url": "https://sheepycrunch.github.io",
+  "author": "sheepycrunch",
+  "navigation": [
+    {
+      "title": "소개",
+      "url": "/aboutme.html"
+    },
+    {
+      "title": "글",
+      "url": "/txt/txt_main.html"
+    },
+    {
+      "title": "낙서",
+      "url": "/gallery/gallery_main.html"
+    },
+    {
+      "title": "아카이브",
+      "url": "/archive/archive_main.html"
+    }
+  ]
+}

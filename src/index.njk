@@ -1,0 +1,25 @@
+---
+layout: layout.njk
+title: "100%health"
+description: "100%health - 개인 블로그"
+---
+
+<nav class="section" id="home" aria-label="홈 섹션">
+  <div class="highlight_logo">
+    <div class="highlight">
+      <h2><span title="home" lang="ko">홈</span> / <small>Welcome</small></h2>
+    </div>
+  </div>
+  <div id="homecontent">
+    <h3>안녕하세요!</h3>
+    <p>100%health 블로그에 오신 것을 환영합니다.</p>
+    <p>여기서 다양한 글과 낙서를 만나보실 수 있습니다.</p>
+    
+    <h3>사용 가능한 페이지</h3>
+    <ul>
+      {% for item in site.navigation %}
+      <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>
