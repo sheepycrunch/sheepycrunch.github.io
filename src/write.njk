@@ -464,8 +464,15 @@ function savePost() {
     tags: tags
   };
   
+  // 오늘 날짜 기록 (하루 제한)
+  const today = new Date().toDateString();
+  localStorage.setItem('last-post-date', today);
+  
   console.log('새 포스트:', newPost);
   alert(i18nData.write.messages.saveSuccess);
+  
+  // 폼 비활성화
+  disableForm();
 }
 
 function clearForm() {
@@ -605,9 +612,63 @@ document.addEventListener('DOMContentLoaded', function() {
     loadDraft();
   }
   
+  // 하루 글 작성 제한 체크
+  checkDailyPostLimit();
+  
   // 텍스트 영역 자동 크기 조정
   setupTextareaAutoResize();
 });
+
+// 하루 글 작성 제한 체크 함수
+function checkDailyPostLimit() {
+  // 개발자 모드 체크 (F12 또는 개발자 도구가 열려있는지 확인)
+  const isDevMode = localStorage.getItem('dev-mode') === 'true' || 
+                    window.outerHeight - window.innerHeight > 200; // 개발자 도구가 열려있으면 높이 차이가 큼
+  
+  if (isDevMode) {
+    console.log('개발자 모드: 하루 글 작성 제한 비활성화');
+    return; // 개발자 모드에서는 제한 없음
+  }
+  
+  const today = new Date().toDateString();
+  const lastPostDate = localStorage.getItem('last-post-date');
+  
+  if (lastPostDate === today) {
+    // 오늘 이미 글을 작성했으면 폼 비활성화
+    disableForm();
+    showTopMessage(i18nData.write.messages.dailyLimitReached);
+  }
+}
+
+// 폼 비활성화 함수
+function disableForm() {
+  const form = document.querySelector('.write-form');
+  const inputs = form.querySelectorAll('input, textarea, select, button');
+  
+  inputs.forEach(input => {
+    input.disabled = true;
+    input.style.opacity = '0.5';
+    input.style.cursor = 'not-allowed';
+  });
+  
+  // 저장 버튼 숨기기
+  const saveButton = document.getElementById('save-post');
+  if (saveButton) {
+    saveButton.style.display = 'none';
+  }
+  
+  // 제한 메시지 표시
+  const limitMessage = document.createElement('div');
+  limitMessage.className = 'daily-limit-message';
+  limitMessage.innerHTML = `
+    <div style="text-align: center; padding: var(--spacing-lg); background: var(--bg-secondary); border-radius: var(--border-radius-sm); margin: var(--spacing-lg) 0;">
+      <h3 style="color: var(--accent-primary); margin: 0 0 var(--spacing-sm) 0;">${i18nData.write.messages.dailyLimitTitle}</h3>
+      <p style="color: var(--text-secondary); margin: 0;">${i18nData.write.messages.dailyLimitDescription}</p>
+    </div>
+  `;
+  
+  form.insertBefore(limitMessage, form.firstChild);
+}
 
 // 텍스트 영역 자동 크기 조정 함수
 function setupTextareaAutoResize() {
