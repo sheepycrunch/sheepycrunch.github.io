@@ -14,10 +14,10 @@
   --accent-tertiary: #495057;
   
   /* 크기 변수 */
-  --font-size-base: 14px;
-  --font-size-large: 16px;
-  --font-size-xl: 18px;
-  --font-size-small: 12px;
+  --font-size-small: 9px;
+  --font-size-base: 11px;
+  --font-size-large: 14px;
+  --font-size-xl: 16px;
   --line-height-base: 1.6;
   --line-height-tight: 1.4;
   
@@ -139,9 +139,9 @@ article {
 }
 
 h1 {
-  text-align: center;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: var(--spacing-4xl);
+  text-align: right;
   color: var(--text-primary);
 }
 
@@ -178,10 +178,6 @@ section:not(.no-border), .bordered {
   font-size: var(--font-size-base);
   font-weight: bold;
   color: var(--text-primary);
-}
-
-section > :not(h2) {
-  padding-left: var(--spacing-2xl);
 }
 
 li {
@@ -343,13 +339,6 @@ a:hover {
   padding: 0;
 }
 
-/* 통계 정보 */
-.info-stats {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
 .stat-item {
   display: flex;
   justify-content: space-between;
@@ -464,24 +453,14 @@ a:hover {
   margin-left: auto;
 }
 
-/* 방문자 메시지 */
-.visitor-message {
+/* 스탯 */
+.site-stats {
   background-color: var(--bg-primary);
   padding: var(--spacing-3xl) var(--spacing-3xl) var(--spacing-3xl) var(--spacing-3xl);
   text-align: center;
   border-radius: var(--border-radius-sm);
-}
-
-.visitor-message h3 {
-  font-size: var(--font-size-xl);
-  padding-bottom: var(--spacing-xl);
-  color: var(--text-primary);
-}
-
-.visitor-message p {
   color: var(--text-secondary);
-  font-size: var(--font-size-large);
-  padding-bottom: var(--spacing-3xl);
+  font-size: var(--font-size-small);
 }
 
 .message-actions {

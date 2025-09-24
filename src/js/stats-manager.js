@@ -13,6 +13,8 @@ class StatsManager {
     this.loadStats();
     this.updateStats();
     this.setupEventListeners();
+    // 페이지 로드 시 즉시 마지막 업데이트 표시
+    this.updateLastUpdateDate();
   }
   
   loadStats() {
@@ -67,7 +69,9 @@ class StatsManager {
     const formattedDate = now.toLocaleDateString('ko-KR', options);
     this.stats.lastUpdate = now.toISOString();
     
+    // 기존 테이블 구조와 새로운 구조 모두 지원
     this.updateElement('.stat-item:nth-child(3) .stat-value', formattedDate);
+    this.updateElement('#last-update', formattedDate);
   }
   
   updatePostCount() {
@@ -85,8 +89,13 @@ class StatsManager {
   updateElement(selector, value) {
     const element = document.querySelector(selector);
     if (element) {
-      // 애니메이션과 함께 업데이트
-      this.animateValue(element, value);
+      // 마지막 업데이트는 애니메이션 없이 바로 업데이트
+      if (selector === '#last-update') {
+        element.textContent = value;
+      } else {
+        // 애니메이션과 함께 업데이트
+        this.animateValue(element, value);
+      }
     }
   }
   

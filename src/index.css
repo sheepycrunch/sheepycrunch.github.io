@@ -68,7 +68,7 @@
 }
 
 /* 반응형 디자인 */
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   #icon-showcase > ol {
     flex-direction: column;
     align-items: center;

@@ -1,35 +1,28 @@
 {
   "kr": {
     "site": {
-      "title": "DIY Hamster Dungeon",
-      "description": "DIY Hamster Dungeon - 개인 블로그"
+      "title": "dakimakura",
+      "author": "Hampter the maid",
+      "description": "개인 블로그"
     },
     "sections": {
       "selfIntroduction": "자기소개",
       "aboutSite": "이 사이트에 대해",
-      "snsLinks": "각 SNS 링크",
-      "content": "콘텐츠",
+      "snsLinks": "링크",
+      "content": "카테고리",
       "siteInfo": "사이트 정보",
-      "latestUpdates": "최신 업데이트",
-      "mainFeatures": "주요 기능",
-      "visitorMessage": "방문해주셔서 감사합니다"
+      "latestUpdates": "최신 업데이트"
     },
     "author": {
-      "name": "이름",
-      "introduction": "안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!",
-      "hobbies": "주요 취미",
-      "currentProject": "2024년부터 블로그 운영 중"
+      "name": "사이트 소유자",
+      "introduction": "dakimakura는 개인 목적의 사이트입니다."
     },
     "hobbies": ["그림 그리기", "게임", "DIY 프로젝트"],
     "aboutSite": {
-      "text1": "2024년 현재, 전반적으로 새롭게 만들고 싶지만 작업이 전혀 진행되지 않고 있습니다.",
-      "text2": "이 사이트의 내용도 그다지 업데이트하지 못해서 정말 죄송합니다."
+      "text1": "안녕하세요.",
+      "text2": "30분 후 잠자리에 들 예정입니다."
     },
     "navigation": [
-      {
-        "name": "소개",
-        "url": "/aboutme.html"
-      },
       {
         "name": "글",
         "url": "/txt/index.html"
@@ -85,7 +78,7 @@
     ],
     "visitorMessage": {
       "title": "방문해주셔서 감사합니다",
-      "text": "DIY Hamster Dungeon에 오신 것을 환영합니다! 자유롭게 둘러보시고 즐거운 시간 보내세요!",
+      "text": "dakimakura에 오신 것을 환영합니다! 자유롭게 둘러보시고 즐거운 시간 보내세요!",
       "actions": {
         "sendMessage": "메시지 보내기",
         "viewGallery": "갤러리 보기"
@@ -98,8 +91,8 @@
   },
   "jp": {
     "site": {
-      "title": "DIY Hamster Dungeon",
-      "description": "DIY Hamster Dungeon - 個人ブログ"
+      "title": "dakimakura",
+      "description": "dakimakura - 個人ブログ"
     },
     "sections": {
       "selfIntroduction": "自己紹介",
@@ -113,7 +106,7 @@
     },
     "author": {
       "name": "名前",
-      "introduction": "こんにちは！DIY Hamster Dungeonブログへようこそ！",
+      "introduction": "こんにちは！dakimakuraブログへようこそ！",
       "hobbies": "主な趣味",
       "currentProject": "2024年からブログ運営中"
     },
@@ -182,7 +175,7 @@
     ],
     "visitorMessage": {
       "title": "ご訪問ありがとうございます",
-      "text": "DIY Hamster Dungeonへようこそ！自由に見回して楽しい時間をお過ごしください！",
+      "text": "dakimakuraへようこそ！自由に見回して楽しい時間をお過ごしください！",
       "actions": {
         "sendMessage": "メッセージを送る",
         "viewGallery": "ギャラリーを見る"
@@ -195,8 +188,8 @@
   },
   "en": {
     "site": {
-      "title": "DIY Hamster Dungeon",
-      "description": "DIY Hamster Dungeon - Personal Blog"
+      "title": "dakimakura",
+      "description": "dakimakura - Personal Blog"
     },
     "sections": {
       "selfIntroduction": "About Me",
@@ -210,7 +203,7 @@
     },
     "author": {
       "name": "Name",
-      "introduction": "Hello! Welcome to the DIY Hamster Dungeon blog!",
+      "introduction": "Hello! Welcome to the dakimakura blog!",
       "hobbies": "Main Hobbies",
       "currentProject": "Running blog since 2024"
     },
@@ -279,7 +272,7 @@
     ],
     "visitorMessage": {
       "title": "Thank You for Visiting",
-      "text": "Welcome to DIY Hamster Dungeon! Feel free to look around and have a great time!",
+      "text": "Welcome to dakimakura! Feel free to look around and have a great time!",
       "actions": {
         "sendMessage": "Send Message",
         "viewGallery": "View Gallery"

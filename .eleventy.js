@@ -52,6 +52,8 @@ module.exports = function(eleventyConfig) {
 
   // 다국어 필터 추가
   eleventyConfig.addFilter("t", function(key, lang = "kr") {
+    if (!key) return key; // key가 undefined이면 그대로 반환
+    
     const i18n = require("./src/_data/i18n.json");
     const keys = key.split('.');
     let value = i18n[lang];
@@ -124,6 +126,8 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/js");
+  eleventyConfig.addPassthroughCopy("src/style.css");
+  eleventyConfig.addPassthroughCopy("src/index.css");
   eleventyConfig.addPassthroughCopy("src/robots.txt");
   eleventyConfig.addPassthroughCopy("neocities.png");
 

@@ -1,7 +1,7 @@
 ---
 layout: layout.njk
-title: "DIY Hamster Dungeon"
-description: "DIY Hamster Dungeon - 개인 블로그"
+title: "dakimakura"
+description: "dakimakura - 개인 블로그"
 showNavigation: true
 css: "/index.css"
 lang: "kr"
@@ -20,25 +20,39 @@ lang: "kr"
 </section>
 
 <!-- 자기소개 섹션 -->
-<section>
-  <h2>{{ i18n_kr.sections.selfIntroduction | t(lang) }}</h2>
+<!-- <section>
   <table>
     <tr>
       <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.author.name | t(lang) }}</font></font></th>
       <td><span class="fn nickname" itemprop="name"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.author.name }}</font></font></span></td>
     </tr>
   </table>
-  <p>{{ i18n_kr.author.introduction | t(lang) }}</p>
-  <p>{{ i18n_kr.author.hobbies | t(lang) }}: {{ site.author.hobbies | join(', ') }}</p>
-  <p>{{ i18n_kr.author.currentProject | t(lang) }}</p>
-</section>
+</section> -->
 
 <!-- 사이트 소개 섹션 -->
 <section>
   <h2>{{ i18n_kr.sections.aboutSite | t(lang) }}</h2>
+  <p>{{ i18n_kr.author.name | t(lang) }}: {{ i18n_kr.site.author }}</p>
+  <p>{{ i18n_kr.author.introduction | t(lang) }}</p>
   <p>{{ i18n_kr.aboutSite.text1 | t(lang) }}</p>
   <p>{{ i18n_kr.aboutSite.text2 | t(lang) }}</p>
 </section>
+
+
+<!-- 콘텐츠 섹션 -->
+<section>
+  <h2>{{ i18n_kr.sections.content }}</h2>
+  <ul class="vertical-layout">
+    {% for nav in i18n_kr.navigation %}
+    <li>
+      <a href="{{ nav.url | localizedUrl(lang) }}" class="text-button">
+        {{ nav.name | t(lang) }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
 
 <!-- SNS 링크 섹션 -->
 <section>
@@ -68,70 +82,9 @@ lang: "kr"
   </ul>
 </section>
 
-<!-- 콘텐츠 섹션 -->
-<section>
-  <h2>{{ i18n_kr.sections.content | t(lang) }}</h2>
-  <ul class="horizontal-layout">
-    {% for nav in i18n_kr.navigation %}
-    <li>
-      <a href="{{ nav.url | localizedUrl(lang) }}">
-        <div class="clickable button-like-decoration">
-          <p>{{ nav.name | t(lang) }}</p>
-        </div>
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-</section>
-
-
-<!-- 최신 업데이트 섹션 -->
-<section>
-  <h2>{{ i18n_kr.sections.latestUpdates | t(lang) }}</h2>
-  <table>
-    {% for update in i18n_kr.updates %}
-    <tr>
-      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ update.date }}</font></font></th>
-      <td><span class="update-text"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ update.text | t(lang) }}</font></font></span></td>
-    </tr>
-    {% endfor %}
-  </table>
-</section>
-
-
-<!-- 작은 섹션들 -->
-<section class="small-section">
-  <h2>사이트 정보</h2>
-  <table>
-    <tr>
-      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.posts | t(lang) }}</font></font></th>
-      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ realPostCount }}</font></font></span></td>
-    </tr>
-    <tr>
-      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.visitors | t(lang) }}</font></font></th>
-      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.stats.visitors }}</font></font></span></td>
-    </tr>
-    <tr>
-      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.stats.lastUpdate | t(lang) }}</font></font></th>
-      <td><span class="stat-value"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.stats.lastUpdate }}</font></font></span></td>
-    </tr>
-  </table>
-</section>
-
-<section class="small-section">
-  <h2>최근 활동</h2>
-  <p>블로그 업데이트와 새로운 프로젝트 소식을 확인해보세요.</p>
-</section>
-
-<section class="small-section">
-  <h2>연락처</h2>
-  <p>궁금한 점이 있으시면 언제든 연락해주세요!</p>
-</section>
-
 <!-- 방문자 메시지 -->
-<section class="visitor-message">
-  <h3>{{ i18n_kr.visitorMessage.title | t(lang) }}</h3>
-  <p>{{ i18n_kr.visitorMessage.text | t(lang) }}</p>
+<section class="site-stats">
+  <p id="site-stats">{{ i18n_kr.stats.posts | t(lang) }}: {{ realPostCount }}, {{ i18n_kr.stats.visitors | t(lang) }}: {{ site.stats.visitors }}, {{ i18n_kr.stats.lastUpdate | t(lang) }}: <span id="last-update">로딩 중...</span></p>
   <div class="message-actions">
     <a href="/contact" class="button">{{ i18n_kr.visitorMessage.actions.sendMessage | t(lang) }}</a>
     <a href="/gallery" class="button secondary">{{ i18n_kr.visitorMessage.actions.viewGallery | t(lang) }}</a>

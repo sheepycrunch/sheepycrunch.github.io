@@ -1,7 +1,7 @@
 ---
 layout: layout.njk
-title: "DIY Hamster Dungeon"
-description: "DIY Hamster Dungeon - Personal Blog"
+title: "dakimakura"
+description: "dakimakura - Personal Blog"
 showNavigation: true
 css: "/index.css"
 lang: "en"
@@ -24,11 +24,10 @@ lang: "en"
   <h2>{{ i18n_en.sections.selfIntroduction }}</h2>
   <dl id="name-display">
     <dt>{{ i18n_en.author.name }}</dt>
-    <dd>{{ site.author.name }}</dd>
+    <dd>{{ site.author }}</dd>
   </dl>
   <p>{{ i18n_en.author.introduction }}</p>
   <p>{{ i18n_en.author.hobbies }}: {{ i18n_en.hobbies | join(', ') }}</p>
-  <p>{{ i18n_en.author.currentProject }}</p>
 </section>
 
 <!-- 사이트 소개 섹션 -->
@@ -129,7 +128,7 @@ lang: "en"
 </section>
 
 <!-- 방문자 메시지 -->
-<section class="visitor-message">
+<section class="site-stats">
   <h3>{{ i18n_en.visitorMessage.title }}</h3>
   <p>{{ i18n_en.visitorMessage.text }}</p>
   <div class="message-actions">
