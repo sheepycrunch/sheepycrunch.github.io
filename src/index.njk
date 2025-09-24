@@ -1,61 +1,120 @@
 ---
 layout: layout.njk
-title: It''s a Wonderful World
-description: A lovingly preserved Sailor Moon fan shrine in glorious 1998 style.
-scripts:
-  - |
-      document.addEventListener("DOMContentLoaded", () => {
-        const ticker = [
-          "Site refreshed: Sept 24, 2024",
-          "Best viewed in Netscape Navigator 4.7!",
-          "You are visitor #" + Math.floor(Math.random() * 900000 + 100000)
-        ];
-        let idx = 0;
-        setInterval(() => {
-          window.status = ticker[idx % ticker.length];
-          idx += 1;
-        }, 2200);
-      });
+title: "DIY Hamster Dungeon"
+description: "DIY Hamster Dungeon - 개인 블로그"
 ---
-<div class="intro-paragraph">
-  <p>
-    Thanks for stumbling into this wee corner of the galaxy, I''ve been doing some spring cleaning so
-    everything''s working beautifully and seamlessly <span class="sparkles">*crossing both fingers*</span>.
-  </p>
-  <p>
-    For the stout hearted looking for adventure there''s <a href="/adventure" class="nostalgia-link">The Wonderful World of Adventure</a>.
-    Some might call it a role playing game, but I''d call it an adventure in the making... Any Juliets or Romeos out there just waiting to be
-    star crossed lovers might want to take a look at the <a href="/cupids-arrow" class="nostalgia-link">Cupid''s Arrow</a> frequently frequented
-    by many hearts seeking laughter and love.
-  </p>
-  <p>
-    If you''re lost and ever so nervous about contacting the gophers that run things, just hit the email bubble below.
-    Our inbox is always open and the rainbow mail carrier never sleeps!
-  </p>
-</div>
 
-<div class="callouts">
-  <div class="callout-card">
-    <h3>Latest Updates</h3>
-    <ul>
-      <li>Sept 24, 2024 · New scans in the gallery!</li>
-      <li>Sept 10, 2024 · Shrine navigation polished.</li>
-      <li>Aug 29, 2024 · Guestbook revived.</li>
-    </ul>
-  </div>
-  <div class="callout-card">
-    <h3>Visitor Mission</h3>
-    <p>
-      <strong>Step 1:</strong> Grab a moon prism cookie.<br>
-      <strong>Step 2:</strong> Sign the guestbook.<br>
-      <strong>Step 3:</strong> Tell a friend that Sailor V still rocks!
-    </p>
+<!-- 메인 환영 섹션 -->
+<div class="welcome-section">
+  <h1>✦ Welcome to DIY Hamster Dungeon! ✦</h1>
+  <div class="welcome-content">
+    <p class="welcome-text">안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!</p>
+    <p class="welcome-text">여기서 다양한 글과 낙서를 만나보실 수 있습니다.</p>
   </div>
 </div>
 
-<blockquote class="cloud-quote">"Every moonbeam is a postcard from destiny, so shine on!"</blockquote>
+<!-- 메인 콘텐츠 그리드 -->
+<div class="content-grid">
+  
+  <!-- 왼쪽 콘텐츠 박스 -->
+  <div class="content-box primary">
+    <h2>🎨 Latest Updates</h2>
+    <div class="update-list">
+      <div class="update-item">
+        <span class="update-date">2024.01.15</span>
+        <span class="update-text">새로운 갤러리 업데이트!</span>
+      </div>
+      <div class="update-item">
+        <span class="update-date">2024.01.10</span>
+        <span class="update-text">블로그 디자인 개선</span>
+      </div>
+      <div class="update-item">
+        <span class="update-date">2024.01.05</span>
+        <span class="update-text">첫 번째 포스트 작성</span>
+      </div>
+    </div>
+  </div>
 
-<p class="footer-note">
-  Need the no-frames version? <a href="#" class="nostalgia-link">Click here for old-school mode</a>.<br>
-  Want to trade banners? Email me and I''ll send back a 88x31 button!
-</p>
+  <!-- 중앙 콘텐츠 박스 -->
+  <div class="content-box secondary">
+    <h2>📚 Available Pages</h2>
+    <div class="page-links">
+      <a href="/gallery" class="page-link">
+        <span class="link-icon">🎨</span>
+        <span class="link-text">Gallery</span>
+        <span class="link-desc">My Art Collection</span>
+      </a>
+      <a href="/about" class="page-link">
+        <span class="link-icon">✿</span>
+        <span class="link-text">About</span>
+        <span class="link-desc">Learn About Me</span>
+      </a>
+      <a href="/contact" class="page-link">
+        <span class="link-icon">☎</span>
+        <span class="link-text">Contact</span>
+        <span class="link-desc">Get In Touch</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 오른쪽 콘텐츠 박스 -->
+  <div class="content-box accent">
+    <h2>🌟 Quick Info</h2>
+    <div class="info-stats">
+      <div class="stat-item">
+        <span class="stat-label">Posts:</span>
+        <span class="stat-value">42</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Visitors:</span>
+        <span class="stat-value">1,337</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Last Update:</span>
+        <span class="stat-value">Today</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 하단 특별 섹션 -->
+<div class="special-section">
+  <div class="quote-box">
+    <h3>💫 Daily Quote</h3>
+    <blockquote class="daily-quote">
+      "Every hamster needs a cozy dungeon to call home! 🐹✨"
+    </blockquote>
+  </div>
+  
+  <div class="feature-box">
+    <h3>🎯 Featured Content</h3>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="feature-icon">🎨</span>
+        <span class="feature-title">Art Gallery</span>
+        <span class="feature-desc">Check out my latest drawings!</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📝</span>
+        <span class="feature-title">Blog Posts</span>
+        <span class="feature-desc">Read my thoughts and stories</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🎮</span>
+        <span class="feature-title">Projects</span>
+        <span class="feature-desc">DIY and creative projects</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 방문자 메시지 -->
+<div class="visitor-message">
+  <h3>💌 Leave a Message</h3>
+  <p>Thanks for visiting my hamster dungeon! Feel free to explore and enjoy your stay! 🌸</p>
+  <div class="message-actions">
+    <a href="/contact" class="button">Send Message</a>
+    <a href="/gallery" class="button secondary">View Gallery</a>
+  </div>
+</div>
