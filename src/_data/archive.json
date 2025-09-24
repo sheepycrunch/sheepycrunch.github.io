@@ -1,0 +1,45 @@
+{
+  "timeline": [
+    {
+      "year": "2024",
+      "month": "12",
+      "date": "19",
+      "events": [
+        {
+          "description": "첫 번째 글",
+          "type": "post",
+          "url": "/txt.html"
+        },
+        {
+          "description": "새로운 그림 업로드",
+          "type": "gallery",
+          "url": "/gallery.html"
+        }
+      ]
+    },
+    {
+      "year": "2024",
+      "month": "11",
+      "date": "30",
+      "events": [
+        {
+          "description": "유용한 링크 추가",
+          "type": "link",
+          "url": "/links.html"
+        }
+      ]
+    },
+    {
+      "year": "2024",
+      "month": "10",
+      "date": "15",
+      "events": [
+        {
+          "description": "사이트 오픈",
+          "type": "milestone",
+          "url": null
+        }
+      ]
+    }
+  ]
+}

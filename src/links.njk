@@ -1,0 +1,126 @@
+---
+layout: layout.njk
+title: "{{ i18n_kr.sections.snsLinks | t(lang) }}"
+description: "{{ i18n_kr.sections.snsLinks | t(lang) }}"
+lang: "kr"
+---
+
+<section>
+  <h1>{{ i18n_kr.sections.snsLinks | t(lang) }}</h1>
+  <p>{{ i18n_kr.aboutSite.text2 | t(lang) }}</p>
+  
+  <div class="links-categories">
+    <div class="link-category">
+      <h3>개발</h3>
+      <ul class="link-list">
+        <li>
+          <a href="https://github.com" target="_blank" rel="noopener">
+            <strong>GitHub</strong>
+            <span>코드 저장소 및 협업 플랫폼</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://stackoverflow.com" target="_blank" rel="noopener">
+            <strong>Stack Overflow</strong>
+            <span>개발자 Q&A 커뮤니티</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="link-category">
+      <h3>디자인</h3>
+      <ul class="link-list">
+        <li>
+          <a href="https://dribbble.com" target="_blank" rel="noopener">
+            <strong>Dribbble</strong>
+            <span>디자인 포트폴리오 플랫폼</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.behance.net" target="_blank" rel="noopener">
+            <strong>Behance</strong>
+            <span>크리에이티브 포트폴리오</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="link-category">
+      <h3>기타</h3>
+      <ul class="link-list">
+        <li>
+          <a href="https://www.youtube.com" target="_blank" rel="noopener">
+            <strong>YouTube</strong>
+            <span>동영상 플랫폼</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+.links-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3xl);
+  margin-top: var(--spacing-xl);
+}
+
+.link-category {
+  background: var(--bg-secondary);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.link-category h3 {
+  margin: 0 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-large);
+}
+
+.link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.link-list li {
+  margin: 0;
+}
+
+.link-list a {
+  display: block;
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
+}
+
+.link-list a:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+}
+
+.link-list a strong {
+  display: block;
+  color: var(--accent-primary);
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-base);
+}
+
+.link-list a span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-tight);
+}
+</style>

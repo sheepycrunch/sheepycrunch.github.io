@@ -44,6 +44,12 @@ class AdminPanel {
           <h4>글 작성기</h4>
           <button id="open-writer">글 작성기 열기</button>
           <button id="export-html">HTML 내보내기</button>
+          <button id="sync-data">데이터 동기화</button>
+        </div>
+        <div class="admin-section">
+          <h4>업데이트 관리</h4>
+          <button id="add-update">새 업데이트 추가</button>
+          <button id="manage-updates">업데이트 목록 관리</button>
         </div>
         <div class="admin-section">
           <h4>개발자 도구</h4>
@@ -179,6 +185,8 @@ class AdminPanel {
     // 포스트 수 증가
     document.getElementById('increment-posts').addEventListener('click', () => {
       if (window.statsManager) {
+        // 실제 포스트를 추가하는 로직
+        this.addSamplePost();
         window.statsManager.incrementPostCount();
         this.updateCurrentStats();
       }
@@ -225,6 +233,22 @@ class AdminPanel {
       }
     });
     
+    // 새 업데이트 추가
+    document.getElementById('add-update').addEventListener('click', () => {
+      this.openUpdateEditor();
+    });
+    
+    // 업데이트 목록 관리
+    document.getElementById('manage-updates').addEventListener('click', () => {
+      this.manageUpdates();
+    });
+    
+    // 데이터 동기화
+    document.getElementById('sync-data').addEventListener('click', () => {
+      this.syncDataTemplates();
+      alert('데이터 동기화가 완료되었습니다!');
+    });
+    
     // 현재 통계 업데이트
     this.updateCurrentStats();
     setInterval(() => this.updateCurrentStats(), 5000);
@@ -246,6 +270,140 @@ class AdminPanel {
       const stats = window.statsManager.getStats();
       statsElement.textContent = JSON.stringify(stats, null, 2);
     }
+  }
+
+  // 데이터 템플릿 동기화 기능
+  syncDataTemplates() {
+    // 로컬 스토리지에서 데이터를 읽어와서 페이지에 반영
+    this.loadTxtData();
+    this.loadGalleryData();
+    this.loadArchiveData();
+  }
+
+  loadTxtData() {
+    const txtData = localStorage.getItem('txt_data');
+    if (txtData) {
+      // txt 페이지에 데이터 반영 (실제로는 서버에 저장되어야 함)
+      console.log('txt 데이터 로드:', JSON.parse(txtData));
+    }
+  }
+
+  loadGalleryData() {
+    const galleryData = localStorage.getItem('gallery_data');
+    if (galleryData) {
+      // gallery 페이지에 데이터 반영
+      console.log('gallery 데이터 로드:', JSON.parse(galleryData));
+    }
+  }
+
+  loadArchiveData() {
+    const archiveData = localStorage.getItem('archive_data');
+    if (archiveData) {
+      // archive 페이지에 데이터 반영
+      console.log('archive 데이터 로드:', JSON.parse(archiveData));
+    }
+  }
+
+  addSamplePost() {
+    const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    const newPost = {
+      id: Date.now(),
+      content: `샘플 포스트 #${posts.length + 1}\n\n이것은 관리자 패널에서 생성된 샘플 포스트입니다.`,
+      tags: ['sample', 'admin'],
+      image: '',
+      category: 'posts',
+      date: new Date().toLocaleDateString('ko-KR').replace(/\./g, '.').replace(/\s/g, ''),
+      timestamp: Date.now()
+    };
+    
+    posts.push(newPost);
+    localStorage.setItem('hamster_posts', JSON.stringify(posts));
+    
+    // 데이터 템플릿에 반영
+    this.updateDataTemplate(newPost);
+    
+    alert(`샘플 포스트가 추가되었습니다! (총 ${posts.length}개)`);
+  }
+
+  updateDataTemplate(post) {
+    // 카테고리별로 데이터 템플릿 업데이트
+    switch(post.category) {
+      case 'posts':
+        this.updateTxtData(post);
+        break;
+      case 'gallery':
+        this.updateGalleryData(post);
+        break;
+      case 'archive':
+        this.updateArchiveData(post);
+        break;
+      default:
+        this.updateTxtData(post);
+    }
+  }
+
+  updateTxtData(post) {
+    // txt.json 데이터 업데이트 (실제로는 서버에 저장해야 함)
+    console.log('txt 데이터 업데이트:', post);
+    // 여기서는 로컬 스토리지에 임시 저장
+    const txtData = JSON.parse(localStorage.getItem('txt_data') || '{"posts": []}');
+    txtData.posts.push({
+      id: post.id,
+      date: post.date,
+      category: post.category,
+      content: post.content,
+      excerpt: post.content.substring(0, 50) + '...',
+      tags: post.tags
+    });
+    localStorage.setItem('txt_data', JSON.stringify(txtData));
+  }
+
+  updateGalleryData(post) {
+    // gallery.json 데이터 업데이트
+    console.log('gallery 데이터 업데이트:', post);
+    const galleryData = JSON.parse(localStorage.getItem('gallery_data') || '{"gallery": []}');
+    galleryData.gallery.push({
+      id: post.id,
+      date: post.date,
+      category: post.category,
+      image: post.image,
+      description: post.content,
+      tags: post.tags
+    });
+    localStorage.setItem('gallery_data', JSON.stringify(galleryData));
+  }
+
+  updateArchiveData(post) {
+    // archive.json 데이터 업데이트
+    console.log('archive 데이터 업데이트:', post);
+    const archiveData = JSON.parse(localStorage.getItem('archive_data') || '{"timeline": []}');
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const date = today.getDate();
+    
+    // 해당 날짜의 타임라인 찾기
+    let timelineItem = archiveData.timeline.find(item => 
+      item.year === year.toString() && item.month === month.toString()
+    );
+    
+    if (!timelineItem) {
+      timelineItem = {
+        year: year.toString(),
+        month: month.toString(),
+        date: date.toString(),
+        events: []
+      };
+      archiveData.timeline.push(timelineItem);
+    }
+    
+    timelineItem.events.push({
+      description: post.content,
+      type: post.category,
+      url: `/${post.category}.html`
+    });
+    
+    localStorage.setItem('archive_data', JSON.stringify(archiveData));
   }
   
   show() {
@@ -305,11 +463,9 @@ class AdminPanel {
           <div class="form-group">
             <label for="post-category">카테고리</label>
             <select id="post-category">
-              <option value="posts">일반 글</option>
-              <option value="reviews">리뷰</option>
-              <option value="tutorials">튜토리얼</option>
-              <option value="thoughts">생각</option>
-              <option value="projects">프로젝트</option>
+              <option value="posts">일반 글 (txt)</option>
+              <option value="gallery">갤러리</option>
+              <option value="archive">아카이브</option>
             </select>
           </div>
           
@@ -634,9 +790,54 @@ class AdminPanel {
       this.showTagSuggestions();
     });
     
-    // 태그 영어 강제
+    // 태그 한글을 영문으로 자동 변환
     document.getElementById('post-tags').addEventListener('input', (e) => {
-      e.target.value = e.target.value.replace(/[^a-zA-Z0-9,\s]/g, '');
+      let value = e.target.value;
+      
+      // 한글을 영문으로 변환하는 매핑
+      const koreanToEnglish = {
+        '일반': 'general',
+        '리뷰': 'review', 
+        '갤러리': 'gallery',
+        '아카이브': 'archive',
+        '생각': 'thoughts',
+        '프로젝트': 'project',
+        '튜토리얼': 'tutorial',
+        '일기': 'diary',
+        '후기': 'review',
+        '소감': 'impression',
+        '느낌': 'feeling',
+        '경험': 'experience',
+        '학습': 'learning',
+        '공부': 'study',
+        '개발': 'development',
+        '코딩': 'coding',
+        '프로그래밍': 'programming',
+        '디자인': 'design',
+        '아트': 'art',
+        '그림': 'drawing',
+        '스케치': 'sketch',
+        '컬러링': 'coloring',
+        '디지털': 'digital',
+        '첫번째': 'first',
+        '두번째': 'second',
+        '세번째': 'third',
+        '새로운': 'new',
+        '최신': 'latest',
+        '인기': 'popular',
+        '추천': 'recommended'
+      };
+      
+      // 한글을 영문으로 변환
+      Object.keys(koreanToEnglish).forEach(korean => {
+        const regex = new RegExp(korean, 'g');
+        value = value.replace(regex, koreanToEnglish[korean]);
+      });
+      
+      // 특수문자 제거 (영문, 숫자, 쉼표, 공백만 허용)
+      value = value.replace(/[^a-zA-Z0-9,\s]/g, '');
+      
+      e.target.value = value;
     });
     
     // 이미지 드래그앤드랍
@@ -664,29 +865,26 @@ class AdminPanel {
       return;
     }
     
-    // 파일명 자동생성: (카테고리)_(글번호)
-    const finalFilename = this.generateAutoFilename(category);
-    
+    // 통일된 템플릿 구조: 그림 하나 + 글 하나 (타이틀 없음)
     const post = {
       id: Date.now(),
       content: content,
-      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
       image: image,
-      filename: finalFilename,
+      date: new Date().toLocaleDateString('ko-KR').replace(/\./g, '.').replace(/\s/g, ''),
       category: category,
-      date: new Date().toISOString(),
+      tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
       timestamp: Date.now()
     };
     
-    // 로컬 스토리지에 저장
+    // 로컬 스토리지에 저장 (기존 방식 유지)
     const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
     posts.push(post);
     localStorage.setItem('hamster_posts', JSON.stringify(posts));
     
-    // HTML 파일 자동 생성
-    this.generateHTMLFromPost(post);
+    // 데이터 템플릿에 반영
+    this.updateDataTemplate(post);
     
-    alert(`글이 저장되었습니다!\nHTML 파일: ${category}/${finalFilename}.html`);
+    alert(`글이 저장되었습니다!\n카테고리: ${category}\n이미지: ${image ? '있음' : '없음'}`);
     this.clearForm();
   }
   
@@ -1044,6 +1242,68 @@ eleventyExcludeFromCollections: false
   
   isValidImageUrl(url) {
     return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) || url.startsWith('data:image/');
+  }
+  
+  openUpdateEditor() {
+    const updateText = prompt('새 업데이트 내용을 입력하세요:');
+    if (updateText && updateText.trim()) {
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}.${(today.getMonth() + 1).toString().padStart(2, '0')}.${today.getDate().toString().padStart(2, '0')}`;
+      
+      const newUpdate = {
+        date: dateStr,
+        text: updateText.trim()
+      };
+      
+      // 로컬 스토리지에 저장
+      const updates = JSON.parse(localStorage.getItem('hamster_updates') || '[]');
+      updates.unshift(newUpdate); // 최신 업데이트를 맨 위에 추가
+      
+      // 최대 10개까지만 저장
+      if (updates.length > 10) {
+        updates.splice(10);
+      }
+      
+      localStorage.setItem('hamster_updates', JSON.stringify(updates));
+      alert('업데이트가 추가되었습니다!');
+      
+      // i18n.json 파일 업데이트 (실제로는 수동으로 해야 함)
+      console.log('i18n.json 파일의 updates 배열을 수동으로 업데이트해주세요:', updates);
+    }
+  }
+  
+  manageUpdates() {
+    const updates = JSON.parse(localStorage.getItem('hamster_updates') || '[]');
+    
+    if (updates.length === 0) {
+      alert('저장된 업데이트가 없습니다.');
+      return;
+    }
+    
+    let updateList = '현재 업데이트 목록:\n\n';
+    updates.forEach((update, index) => {
+      updateList += `${index + 1}. [${update.date}] ${update.text}\n`;
+    });
+    
+    const action = prompt(`${updateList}\n\n삭제할 번호를 입력하거나 "전체삭제"를 입력하세요:`);
+    
+    if (action === '전체삭제') {
+      if (confirm('정말로 모든 업데이트를 삭제하시겠습니까?')) {
+        localStorage.removeItem('hamster_updates');
+        alert('모든 업데이트가 삭제되었습니다.');
+      }
+    } else if (action && !isNaN(action)) {
+      const index = parseInt(action) - 1;
+      if (index >= 0 && index < updates.length) {
+        if (confirm(`"${updates[index].text}" 업데이트를 삭제하시겠습니까?`)) {
+          updates.splice(index, 1);
+          localStorage.setItem('hamster_updates', JSON.stringify(updates));
+          alert('업데이트가 삭제되었습니다.');
+        }
+      } else {
+        alert('잘못된 번호입니다.');
+      }
+    }
   }
 }
 

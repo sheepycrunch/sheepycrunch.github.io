@@ -1,0 +1,74 @@
+---
+layout: layout.njk
+title: "{{ i18n_kr.sections.content | t(lang) }}"
+description: "{{ i18n_kr.sections.content | t(lang) }}"
+lang: "kr"
+---
+
+<section>
+  <h1>{{ i18n_kr.sections.content | t(lang) }}</h1>
+  <p>{{ i18n_kr.aboutSite.text1 | t(lang) }}</p>
+  
+  <div class="post-list">
+    {% for post in txt.posts %}
+    <div class="post-item">
+      <p class="post-meta">{{ post.date }} | {{ post.category }}</p>
+      <p>{{ post.content }}</p>
+      {% if post.tags %}
+      <div class="post-tags">
+        {% for tag in post.tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<style>
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+.post-item {
+  padding: var(--spacing-xl);
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.post-item h3 {
+  margin: 0 0 var(--spacing-sm) 0;
+  color: var(--text-primary);
+}
+
+.post-meta {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.post-item p:last-child {
+  margin: 0;
+  line-height: var(--line-height-base);
+}
+
+.post-tags {
+  margin-top: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-small);
+}
+</style>

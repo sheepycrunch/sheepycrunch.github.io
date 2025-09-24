@@ -34,15 +34,11 @@
       {
         "name": "아카이브",
         "url": "/archive/index.html"
-      },
-      {
-        "name": "링크",
-        "url": "/links/index.html"
       }
     ],
     "stats": {
       "posts": "포스트",
-      "visitors": "방문자",
+      "visitors": "방문자 수",
       "lastUpdate": "마지막 업데이트"
     },
     "updates": [
@@ -59,31 +55,6 @@
         "text": "첫 번째 포스트 작성"
       }
     ],
-    "features": [
-      {
-        "icon": "✎",
-        "title": "Art Gallery",
-        "description": "최신 그림들을 확인해보세요!"
-      },
-      {
-        "icon": "✐",
-        "title": "Blog Posts",
-        "description": "생각과 이야기를 읽어보세요"
-      },
-      {
-        "icon": "⌂",
-        "title": "Projects",
-        "description": "DIY와 창작 프로젝트들"
-      }
-    ],
-    "visitorMessage": {
-      "title": "방문해주셔서 감사합니다",
-      "text": "dakimakura에 오신 것을 환영합니다! 자유롭게 둘러보시고 즐거운 시간 보내세요!",
-      "actions": {
-        "sendMessage": "메시지 보내기",
-        "viewGallery": "갤러리 보기"
-      }
-    },
     "language": {
       "current": "한국어",
       "switch": "언어 변경"
@@ -173,14 +144,6 @@
         "description": "DIYと創作プロジェクト"
       }
     ],
-    "visitorMessage": {
-      "title": "ご訪問ありがとうございます",
-      "text": "dakimakuraへようこそ！自由に見回して楽しい時間をお過ごしください！",
-      "actions": {
-        "sendMessage": "メッセージを送る",
-        "viewGallery": "ギャラリーを見る"
-      }
-    },
     "language": {
       "current": "日本語",
       "switch": "言語変更"
@@ -270,14 +233,6 @@
         "description": "DIY and creative projects"
       }
     ],
-    "visitorMessage": {
-      "title": "Thank You for Visiting",
-      "text": "Welcome to dakimakura! Feel free to look around and have a great time!",
-      "actions": {
-        "sendMessage": "Send Message",
-        "viewGallery": "View Gallery"
-      }
-    },
     "language": {
       "current": "English",
       "switch": "Change Language"

@@ -19,8 +19,8 @@ class StatsManager {
   
   loadStats() {
     const defaultStats = {
-      visitors: 1337,
-      posts: 42,
+      visitors: 0,
+      posts: 0,
       lastUpdate: new Date().toISOString()
     };
     
@@ -53,7 +53,8 @@ class StatsManager {
       localStorage.setItem(this.visitorKey, this.stats.visitors.toString());
     }
     
-    this.updateElement('.stat-item:nth-child(2) .stat-value', this.stats.visitors.toLocaleString());
+    // 실제 HTML 구조에 맞게 업데이트
+    this.updateSiteStats();
   }
   
   updateLastUpdateDate() {
@@ -76,16 +77,38 @@ class StatsManager {
   
   updatePostCount() {
     // 실제 포스트 수를 계산하는 로직
-    // 여기서는 간단히 로컬 스토리지에서 관리
-    let postCount = parseInt(localStorage.getItem(this.postCountKey)) || this.stats.posts;
+    // 로컬 스토리지에서 저장된 포스트 수 가져오기
+    const savedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    let postCount = savedPosts.length;
     
-    // 실제로는 서버에서 파일 수를 계산하거나 API를 호출할 수 있음
-    // 예: fetch('/api/posts/count').then(response => response.json()).then(data => { ... });
+    // 기본 포스트들 (txt, gallery, archive, links)도 카운트
+    const defaultPosts = 4; // txt, gallery, archive, links
+    postCount += defaultPosts;
     
     this.stats.posts = postCount;
-    this.updateElement('.stat-item:nth-child(1) .stat-value', postCount.toLocaleString());
+    localStorage.setItem(this.postCountKey, postCount.toString());
+    
+    // 실제 HTML 구조에 맞게 업데이트
+    this.updateSiteStats();
   }
   
+  updateSiteStats() {
+    const siteStatsElement = document.getElementById('site-stats');
+    if (siteStatsElement) {
+      const now = new Date();
+      const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const formattedDate = now.toLocaleDateString('ko-KR', options);
+      
+      siteStatsElement.innerHTML = `포스트: ${this.stats.posts}, 방문자: ${this.stats.visitors.toLocaleString()}, 마지막 업데이트: <span id="last-update">${formattedDate}</span>`;
+    }
+  }
+
   updateElement(selector, value) {
     const element = document.querySelector(selector);
     if (element) {
@@ -145,7 +168,7 @@ class StatsManager {
   
   // 외부에서 호출할 수 있는 메서드들
   incrementPostCount() {
-    this.stats.posts++;
+    // 실제 포스트 수를 다시 계산
     this.updatePostCount();
     this.saveStats();
   }
