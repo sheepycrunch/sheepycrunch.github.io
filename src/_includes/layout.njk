@@ -13,27 +13,91 @@
   {% endif %}
 </head>
 <body>
-  <div id="wrapper">
-    <div class="main-layout">
-      <div class="sidebar scanline">
-        <h1 class="logo-text glitter">DIY Hamster Dungeon</h1>
-        <p class="tagline blink">Welcome to my hamster lair on the web!</p>
-        <nav class="nav">
-          <ul>
-            <li><a href="/">★ Home ★</a></li>
-            <li><a href="/gallery">☆ Gallery ☆</a></li>
-            <li><a href="/about">✿ About ✿</a></li>
-            <li><a href="/contact">☎ Contact ☎</a></li>
-          </ul>
-        </nav>
-        <div class="visitor-counter">
-          This page has been visited <span style="color: #ff0000;">🔴 Counter</span> times since 2024. And I am pleased!
-        </div>
-      </div>
-      <div class="main-content scanline">
-        {{ content | safe }}
+  <!-- Geocities 스타일 메인 컨테이너 -->
+  <div id="geocities-container">
+    
+    <!-- 상단 배너 (레퍼런스 기반) -->
+    <div class="geocities-banner">
+      <div class="banner-content">
+        <span class="banner-text">✦ DIY HAMSTER DUNGEON ✦</span>
+        <div class="banner-decoration">🌸 ✨ 🌸</div>
       </div>
     </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-content-area">
+      
+      <!-- 왼쪽 사이드바 (Geocities 스타일) -->
+      <div class="left-sidebar">
+        <div class="sidebar-box">
+          <h2 class="sidebar-title">Navigation</h2>
+          <div class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/gallery" class="nav-link">🎨 Gallery</a>
+            <a href="/about" class="nav-link">✿ About</a>
+            <a href="/contact" class="nav-link">☎ Contact</a>
+          </div>
+        </div>
+        
+        <div class="sidebar-box">
+          <h3 class="sidebar-subtitle">Visitor Info</h3>
+          <div class="visitor-stats">
+            <p>You are visitor #999,999!</p>
+            <div class="counter-display">
+              <span class="counter-icon">🔴</span>
+              <span class="counter-text">Counter</span>
+            </div>
+            <p class="counter-note">Since 2024. And I am pleased!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 중앙 콘텐츠 영역 -->
+      <div class="center-content">
+        <div class="content-wrapper">
+          {{ content | safe }}
+        </div>
+      </div>
+
+      <!-- 오른쪽 사이드바 (선택적) -->
+      <div class="right-sidebar">
+        <div class="sidebar-box">
+          <h3 class="sidebar-subtitle">Quick Links</h3>
+          <div class="quick-links">
+            <a href="#" class="quick-link">🌟 Favorites</a>
+            <a href="#" class="quick-link">📚 Resources</a>
+            <a href="#" class="quick-link">🎵 Music</a>
+            <a href="#" class="quick-link">🎮 Games</a>
+          </div>
+        </div>
+        
+        <div class="sidebar-box">
+          <h3 class="sidebar-subtitle">Status</h3>
+          <div class="status-info">
+            <p class="status-text">Site Status: Online ✨</p>
+            <p class="status-text">Last Updated: Today</p>
+            <p class="status-text">Theme: Kawaii Mode</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <div class="geocities-footer">
+      <div class="footer-content">
+        <p class="footer-text">
+          © 2024 DIY Hamster Dungeon | 
+          <a href="/contact" class="footer-link">Contact Me</a> | 
+          <a href="/about" class="footer-link">About This Site</a>
+        </p>
+        <div class="footer-decoration">
+          <span>🌸</span>
+          <span>✨</span>
+          <span>🌸</span>
+        </div>
+      </div>
+    </div>
+
   </div>
   
   {% if scripts %}

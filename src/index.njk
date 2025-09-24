@@ -4,20 +4,117 @@ title: "DIY Hamster Dungeon"
 description: "DIY Hamster Dungeon - 개인 블로그"
 ---
 
-<div class="box">
-  <h2>✦ 홈 / Welcome</h2>
-  <div class="card">
-    <h3>안녕하세요!</h3>
-    <p>DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!</p>
-    <p>여기서 다양한 글과 낙서를 만나보실 수 있습니다.</p>
+<!-- 메인 환영 섹션 -->
+<div class="welcome-section">
+  <h1>✦ Welcome to DIY Hamster Dungeon! ✦</h1>
+  <div class="welcome-content">
+    <p class="welcome-text">안녕하세요! DIY Hamster Dungeon 블로그에 오신 것을 환영합니다!</p>
+    <p class="welcome-text">여기서 다양한 글과 낙서를 만나보실 수 있습니다.</p>
+  </div>
+</div>
+
+<!-- 메인 콘텐츠 그리드 -->
+<div class="content-grid">
+  
+  <!-- 왼쪽 콘텐츠 박스 -->
+  <div class="content-box primary">
+    <h2>🎨 Latest Updates</h2>
+    <div class="update-list">
+      <div class="update-item">
+        <span class="update-date">2024.01.15</span>
+        <span class="update-text">새로운 갤러리 업데이트!</span>
+      </div>
+      <div class="update-item">
+        <span class="update-date">2024.01.10</span>
+        <span class="update-text">블로그 디자인 개선</span>
+      </div>
+      <div class="update-item">
+        <span class="update-date">2024.01.05</span>
+        <span class="update-text">첫 번째 포스트 작성</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 중앙 콘텐츠 박스 -->
+  <div class="content-box secondary">
+    <h2>📚 Available Pages</h2>
+    <div class="page-links">
+      <a href="/gallery" class="page-link">
+        <span class="link-icon">🎨</span>
+        <span class="link-text">Gallery</span>
+        <span class="link-desc">My Art Collection</span>
+      </a>
+      <a href="/about" class="page-link">
+        <span class="link-icon">✿</span>
+        <span class="link-text">About</span>
+        <span class="link-desc">Learn About Me</span>
+      </a>
+      <a href="/contact" class="page-link">
+        <span class="link-icon">☎</span>
+        <span class="link-text">Contact</span>
+        <span class="link-desc">Get In Touch</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 오른쪽 콘텐츠 박스 -->
+  <div class="content-box accent">
+    <h2>🌟 Quick Info</h2>
+    <div class="info-stats">
+      <div class="stat-item">
+        <span class="stat-label">Posts:</span>
+        <span class="stat-value">42</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Visitors:</span>
+        <span class="stat-value">1,337</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Last Update:</span>
+        <span class="stat-value">Today</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 하단 특별 섹션 -->
+<div class="special-section">
+  <div class="quote-box">
+    <h3>💫 Daily Quote</h3>
+    <blockquote class="daily-quote">
+      "Every hamster needs a cozy dungeon to call home! 🐹✨"
+    </blockquote>
   </div>
   
-  <div class="box secondary">
-    <h3>사용 가능한 페이지</h3>
-    <ul>
-      {% for item in site.navigation %}
-      <li><a href="{{ item.url }}" class="button">{{ item.title }}</a></li>
-      {% endfor %}
-    </ul>
+  <div class="feature-box">
+    <h3>🎯 Featured Content</h3>
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="feature-icon">🎨</span>
+        <span class="feature-title">Art Gallery</span>
+        <span class="feature-desc">Check out my latest drawings!</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">📝</span>
+        <span class="feature-title">Blog Posts</span>
+        <span class="feature-desc">Read my thoughts and stories</span>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon">🎮</span>
+        <span class="feature-title">Projects</span>
+        <span class="feature-desc">DIY and creative projects</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 방문자 메시지 -->
+<div class="visitor-message">
+  <h3>💌 Leave a Message</h3>
+  <p>Thanks for visiting my hamster dungeon! Feel free to explore and enjoy your stay! 🌸</p>
+  <div class="message-actions">
+    <a href="/contact" class="button">Send Message</a>
+    <a href="/gallery" class="button secondary">View Gallery</a>
   </div>
 </div>
