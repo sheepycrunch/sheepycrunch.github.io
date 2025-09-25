@@ -22,10 +22,9 @@ module.exports = function(eleventyConfig) {
     navigation: [
       { name: "txt", url: "/txt/" },
       { name: "gallery", url: "/gallery/" },
-      { name: "archive", url: "/archive/" },
-      { name: "write", url: "/write/" },
+      { name: "links", url: "/archive/" },
       { name: "search", url: "/search/" },
-      { name: "links", url: "/links/" }
+      { name: "write", url: "/write/" },
     ],
     authorInfo: {
       introduction: "이 블로그는 기존 상업 블로그의 대안으로 설립되었습니다."
@@ -60,7 +59,6 @@ module.exports = function(eleventyConfig) {
         name: config.author.name,
         introduction: config.authorInfo.introduction
       },
-      hobbies: config.hobbies,
       aboutSite: config.aboutSite,
       search: {
         title: "검색",
@@ -73,9 +71,9 @@ module.exports = function(eleventyConfig) {
         title: "글",
         description: "텍스트 포스트들을 확인하세요."
       },
-      archive: {
-        title: "아카이브",
-        description: "아카이브된 포스트들을 확인하세요."
+      links: {
+        title: "링크",
+        description: "유용한 링크들을 모아놓았습니다."
       },
       gallery: {
         title: "갤러리",
@@ -89,9 +87,9 @@ module.exports = function(eleventyConfig) {
         title: "글 작성",
         description: "새로운 글을 작성하세요."
       },
-      links: {
-        title: "링크",
-        description: "유용한 링크들을 모아놓았습니다."
+      banners: {
+        title: "배너",
+        description: "사이트 배너 및 홍보 자료입니다. 자유롭게 Links를 걸어주세요."
       },
       stats: {
         posts: "포스트",
@@ -119,7 +117,6 @@ module.exports = function(eleventyConfig) {
         name: config.author.name,
         introduction: "このブログは既存の商業ブログの代替として設立されました。"
       },
-      hobbies: ["絵を描く", "ゲーム", "DIYプロジェクト"],
       aboutSite: {
         text: "一日一回定期的な記事作成を目標にしています。"
       },
@@ -134,9 +131,9 @@ module.exports = function(eleventyConfig) {
         title: "記事",
         description: "テキストポストを確認してください。"
       },
-      archive: {
-        title: "アーカイブ",
-        description: "アーカイブされたポストを確認してください。"
+      links: {
+        title: "リンク",
+        description: "有用なリンクをまとめました。"
       },
       gallery: {
         title: "ギャラリー",
@@ -153,6 +150,10 @@ module.exports = function(eleventyConfig) {
       links: {
         title: "リンク",
         description: "有用なリンクをまとめました。"
+      },
+      banners: {
+        title: "バナー",
+        description: "サイトバナーとプロモーション素材です。 このサイトはリンクフリーです。"
       },
       stats: {
         posts: "ポスト",
@@ -180,7 +181,6 @@ module.exports = function(eleventyConfig) {
         name: config.author.name,
         introduction: "This blog was established as an alternative to existing commercial blogs."
       },
-      hobbies: ["Drawing", "Gaming", "DIY Projects"],
       aboutSite: {
         text: "Aiming for regular daily writing."
       },
@@ -195,9 +195,9 @@ module.exports = function(eleventyConfig) {
         title: "Posts",
         description: "Check out text posts."
       },
-      archive: {
-        title: "Archive",
-        description: "Check out archived posts."
+      links: {
+        title: "Links",
+        description: "Useful links are collected here. Feel free to link to this site."
       },
       gallery: {
         title: "Gallery",
@@ -215,6 +215,10 @@ module.exports = function(eleventyConfig) {
         title: "Links",
         description: "Useful links are collected here."
       },
+      banners: {
+        title: "Banners",
+        description: "Site banners and promotional materials."
+      },
       stats: {
         posts: "Posts",
         visitors: "Visitors",
@@ -224,12 +228,12 @@ module.exports = function(eleventyConfig) {
   });
 
   const i18nData = generateI18nData(siteConfig);
-  eleventyConfig.addGlobalData("i18n", i18nData.en); // 기본값을 영어로 설정
-  eleventyConfig.addGlobalData("i18n", i18nData.kr);
+  eleventyConfig.addGlobalData("i18n", i18nData.kr); // 기본값을 한국어로 설정
+  eleventyConfig.addGlobalData("i18n_kr", i18nData.kr);
   eleventyConfig.addGlobalData("i18n_jp", i18nData.jp);
   eleventyConfig.addGlobalData("i18n_en", i18nData.en);
   
-  // 포괄적인 번역 매핑
+  // 포괄적인 번역 매핑 (한글 → 다른 언어)
   const translationMap = {
     'jp': {
       // 기본 섹션
@@ -241,6 +245,7 @@ module.exports = function(eleventyConfig) {
       "최신 업데이트": "最新アップデート",
       "글 작성": "記事作成",
       "검색": "検索",
+      "배너": "バナー",
       
       // 페이지 제목
       "글": "記事",
@@ -257,6 +262,7 @@ module.exports = function(eleventyConfig) {
       "새로운 글을 작성하세요.": "新しい記事を作成してください。",
       "유용한 링크들을 모아놓았습니다.": "有用なリンクをまとめました。",
       "태그나 키워드로 포스트를 검색하세요.": "タグやキーワードでポストを検索してください。",
+      "사이트 배너 및 홍보 자료입니다.": "サイトバナーとプロモーション素材です。",
       
       // 검색 관련
       "태그나 키워드로 검색...": "タグやキーワードで検索...",
@@ -266,7 +272,13 @@ module.exports = function(eleventyConfig) {
       // 사이트 정보
       "포스트": "ポスト",
       "방문자": "訪問者",
-      "마지막 업데이트": "最終更新"
+      "마지막 업데이트": "最終更新",
+      "로딩 중...": "読み込み中...",
+      
+      // 기타
+      "이 블로그는 기존 상업 블로그의 대안으로 설립되었습니다.": "このブログは既存の商業ブログの代替として設立されました。",
+      "하루 한 번 정기적인 글 작성을 목표로 하고 있습니다.": "一日一回定期的な記事作成を目標にしています。",
+      "자유롭게 Links를 걸어주세요.": "このサイトへのリンクは自由です。"
     },
     'en': {
       // 기본 섹션
@@ -278,6 +290,7 @@ module.exports = function(eleventyConfig) {
       "최신 업데이트": "Latest Updates",
       "글 작성": "Write Post",
       "검색": "Search",
+      "배너": "Banners",
       
       // 페이지 제목
       "글": "Posts",
@@ -294,6 +307,7 @@ module.exports = function(eleventyConfig) {
       "새로운 글을 작성하세요.": "Write a new post.",
       "유용한 링크들을 모아놓았습니다.": "Useful links are collected here.",
       "태그나 키워드로 포스트를 검색하세요.": "Search posts by tags or keywords.",
+      "사이트 배너 및 홍보 자료입니다.": "Site banners and promotional materials.",
       
       // 검색 관련
       "태그나 키워드로 검색...": "Search by tags or keywords...",
@@ -303,31 +317,56 @@ module.exports = function(eleventyConfig) {
       // 사이트 정보
       "포스트": "Posts",
       "방문자": "Visitors",
-      "마지막 업데이트": "Last Update"
+      "마지막 업데이트": "Last Update",
+      "로딩 중...": "Loading...",
+      
+      // 기타
+      "이 블로그는 기존 상업 블로그의 대안으로 설립되었습니다.": "This blog was established as an alternative to existing commercial blogs.",
+      "하루 한 번 정기적인 글 작성을 목표로 하고 있습니다.": "Aiming for regular daily writing.",
+      "자유롭게 Links를 걸어주세요.": "Feel free to link to this site."
     }
   };
 
-  // 번역 필터 추가
+  // 한글 자동 감지 및 번역 필터
   eleventyConfig.addFilter("t", function(text, lang) {
     if (!text || !lang) return text;
-    if (lang === 'en') return text; // 기본값을 영어로 설정
+    if (lang === 'kr') return text; // 기본값을 한국어로 설정
     
     const translations = translationMap[lang];
     if (!translations) return text;
+    
+    // 한글 텍스트 자동 감지
+    const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(text);
+    if (!isKorean) return text; // 한글이 아니면 그대로 반환
     
     // 정확한 매칭 우선
     if (translations[text]) {
       return translations[text];
     }
     
-    // 부분 매칭 시도
-    for (const [key, value] of Object.entries(translations)) {
-      if (text.includes(key)) {
-        return text.replace(key, value);
+    // 부분 매칭 시도 (긴 텍스트부터 매칭)
+    const sortedKeys = Object.keys(translations).sort((a, b) => b.length - a.length);
+    let result = text;
+    
+    for (const key of sortedKeys) {
+      if (result.includes(key)) {
+        result = result.replace(new RegExp(key, 'g'), translations[key]);
       }
     }
     
-    return text;
+    return result;
+  });
+  
+  // 자동 번역 필터 (한글 감지 시 자동으로 번역)
+  eleventyConfig.addFilter("autoTranslate", function(text, targetLang) {
+    if (!text || !targetLang) return text;
+    
+    // 한글 텍스트인지 확인
+    const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(text);
+    if (!isKorean) return text;
+    
+    // 자동 번역 실행
+    return eleventyConfig.getFilter('t')(text, targetLang);
   });
   
   // 이미지 경로 필터 추가
@@ -383,6 +422,13 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addFilter("limit", function(array, limit) {
     return array.slice(0, limit);
   });
+
+  // CSS, JS, 이미지 파일 복사
+  eleventyConfig.addPassthroughCopy("src/css");
+  eleventyConfig.addPassthroughCopy("src/js");
+  eleventyConfig.addPassthroughCopy("src/images");
+  eleventyConfig.addPassthroughCopy("src/style.css");
+  eleventyConfig.addPassthroughCopy("neocities.png");
 
   return {
     templateFormats: [

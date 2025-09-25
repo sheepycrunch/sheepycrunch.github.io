@@ -19,7 +19,6 @@
       "name": "사이트 소유자",
       "introduction": "dakimakura는 개인 목적의 사이트입니다."
     },
-    "hobbies": ["그림 그리기", "게임", "DIY 프로젝트"],
     "aboutSite": {
       "text1": "안녕하세요.",
       "text2": "30분 후 잠자리에 들 예정입니다."
@@ -160,10 +159,8 @@
     "author": {
       "name": "名前",
       "introduction": "こんにちは！dakimakuraブログへようこそ！",
-      "hobbies": "主な趣味",
       "currentProject": "2024年からブログ運営中"
     },
-    "hobbies": ["絵を描く", "ゲーム", "DIYプロジェクト"],
     "aboutSite": {
       "text1": "2024年現在、全体的に新しく作りたいですが、作業が全く進んでいません。",
       "text2": "このサイトの内容もあまり更新できず、本当に申し訳ありません。"
@@ -321,10 +318,8 @@
     "author": {
       "name": "Name",
       "introduction": "Hello! Welcome to the dakimakura blog!",
-      "hobbies": "Main Hobbies",
       "currentProject": "Running blog since 2024"
     },
-    "hobbies": ["Drawing", "Gaming", "DIY Projects"],
     "aboutSite": {
       "text1": "As of 2024, I want to completely rebuild this site, but work hasn't progressed at all.",
       "text2": "I haven't been able to update the site content much, and I'm really sorry about that."
