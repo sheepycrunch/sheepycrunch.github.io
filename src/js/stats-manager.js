@@ -81,6 +81,17 @@ class StatsManager {
     const savedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
     let postCount = savedPosts.length;
     
+    // posts.json 파일의 포스트 수도 확인 (서버에서 로드된 경우)
+    try {
+      // posts.json 데이터가 있다면 추가로 카운트
+      const postsData = JSON.parse(localStorage.getItem('posts_json_data') || '{"posts": []}');
+      if (postsData.posts && Array.isArray(postsData.posts)) {
+        postCount += postsData.posts.length;
+      }
+    } catch (e) {
+      console.log('posts.json 데이터 로드 실패:', e);
+    }
+    
     // 기본 포스트들 (txt, gallery, archive, links)도 카운트
     const defaultPosts = 4; // txt, gallery, archive, links
     postCount += defaultPosts;
@@ -169,6 +180,12 @@ class StatsManager {
   // 외부에서 호출할 수 있는 메서드들
   incrementPostCount() {
     // 실제 포스트 수를 다시 계산
+    this.updatePostCount();
+    this.saveStats();
+  }
+  
+  // 포스트가 추가/삭제될 때 호출되는 메서드
+  refreshPostCount() {
     this.updatePostCount();
     this.saveStats();
   }

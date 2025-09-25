@@ -1,12 +1,13 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.txt.title | t(lang) }}"
-description: "{{ i18n_kr.txt.description | t(lang) }}"
+title: "글"
+description: "텍스트 포스트들을 확인하세요."
 lang: "kr"
+permalink: "/txt.html"
 ---
 
-<section>
-  <h2>{{ i18n_kr.txt.title | t(lang) }}</h2>
+<section id="content">
+  <h2>{{ i18n.txt.title | t(lang) }}</h2>
   
   <div class="post-list">
     {% for item in posts.posts %}

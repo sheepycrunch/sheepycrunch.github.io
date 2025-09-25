@@ -37,7 +37,6 @@ const translationMap = {
     "주요 기능": "Main Features",
     "방문해주셔서 감사합니다": "Thank You for Visiting",
     "이름": "Name",
-    "주요 취미": "Main Hobbies",
     "포스트": "Posts",
     "방문자": "Visitors",
     "마지막 업데이트": "Last Update",

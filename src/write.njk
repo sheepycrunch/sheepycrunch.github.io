@@ -1,31 +1,32 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.sections.write | t(lang) }}"
-description: "{{ i18n_kr.sections.write | t(lang) }}"
+title: "{{ i18n.sections.write | t(lang) }}"
+description: "{{ i18n.sections.write | t(lang) }}"
 lang: "kr"
+permalink: "/write.html"
 ---
 
-<section>
-  <h2>{{ i18n_kr.write.title | t(lang) }}</h2>
+<section id="content">
+  <h2>{{ i18n.write.title | t(lang) }}</h2>
   
   <div class="write-container">
-    <div id="i18n-data" style="display: none;">{{ i18n_kr | dump | safe }}</div>
+    <div id="i18n-data" style="display: none;">{{ i18n | dump | safe }}</div>
     <div class="write-form">
       <div class="form-group">
-        <label for="post-category">{{ i18n_kr.write.form.category | t(lang) }}</label>
+        <label for="post-category">{{ i18n.write.form.category | t(lang) }}</label>
         <select id="post-category" class="form-input">
-          <option value="txt">{{ i18n_kr.write.categories.txt | t(lang) }}</option>
-          <option value="gallery">{{ i18n_kr.write.categories.gallery | t(lang) }}</option>
-          <option value="archive">{{ i18n_kr.write.categories.archive | t(lang) }}</option>
+          <option value="txt">{{ i18n.write.categories.txt | t(lang) }}</option>
+          <option value="gallery">{{ i18n.write.categories.gallery | t(lang) }}</option>
+          <option value="archive">{{ i18n.write.categories.archive | t(lang) }}</option>
         </select>
       </div>
       
       <div class="form-group">
-        <label for="post-image">{{ i18n_kr.write.form.image | t(lang) }}</label>
+        <label for="post-image">{{ i18n.write.form.image | t(lang) }}</label>
         <div class="image-upload-area" id="image-upload-area">
           <div class="upload-method" id="file-upload-method">
             <div class="drag-drop-zone" id="drag-drop-zone">
-              <p>{{ i18n_kr.write.placeholders.dragDrop | t(lang) }}</p>
+              <p>{{ i18n.write.placeholders.dragDrop | t(lang) }}</p>
               <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
             </div>
           </div>
@@ -33,30 +34,30 @@ lang: "kr"
           <div class="image-preview" id="image-preview" style="display: none;">
             <div class="image-container">
               <div class="image-crop-container">
-                <img id="preview-img" src="" alt="{{ i18n_kr.write.preview.title | t(lang) }}" />
+                <img id="preview-img" src="" alt="{{ i18n.write.preview.title | t(lang) }}" />
                 <div class="crop-overlay" id="crop-overlay"></div>
               </div>
             </div>
-            <button type="button" id="remove-image">{{ i18n_kr.write.form.removeImage | t(lang) }}</button>
+            <button type="button" id="remove-image">{{ i18n.write.form.removeImage | t(lang) }}</button>
           </div>
         </div>
       </div>
       
       <div class="form-group">
-        <label for="post-content">{{ i18n_kr.write.form.content | t(lang) }}</label>
-        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n_kr.write.placeholders.content | t(lang) }}" rows="10"></textarea>
+        <label for="post-content">{{ i18n.write.form.content | t(lang) }}</label>
+        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n.write.placeholders.content | t(lang) }}" rows="10"></textarea>
       </div>
       
       <div class="form-group">
-        <label for="post-tags">{{ i18n_kr.write.form.tags | t(lang) }}</label>
-        <input type="text" id="post-tags" class="form-input" placeholder="{{ i18n_kr.write.placeholders.tags | t(lang) }}" />
+        <label for="post-tags">{{ i18n.write.form.tags | t(lang) }}</label>
+        <input type="text" id="post-tags" class="form-input" placeholder="{{ i18n.write.placeholders.tags | t(lang) }}" />
         <div class="tag-suggestions" id="tag-suggestions"></div>
       </div>
       
       <div class="writer-actions">
-        <button id="save-draft-writer" class="button secondary">{{ i18n_kr.write.form.saveDraft | t(lang) }}</button>
-        <button id="load-draft-writer" class="button secondary">{{ i18n_kr.write.form.loadDraft | t(lang) }}</button>
-        <button id="save-post" class="button">{{ i18n_kr.write.form.save | t(lang) }}</button>
+        <button id="save-draft-writer" class="button secondary">{{ i18n.write.form.saveDraft | t(lang) }}</button>
+        <button id="load-draft-writer" class="button secondary">{{ i18n.write.form.loadDraft | t(lang) }}</button>
+        <button id="save-post" class="button">{{ i18n.write.form.save | t(lang) }}</button>
       </div>
     </div>
   </div>

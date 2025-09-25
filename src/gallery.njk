@@ -1,12 +1,13 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.gallery.title | t(lang) }}"
-description: "{{ i18n_kr.gallery.description | t(lang) }}"
+title: "갤러리"
+description: "갤러리 이미지들을 확인하세요."
 lang: "kr"
+permalink: "/gallery.html"
 ---
 
-<section>
-  <h2>{{ i18n_kr.gallery.title | t(lang) }}</h2>
+<section id="content">
+  <h2>{{ i18n.gallery.title | t(lang) }}</h2>
   
   <div class="gallery-grid">
     {% for item in posts.posts %}

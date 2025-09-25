@@ -1,12 +1,13 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.archive.title | t(lang) }}"
-description: "{{ i18n_kr.archive.description | t(lang) }}"
+title: "아카이브"
+description: "아카이브된 포스트들을 확인하세요."
 lang: "kr"
+permalink: "/archive.html"
 ---
 
-<section>
-  <h2>{{ i18n_kr.archive.title | t(lang) }}</h2>
+<section id="content">
+  <h2>{{ i18n.archive.title | t(lang) }}</h2>
   
   <div class="archive-list">
     {% for item in posts.posts %}
@@ -20,7 +21,7 @@ lang: "kr"
           </div>
         </div>
         <div class="archive-content">
-          <h3><a href="{{ item.description }}" class="archive-title-link" target="_blank">{{ item.description }}</a></h3>
+          <h3><a href="{{ item.description }}" class="archive-page-link" target="_blank">{{ item.description }}</a></h3>
           <div class="archive-tags">
             {% for tag in item.tags %}
             <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>

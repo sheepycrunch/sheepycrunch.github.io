@@ -189,7 +189,6 @@ class AdminPanel {
     document.getElementById('increment-posts').addEventListener('click', () => {
       if (window.statsManager) {
         // 실제 포스트를 추가하는 로직
-        this.addSamplePost();
         window.statsManager.incrementPostCount();
         this.updateCurrentStats();
       }
@@ -307,27 +306,6 @@ class AdminPanel {
     }
   }
 
-  addSamplePost() {
-    const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
-    const newPost = {
-      id: Date.now(),
-      content: `샘플 포스트 #${posts.length + 1}\n\n이것은 관리자 패널에서 생성된 샘플 포스트입니다.`,
-      tags: ['sample', 'admin'],
-      image: '',
-      category: 'posts',
-      date: new Date().toLocaleDateString('ko-KR').replace(/\./g, '.').replace(/\s/g, ''),
-      timestamp: Date.now()
-    };
-    
-    posts.push(newPost);
-    localStorage.setItem('hamster_posts', JSON.stringify(posts));
-    
-    // 데이터 템플릿에 반영
-    this.updateDataTemplate(newPost);
-    
-    alert(`샘플 포스트가 추가되었습니다! (총 ${posts.length}개)`);
-  }
-
   updateDataTemplate(post) {
     // 카테고리별로 데이터 템플릿 업데이트
     switch(post.category) {
@@ -359,6 +337,9 @@ class AdminPanel {
       tags: post.tags
     });
     localStorage.setItem('txt_data', JSON.stringify(txtData));
+    
+    // posts.json 데이터도 업데이트
+    this.updatePostsJsonData(post);
   }
 
   updateGalleryData(post) {
@@ -374,6 +355,9 @@ class AdminPanel {
       tags: post.tags
     });
     localStorage.setItem('gallery_data', JSON.stringify(galleryData));
+    
+    // posts.json 데이터도 업데이트
+    this.updatePostsJsonData(post);
   }
 
   updateArchiveData(post) {
@@ -407,7 +391,27 @@ class AdminPanel {
     });
     
     localStorage.setItem('archive_data', JSON.stringify(archiveData));
+    
+    // posts.json 데이터도 업데이트
+    this.updatePostsJsonData(post);
   }
+  
+  updatePostsJsonData(post) {
+    // posts.json 데이터 업데이트
+    const postsJsonData = JSON.parse(localStorage.getItem('posts_json_data') || '{"posts": []}');
+    postsJsonData.posts.push({
+      id: post.id,
+      date: post.date,
+      category: post.category,
+      content: post.content,
+      excerpt: post.content.substring(0, 50) + '...',
+      tags: post.tags,
+      image: post.image,
+      timestamp: post.timestamp
+    });
+    localStorage.setItem('posts_json_data', JSON.stringify(postsJsonData));
+  }
+  
   
   show() {
     if (this.panel) {
@@ -886,6 +890,11 @@ class AdminPanel {
     
     // 데이터 템플릿에 반영
     this.updateDataTemplate(post);
+    
+    // 통계 업데이트
+    if (window.statsManager) {
+      window.statsManager.refreshPostCount();
+    }
     
     alert(`글이 저장되었습니다!\n카테고리: ${category}\n이미지: ${image ? '있음' : '없음'}`);
     this.clearForm();

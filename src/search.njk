@@ -1,16 +1,17 @@
 ---
 layout: layout.njk
-title: "{{ i18n_kr.sections.search | t(lang) }}"
-description: "{{ i18n_kr.sections.search | t(lang) }}"
+title: "{{ i18n.sections.search | t(lang) }}"
+description: "{{ i18n.sections.search | t(lang) }}"
 lang: "kr"
+permalink: "/search.html"
 ---
 
-<section>
-  <h2>{{ i18n_kr.sections.search | t(lang) }}</h2>
+<section id="content">
+  <h2>{{ i18n.sections.search | t(lang) }}</h2>
   
   <div class="search-controls">
-    <input type="text" id="searchInput" placeholder="{{ i18n_kr.search.placeholder | t(lang) }}" class="search-input">
-    <button onclick="clearSearch()" class="clear-button">{{ i18n_kr.search.clearButton | t(lang) }}</button>
+    <input type="text" id="searchInput" placeholder="{{ i18n.search.placeholder | t(lang) }}" class="search-input">
+    <button onclick="clearSearch()" class="clear-button">{{ i18n.search.clearButton | t(lang) }}</button>
   </div>
   
   <div class="search-results" id="searchResults">
@@ -23,7 +24,7 @@ lang: "kr"
 // 포스트 데이터를 JSON으로 출력
 const postsData = {{ posts.posts | dump | safe }};
 // i18n 데이터를 JSON으로 출력
-const i18nData = {{ i18n_kr | dump | safe }};
+const i18nData = {{ i18n | dump | safe }};
 
 let currentSearchTerm = '';
 

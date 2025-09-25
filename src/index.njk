@@ -23,7 +23,7 @@ lang: "kr"
 <!-- <section>
   <table>
     <tr>
-      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n_kr.author.name | t(lang) }}</font></font></th>
+      <th><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ i18n.author.name | t(lang) }}</font></font></th>
       <td><span class="fn nickname" itemprop="name"><font dir="auto" style="vertical-align: inherit;"><font dir="auto" style="vertical-align: inherit;">{{ site.author.name }}</font></font></span></td>
     </tr>
   </table>
@@ -31,24 +31,29 @@ lang: "kr"
 
 <!-- 사이트 소개 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.aboutSite | t(lang) }}</h2>
-  <p>{{ i18n_kr.author.name | t(lang) }}: {{ i18n_kr.site.author }}</p>
-  <p>{{ i18n_kr.author.introduction | t(lang) }}</p>
-  <p>{{ i18n_kr.aboutSite.text1 | t(lang) }}</p>
-  <p>{{ i18n_kr.aboutSite.text2 | t(lang) }}</p>
+  <h2>{{ i18n.sections.aboutSite }}</h2>
+  <p>{{ i18n.author.introduction }}</p>
+  <p>{{ i18n.aboutSite.text }}</p>
 </section>
 
 <!-- 콘텐츠 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.content | t(lang) }}</h2>
+  <h2>{{ i18n.sections.content }}</h2>
   <ul class="vertical-layout">
-    {% for nav in i18n_kr.navigation %}
+    {% for nav in site.navigation %}
     <li>
       <a href="{{ nav.url | localizedUrl(lang) }}" class="text-button" 
          {% if nav.name == "write" %}id="write-link" style="display: none;"{% endif %}>
-        {% if ".title" in nav.name %}
-          {% set categoryKey = nav.name | replace(".title", "") %}
-          {{ i18n_kr[categoryKey].title | t(lang) }}
+        {% if nav.name == "write" %}
+          {{ i18n.write.title }}
+        {% elif nav.name == "txt" %}
+          {{ i18n.txt.title }}
+        {% elif nav.name == "gallery" %}
+          {{ i18n.gallery.title }}
+        {% elif nav.name == "archive" %}
+          {{ i18n.archive.title }}
+        {% elif nav.name == "search" %}
+          {{ i18n.search.title }}
         {% else %}
           {{ nav.name }}
         {% endif %}
@@ -60,7 +65,7 @@ lang: "kr"
 
 <!-- SNS 링크 섹션 -->
 <section>
-  <h2>{{ i18n_kr.sections.snsLinks | t(lang) }}</h2>
+  <h2>{{ i18n.sections.snsLinks }}</h2>
   <ul class="horizontal-layout">
     {% if site.social.twitter %}
     <li>
@@ -88,7 +93,7 @@ lang: "kr"
 
 <!-- 사이트 통계 -->
 <section class="site-stats">
-  <p id="site-stats">{{ i18n_kr.stats.posts | t(lang) }}: {{ realPostCount }}, {{ i18n_kr.stats.visitors | t(lang) }}: {{ site.stats.visitors }}, {{ i18n_kr.stats.lastUpdate | t(lang) }}: <span id="last-update">로딩 중...</span></p>
+  <p id="site-stats">{{ i18n.stats.posts }}: {{ realPostCount }}, {{ i18n.stats.visitors }}: {{ site.stats.visitors }}, {{ i18n.stats.lastUpdate }}: <span id="last-update">Loading...</span></p>
 </section>
 
 <!-- JavaScript 파일들 -->

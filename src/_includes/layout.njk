@@ -22,8 +22,8 @@
       {% else %}
       <h2 class="page-title">
         <a href="/" class="title-link">{{ site.title }}</a>
-        <span class="page-separator">/</span>
-        <span class="current-page">{{ title }}</span>
+        <span>/</span>
+        <span class="current-page">{{ page.url | replace("/", "") | replace(".html", "") | replace("index", "") or "home" }}</span>
       </h2>
       {% endif %}
       {% if page.lang %}

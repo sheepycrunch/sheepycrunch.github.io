@@ -43,6 +43,10 @@
       "title": "갤러리",
       "description": "갤러리 이미지들을 확인하세요."
     },
+    "login": {
+      "title": "관리자 로그인",
+      "description": "관리자 로그인 페이지"
+    },
     "write": {
       "title": "글 작성",
       "description": "새로운 포스트를 작성하고 미리보기를 확인하세요.",
@@ -98,19 +102,19 @@
     "navigation": [
       {
         "name": "txt.title",
-        "url": "/txt/index.html"
+        "url": "/txt.html"
       },
       {
         "name": "gallery.title",
-        "url": "/gallery/index.html"
+        "url": "/gallery.html"
       },
       {
         "name": "archive.title",
-        "url": "/archive/index.html"
+        "url": "/archive.html"
       },
       {
         "name": "링크",
-        "url": "/links/index.html"
+        "url": "/links.html"
       }
     ],
     "stats": {
@@ -190,19 +194,19 @@
       },
       {
         "name": "txt.title",
-        "url": "/txt/index.html"
+        "url": "/txt.html"
       },
       {
         "name": "gallery.title",
-        "url": "/gallery/index.html"
+        "url": "/gallery.html"
       },
       {
         "name": "archive.title",
-        "url": "/archive/index.html"
+        "url": "/archive.html"
       },
       {
         "name": "リンク",
-        "url": "/links/index.html"
+        "url": "/links.html"
       }
     ],
     "stats": {
@@ -351,19 +355,19 @@
       },
       {
         "name": "txt.title",
-        "url": "/txt/index.html"
+        "url": "/txt.html"
       },
       {
         "name": "gallery.title",
-        "url": "/gallery/index.html"
+        "url": "/gallery.html"
       },
       {
         "name": "archive.title",
-        "url": "/archive/index.html"
+        "url": "/archive.html"
       },
       {
         "name": "Links",
-        "url": "/links/index.html"
+        "url": "/links.html"
       }
     ],
     "stats": {
