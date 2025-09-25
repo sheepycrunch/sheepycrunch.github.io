@@ -16,9 +16,12 @@ class AdminPanel {
   }
   
   isDeveloperMode() {
-    // 개발자 도구가 열려있거나 특정 키 조합을 눌렀을 때 활성화
-    return window.location.search.includes('admin=true') || 
-           localStorage.getItem('hamster_admin_mode') === 'true';
+    // 관리자 로그인 상태 확인
+    if (window.AdminAuth) {
+      const adminAuth = new window.AdminAuth();
+      return adminAuth.isAdminLoggedIn();
+    }
+    return false;
   }
   
   createPanel() {

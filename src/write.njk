@@ -6,7 +6,7 @@ lang: "kr"
 ---
 
 <section>
-  <h1>{{ i18n_kr.write.title | t(lang) }}</h1>
+  <h2>{{ i18n_kr.write.title | t(lang) }}</h2>
   
   <div class="write-container">
     <div id="i18n-data" style="display: none;">{{ i18n_kr | dump | safe }}</div>
@@ -64,6 +64,70 @@ lang: "kr"
 
 
 <script>
+// AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
+class AdminAuth {
+  constructor() {
+    // 환경변수에서 관리자 키 가져오기 (빌드 시점에 주입됨)
+    this.adminKey = window.ADMIN_SECRET_KEY || 'DEFAULT_FALLBACK_KEY';
+    this.sessionKey = 'admin_session';
+    this.expiresKey = 'admin_expires';
+  }
+  
+  verifyAdminKey(inputKey) {
+    // 한글 키 지원을 위한 정규화
+    const normalizedInput = this.normalizeKey(inputKey);
+    const normalizedAdminKey = this.normalizeKey(this.adminKey);
+    
+    return normalizedInput === normalizedAdminKey;
+  }
+  
+  // 키 정규화 함수 (한글 키 지원)
+  normalizeKey(key) {
+    if (!key) return '';
+    
+    // 공백만 제거하고 특수문자는 유지 (느낌표 등이 키의 일부일 수 있음)
+    return key.toString()
+      .trim()                    // 앞뒤 공백 제거
+      .replace(/\s+/g, '');      // 중간 공백만 제거
+  }
+  
+  setAdminSession() {
+    const sessionToken = this.generateSessionToken();
+    const expires = Date.now() + (24 * 60 * 60 * 1000);
+    
+    localStorage.setItem(this.sessionKey, sessionToken);
+    localStorage.setItem(this.expiresKey, expires.toString());
+    
+    return sessionToken;
+  }
+  
+  generateSessionToken() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2);
+    return btoa(`${timestamp}_${random}_ADMIN`).replace(/[+/=]/g, '');
+  }
+  
+  isAdminLoggedIn() {
+    const session = localStorage.getItem(this.sessionKey);
+    const expires = localStorage.getItem(this.expiresKey);
+    
+    if (!session || !expires) return false;
+    if (Date.now() > parseInt(expires)) {
+      this.logout();
+      return false;
+    }
+    return true;
+  }
+  
+  logout() {
+    localStorage.removeItem(this.sessionKey);
+    localStorage.removeItem(this.expiresKey);
+  }
+}
+
+// 전역으로 사용할 수 있도록 설정
+window.AdminAuth = AdminAuth;
+
 // i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
@@ -577,8 +641,29 @@ function setupAutoSave() {
   }, 60000); // 1분 = 60000ms
 }
 
+// 관리자 권한 체크 함수
+function checkAdminPermission() {
+  // AdminAuth 클래스가 정의되어 있는지 확인
+  if (typeof AdminAuth !== 'undefined') {
+    const adminAuth = new AdminAuth();
+    return adminAuth.isAdminLoggedIn();
+  }
+  return false;
+}
+
+// 권한이 없으면 404 페이지로 리다이렉트
+function redirectTo404() {
+  window.location.href = '/404.html';
+}
+
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
+  // 관리자 권한 체크
+  if (!checkAdminPermission()) {
+    redirectTo404();
+    return;
+  }
+  
   // 카테고리 로드
   loadCategories();
   
@@ -612,8 +697,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadDraft();
   }
   
-  // 하루 글 작성 제한 체크
-  checkDailyPostLimit();
+  // 하루 글 작성 제한 체크 (관리자 권한이 있으면 제한 없음)
+  // checkDailyPostLimit(); // 이 줄을 주석 처리하여 하루 제한 취소
   
   // 텍스트 영역 자동 크기 조정
   setupTextareaAutoResize();

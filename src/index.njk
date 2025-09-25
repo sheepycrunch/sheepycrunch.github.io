@@ -44,7 +44,8 @@ lang: "kr"
   <ul class="vertical-layout">
     {% for nav in i18n_kr.navigation %}
     <li>
-      <a href="{{ nav.url | localizedUrl(lang) }}" class="text-button">
+      <a href="{{ nav.url | localizedUrl(lang) }}" class="text-button" 
+         {% if nav.name == "write" %}id="write-link" style="display: none;"{% endif %}>
         {% if ".title" in nav.name %}
           {% set categoryKey = nav.name | replace(".title", "") %}
           {{ i18n_kr[categoryKey].title | t(lang) }}
@@ -94,3 +95,29 @@ lang: "kr"
 <script src="/js/stats-manager.js" onerror="console.warn('stats-manager.js 로딩 실패')"></script>
 <script src="/js/icon-changer.js" onerror="console.warn('icon-changer.js 로딩 실패')"></script>
 <script src="/js/admin-panel.js" onerror="console.warn('admin-panel.js 로딩 실패')"></script>
+
+<script>
+// 관리자 권한 체크 및 UI 제어
+document.addEventListener('DOMContentLoaded', function() {
+  // AdminAuth 클래스가 정의되어 있는지 확인
+  if (typeof AdminAuth !== 'undefined') {
+    const adminAuth = new AdminAuth();
+    
+    // 관리자 로그인 상태에 따라 글쓰기 링크 표시/숨김
+    const writeLink = document.getElementById('write-link');
+    if (writeLink) {
+      if (adminAuth.isAdminLoggedIn()) {
+        writeLink.style.display = 'block';
+      } else {
+        writeLink.style.display = 'none';
+      }
+    }
+  } else {
+    // AdminAuth가 로드되지 않은 경우 글쓰기 링크 숨김
+    const writeLink = document.getElementById('write-link');
+    if (writeLink) {
+      writeLink.style.display = 'none';
+    }
+  }
+});
+</script>

@@ -1,0 +1,202 @@
+---
+layout: layout.njk
+title: "관리자 로그인"
+description: "관리자 로그인 페이지"
+lang: "kr"
+---
+
+<section>
+  <h2>관리자 로그인</h2>
+  
+  <div class="login-container">
+    <div class="login-form">
+      <div class="form-group">
+        <label for="admin-key">관리자 키</label>
+        <input type="password" id="admin-key" class="form-input" placeholder="관리자 키를 입력하세요" />
+        <small class="form-help">환경변수에서 관리자 키를 가져옵니다.</small>
+      </div>
+      
+      <div class="form-actions">
+        <button id="login-btn" class="button">로그인</button>
+        <button id="cancel-btn" class="button secondary">취소</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// 관리자 인증 클래스
+class AdminAuth {
+  constructor() {
+    // 환경변수에서 관리자 키 가져오기 (빌드 시점에 주입됨)
+    this.adminKey = window.ADMIN_SECRET_KEY || 'DEFAULT_FALLBACK_KEY';
+    this.sessionKey = 'admin_session';
+    this.expiresKey = 'admin_expires';
+  }
+  
+  verifyAdminKey(inputKey) {
+    // 한글 키 지원을 위한 정규화
+    const normalizedInput = this.normalizeKey(inputKey);
+    const normalizedAdminKey = this.normalizeKey(this.adminKey);
+    
+    return normalizedInput === normalizedAdminKey;
+  }
+  
+  // 키 정규화 함수 (한글 키 지원)
+  normalizeKey(key) {
+    if (!key) return '';
+    
+    // 공백만 제거하고 특수문자는 유지 (느낌표 등이 키의 일부일 수 있음)
+    return key.toString()
+      .trim()                    // 앞뒤 공백 제거
+      .replace(/\s+/g, '');      // 중간 공백만 제거
+  }
+  
+  setAdminSession() {
+    const sessionToken = this.generateSessionToken();
+    const expires = Date.now() + (24 * 60 * 60 * 1000); // 24시간
+    
+    localStorage.setItem(this.sessionKey, sessionToken);
+    localStorage.setItem(this.expiresKey, expires.toString());
+    
+    return sessionToken;
+  }
+  
+  generateSessionToken() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2);
+    return btoa(`${timestamp}_${random}_ADMIN`).replace(/[+/=]/g, '');
+  }
+  
+  isAdminLoggedIn() {
+    const session = localStorage.getItem(this.sessionKey);
+    const expires = localStorage.getItem(this.expiresKey);
+    
+    if (!session || !expires) return false;
+    if (Date.now() > parseInt(expires)) {
+      this.logout();
+      return false;
+    }
+    return true;
+  }
+  
+  logout() {
+    localStorage.removeItem(this.sessionKey);
+    localStorage.removeItem(this.expiresKey);
+  }
+}
+
+// 전역으로 사용할 수 있도록 설정
+window.AdminAuth = AdminAuth;
+
+  // 로그인 처리
+  document.addEventListener('DOMContentLoaded', function() {
+    const adminAuth = new AdminAuth();
+    
+    
+    // 이미 로그인되어 있으면 메인 페이지로 리다이렉트
+    if (adminAuth.isAdminLoggedIn()) {
+      window.location.href = '/';
+      return;
+    }
+  
+  // 로그인 버튼 이벤트
+  document.getElementById('login-btn').addEventListener('click', function() {
+    const inputKey = document.getElementById('admin-key').value;
+    
+    if (adminAuth.verifyAdminKey(inputKey)) {
+      adminAuth.setAdminSession();
+      alert('로그인 성공!');
+      window.location.href = '/';
+    } else {
+      alert('잘못된 관리자 키입니다.');
+    }
+  });
+  
+  // 취소 버튼 이벤트
+  document.getElementById('cancel-btn').addEventListener('click', function() {
+    window.location.href = '/';
+  });
+  
+  // Enter 키로 로그인
+  document.getElementById('admin-key').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      document.getElementById('login-btn').click();
+    }
+  });
+});
+</script>
+
+<style>
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: var(--spacing-3xl);
+}
+
+.login-form {
+  background: var(--bg-secondary);
+  padding: var(--spacing-3xl);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.form-input {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(66, 95, 182, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+.button {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--border-radius-sm);
+  background: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  transition: var(--transition-fast);
+}
+
+.button:hover {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+}
+
+.button.secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.button.secondary:hover {
+  background: var(--border-light);
+}
+</style>

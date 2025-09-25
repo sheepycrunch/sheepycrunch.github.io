@@ -17,7 +17,15 @@
 <body>
   <article>
     <header class="bordered">
+      {% if page.url == '/' or page.url == '/index.html' %}
       <h1>{{ site.title }}</h1>
+      {% else %}
+      <h2 class="page-title">
+        <a href="/" class="title-link">{{ site.title }}</a>
+        <span class="page-separator">/</span>
+        <span class="current-page">{{ title }}</span>
+      </h2>
+      {% endif %}
       {% if page.lang %}
       <div class="language-switcher">
         {% for lang in languageLinks(page.lang) %}
