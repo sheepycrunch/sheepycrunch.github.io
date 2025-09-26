@@ -429,6 +429,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("neocities.png");
+  eleventyConfig.addPassthroughCopy("google57bba735c19e8bd0.html");
 
   return {
     templateFormats: [
