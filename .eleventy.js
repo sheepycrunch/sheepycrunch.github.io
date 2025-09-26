@@ -39,7 +39,7 @@ module.exports = function(eleventyConfig) {
   
   // i18n 데이터 동적 생성
   const generateI18nData = (config) => ({
-    kr: {
+    en: {
       site: {
         title: config.title,
         author: config.author.name,
@@ -228,7 +228,7 @@ module.exports = function(eleventyConfig) {
   });
 
   const i18nData = generateI18nData(siteConfig);
-  eleventyConfig.addGlobalData("i18n", i18nData.kr); // 기본값을 한국어로 설정
+  eleventyConfig.addGlobalData("i18n", i18nData.en); // 기본값을 한국어로 설정
   eleventyConfig.addGlobalData("i18n_kr", i18nData.kr);
   eleventyConfig.addGlobalData("i18n_jp", i18nData.jp);
   eleventyConfig.addGlobalData("i18n_en", i18nData.en);
@@ -330,7 +330,7 @@ module.exports = function(eleventyConfig) {
   // 한글 자동 감지 및 번역 필터
   eleventyConfig.addFilter("t", function(text, lang) {
     if (!text || !lang) return text;
-    if (lang === 'kr') return text; // 기본값을 한국어로 설정
+    if (lang === 'en') return text; // 기본값을 한국어로 설정
     
     const translations = translationMap[lang];
     if (!translations) return text;
@@ -386,7 +386,7 @@ module.exports = function(eleventyConfig) {
   // URL 로컬라이제이션 필터 추가
   eleventyConfig.addFilter("localizedUrl", function(url, lang) {
     if (!url) return "";
-    if (lang === 'kr') return url;
+    if (lang === 'en') return url;
     // 간단한 URL 변환 (실제로는 더 복잡한 로직 필요)
     return url;
   });
