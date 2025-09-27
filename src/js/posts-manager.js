@@ -264,57 +264,97 @@ async function deletePost(postId) {
   }
   
   // 삭제 확인
-  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.')) {
+  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.\n\nGitHub에 직접 수정사항이 반영됩니다.')) {
     return;
   }
   
+  // 로딩 상태 표시
+  const deleteBtn = event.target;
+  const originalText = deleteBtn.textContent;
+  deleteBtn.textContent = '삭제 중...';
+  deleteBtn.disabled = true;
+  
   try {
-    // 1. 로컬 posts.json에서 삭제
+    // 1. GitHub에서 posts.json 직접 수정 및 배포 트리거
+    console.log('GitHub에서 포스트 삭제 시작...');
     await deletePostFromLocal(postId);
     
-    // 2. Neocities에서 삭제
-    await deletePostFromNeocities(postId);
-    
-    // 3. 관련 이미지 삭제
+    // 2. 관련 이미지 삭제 (백그라운드에서 실행)
     let imageDeleteResult = null;
     try {
+      console.log('관련 이미지 삭제 시작...');
       imageDeleteResult = await deletePostImages(postId);
+      if (imageDeleteResult && imageDeleteResult.deleted.length > 0) {
+        console.log(`이미지 ${imageDeleteResult.deleted.length}개가 삭제되었습니다.`);
+      }
     } catch (error) {
       console.warn('이미지 삭제 중 오류:', error);
     }
     
-    // 4. UI에서 제거
+    // 3. UI에서 즉시 제거
     removePostFromUI(postId);
     
-    // UI 업데이트를 위해 약간의 지연
+    // 4. 성공 메시지 표시
     setTimeout(() => {
-      alert('글이 성공적으로 삭제되었습니다.');
+      alert('글이 성공적으로 삭제되었습니다!\n\n✓ GitHub에 수정사항이 반영되었습니다\n✓ GitHub Actions를 통해 자동 배포가 시작됩니다\n✓ Neocities는 자동으로 동기화됩니다');
     }, 100);
+    
   } catch (error) {
     console.error('포스트 삭제 중 오류 발생:', error);
-    alert('포스트 삭제 중 오류가 발생했습니다: ' + error.message);
+    
+    // 에러 타입별 메시지
+    let errorMessage = '포스트 삭제 중 오류가 발생했습니다.';
+    if (error.message.includes('GitHub 토큰')) {
+      errorMessage = 'GitHub 토큰이 필요합니다. 관리자에게 문의하세요.';
+    } else if (error.message.includes('posts.json을 가져올 수 없습니다')) {
+      errorMessage = 'GitHub에서 posts.json을 가져올 수 없습니다. 네트워크를 확인하세요.';
+    } else if (error.message.includes('업데이트 실패')) {
+      errorMessage = 'GitHub에 수정사항을 저장할 수 없습니다. 권한을 확인하세요.';
+    } else if (error.message.includes('삭제할 포스트를 찾을 수 없습니다')) {
+      errorMessage = '삭제할 포스트를 찾을 수 없습니다. 이미 삭제되었을 수 있습니다.';
+    } else {
+      errorMessage = `오류: ${error.message}`;
+    }
+    
+    alert(errorMessage);
+  } finally {
+    // 버튼 상태 복원
+    deleteBtn.textContent = originalText;
+    deleteBtn.disabled = false;
   }
 }
 
-// 로컬 posts.json에서 포스트 삭제 (CSP 우회)
+// GitHub API를 통한 posts.json 직접 수정
 async function deletePostFromLocal(postId) {
   try {
-    // 로컬 posts.json 파일 가져오기
-    const response = await fetch('/posts.json');
-    if (!response.ok) {
-      throw new Error('posts.json을 불러올 수 없습니다.');
+    const token = getGitHubToken();
+    if (!token) {
+      throw new Error('GitHub 토큰이 필요합니다.');
     }
+
+    // 1. 현재 posts.json 내용 가져오기
+    console.log('GitHub에서 현재 posts.json 가져오는 중...');
+    const getResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+      }
+    });
+
+    if (!getResponse.ok) {
+      throw new Error(`posts.json을 가져올 수 없습니다: ${getResponse.status}`);
+    }
+
+    const fileData = await getResponse.json();
+    const currentContent = JSON.parse(atob(fileData.content));
+    const existingPosts = currentContent.posts || [];
     
-    const data = await response.json();
-    const existingPosts = data.posts || [];
-    
-    // 포스트 찾기 및 삭제
     console.log('현재 포스트들:', existingPosts.map(p => ({ id: p.id, date: p.date })));
     console.log('삭제할 포스트 ID:', postId);
     
+    // 포스트 찾기 및 삭제
     const filteredPosts = existingPosts.filter(post => {
       const postIdentifier = post.id || post.date;
-      // 문자열과 숫자 비교를 위해 둘 다 문자열로 변환
       const postIdStr = String(postIdentifier);
       const targetIdStr = String(postId);
       console.log(`포스트 비교: "${postIdStr}" !== "${targetIdStr}" = ${postIdStr !== targetIdStr}`);
@@ -326,18 +366,43 @@ async function deletePostFromLocal(postId) {
     if (filteredPosts.length === existingPosts.length) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
     }
+
+    // 2. 업데이트된 posts.json 내용 생성
+    const updatedContent = { posts: filteredPosts };
+    const newContent = JSON.stringify(updatedContent, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
+
+    // 3. GitHub에 업데이트된 posts.json 업로드
+    console.log('GitHub에 업데이트된 posts.json 업로드 중...');
+    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Delete post ${postId}`,
+        content: encodedContent,
+        sha: fileData.sha
+      })
+    });
+
+    if (!updateResponse.ok) {
+      const errorData = await updateResponse.text();
+      throw new Error(`posts.json 업데이트 실패: ${updateResponse.status} ${errorData}`);
+    }
+
+    const updateResult = await updateResponse.json();
+    console.log('GitHub에서 posts.json이 성공적으로 업데이트되었습니다:', updateResult.commit.sha);
     
-    // 로컬 스토리지에 업데이트된 포스트 저장
-    localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
+    // 4. GitHub Actions 웹훅 트리거
+    await triggerDeployment();
     
-    // CORS 문제로 인해 Neocities API 호출을 건너뜀
-    console.log('CORS 정책으로 인해 Neocities 업데이트를 건너뜁니다.');
-    console.log('로컬 스토리지에 저장되었습니다.');
-    
-    console.log('로컬에서 포스트가 삭제되었습니다.');
+    console.log('포스트가 GitHub에서 성공적으로 삭제되었습니다.');
     
   } catch (error) {
-    console.error('로컬 포스트 삭제 오류:', error);
+    console.error('GitHub 포스트 삭제 오류:', error);
     throw error;
   }
 }
@@ -359,6 +424,8 @@ async function triggerDeployment() {
       return;
     }
 
+    console.log('GitHub Actions 배포 워크플로우 트리거 중...');
+    
     // GitHub Actions 워크플로우 트리거
     const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/dispatches', {
       method: 'POST',
@@ -370,26 +437,26 @@ async function triggerDeployment() {
       body: JSON.stringify({
         event_type: 'manual_deploy',
         client_payload: {
-          source: 'post_deletion'
+          source: 'post_deletion',
+          timestamp: new Date().toISOString()
         }
       })
     });
 
     if (!response.ok) {
-      console.warn('웹훅 트리거 실패:', response.statusText);
+      const errorData = await response.text();
+      console.warn('웹훅 트리거 실패:', response.status, errorData);
+      throw new Error(`배포 트리거 실패: ${response.status}`);
     } else {
-      console.log('배포 워크플로우가 트리거되었습니다.');
+      console.log('배포 워크플로우가 성공적으로 트리거되었습니다.');
     }
   } catch (error) {
-    console.warn('웹훅 트리거 오류:', error);
+    console.error('웹훅 트리거 오류:', error);
+    throw error;
   }
 }
 
-// Neocities에서 포스트 삭제
-async function deletePostFromNeocities(postId) {
-  // GitHub에서 이미 posts.json을 업데이트했으므로 Neocities는 자동으로 동기화됨
-  console.log('Neocities는 GitHub Actions를 통해 자동으로 동기화됩니다.');
-}
+// Neocities는 GitHub Actions를 통해 자동으로 동기화됨
 
 // 포스트 관련 이미지 삭제 (CSP 우회)
 async function deletePostImages(postId) {
