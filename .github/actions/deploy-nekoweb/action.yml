@@ -62,23 +62,38 @@ runs:
         upload_count=0
         error_count=0
         
+        # Enable globstar and nullglob for file matching
         shopt -s globstar nullglob
+        
+        # Count total files first
         total_files=0
+        file_list=()
+        
+        echo "🔍 Scanning for files in ${{ inputs.dist_dir }}..."
         for file in ${{ inputs.dist_dir }}/**/*; do
           if [ -f "$file" ]; then
             ((total_files++))
+            file_list+=("$file")
+            echo "  Found: $file"
           fi
         done
         
         echo "📊 Found $total_files files to upload"
+        if [ $total_files -eq 0 ]; then
+          echo "❌ No files found in ${{ inputs.dist_dir }}"
+          echo "🔍 Directory contents:"
+          ls -la "${{ inputs.dist_dir }}" || echo "Directory listing failed"
+          exit 1
+        fi
+        
         echo "🚀 Starting upload process..."
         
+        # Upload each file
         current_file=0
-        for file in ${{ inputs.dist_dir }}/**/*; do
-          if [ -f "$file" ]; then
-            ((current_file++))
-            relative_path=${file#${{ inputs.dist_dir }}/}
-            echo "📤 Uploading: $relative_path ($current_file/$total_files)"
+        for file in "${file_list[@]}"; do
+          ((current_file++))
+          relative_path=${file#${{ inputs.dist_dir }}/}
+          echo "📤 Uploading: $relative_path ($current_file/$total_files)"
             
             # Get directory path for the file
             dir_path=$(dirname "$relative_path")
