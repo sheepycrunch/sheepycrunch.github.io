@@ -3,8 +3,6 @@ name: Upload Images to Neocities
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'src/_data/posts.json'
   workflow_dispatch:
     inputs:
       posts_data:
@@ -104,6 +102,8 @@ jobs:
             const postsData = fs.readFileSync('src/_data/posts.json', 'utf8');
             const posts = JSON.parse(postsData).posts || [];
             let updated = false;
+            
+            console.log('Processing posts:', posts.length);
             
             for (const post of posts) {
               if (post.description && post.description.ops) {
