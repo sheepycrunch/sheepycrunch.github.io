@@ -13,7 +13,7 @@ permalink: "/login.html"
     <div class="login-form">
       <div class="form-group">
         <label for="admin-key">관리자 키</label>
-        <input type="password" id="admin-key" class="form-input" placeholder="관리자 키를 입력하세요" />
+        <input type="text" id="admin-key" class="form-input" placeholder="Enter admin key" pattern="[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]*" oninput="this.value = this.value.replace(/[^a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?]/g, '')" />
         <small class="form-help">환경변수에서 관리자 키를 가져옵니다.</small>
       </div>
       
@@ -36,21 +36,11 @@ class AdminAuth {
   }
   
   verifyAdminKey(inputKey) {
-    // 한글 키 지원을 위한 정규화
-    const normalizedInput = this.normalizeKey(inputKey);
-    const normalizedAdminKey = this.normalizeKey(this.adminKey);
+    // 영어 키만 지원
+    const trimmedInput = inputKey ? inputKey.trim() : '';
+    const trimmedAdminKey = this.adminKey ? this.adminKey.trim() : '';
     
-    return normalizedInput === normalizedAdminKey;
-  }
-  
-  // 키 정규화 함수 (한글 키 지원)
-  normalizeKey(key) {
-    if (!key) return '';
-    
-    // 공백만 제거하고 특수문자는 유지 (느낌표 등이 키의 일부일 수 있음)
-    return key.toString()
-      .trim()                    // 앞뒤 공백 제거
-      .replace(/\s+/g, '');      // 중간 공백만 제거
+    return trimmedInput === trimmedAdminKey;
   }
   
   setAdminSession() {
@@ -107,10 +97,10 @@ window.AdminAuth = AdminAuth;
     
     if (adminAuth.verifyAdminKey(inputKey)) {
       adminAuth.setAdminSession();
-      alert('로그인 성공!');
+      alert('Login successful!');
       window.location.href = '/';
     } else {
-      alert('잘못된 관리자 키입니다.');
+      alert('Invalid admin key.');
     }
   });
   
