@@ -59,6 +59,7 @@ runs:
         upload_count=0
         error_count=0
         
+        shopt -s globstar nullglob
         for file in ${{ inputs.dist_dir }}/**/*; do
           if [ -f "$file" ]; then
             relative_path=${file#${{ inputs.dist_dir }}/}
