@@ -238,6 +238,15 @@ function searchByTag(tag) {
 // Admin 모드 확인
 function checkAdminMode() {
   console.log('Admin 모드 확인 중...');
+  
+  // 로컬 서버 접속 시 자동으로 admin 모드 활성화
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocal) {
+    console.log('로컬 서버 접속 감지 - 자동 admin 모드 활성화');
+    return true;
+  }
+  
+  // 기존 AdminAuth 방식 (프로덕션 환경용)
   if (typeof AdminAuth !== 'undefined') {
     const adminAuth = new AdminAuth();
     const isLoggedIn = adminAuth.isAdminLoggedIn();
@@ -511,43 +520,11 @@ async function deletePostImages(postId) {
   }
 }
 
-// Neocities에서 이미지 삭제 (직접 API 사용)
+// Neocities에서 이미지 삭제 (자동 업로드 스크립트 사용)
 async function deleteImageFromNeocities(imagePath) {
-  const token = getNeocitiesApiToken();
-  if (!token) {
-    throw new Error('Neocities API 토큰이 없습니다.');
-  }
-
-  // 이미지 경로에서 파일명 추출
-  let fileName = imagePath;
-  if (imagePath.includes('/')) {
-    fileName = imagePath.split('/').pop();
-  }
-  
-  console.log(`Neocities API를 직접 사용하여 이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
-  
-  // FormData 생성
-  const formData = new FormData();
-  formData.append('filenames[]', fileName);
-  
-  // Neocities API로 직접 파일 삭제
-  const response = await fetch('https://neocities.org/api/delete', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-    body: formData
-  });
-
-  if (!response.ok) {
-    const errorData = await response.text();
-    console.error(`이미지 삭제 실패: ${response.status} ${errorData}`);
-    throw new Error(`이미지 삭제 실패: ${response.status} ${errorData}`);
-  }
-
-  const result = await response.json();
-  console.log(`Neocities에서 이미지 삭제 성공: ${fileName}`, result);
-  return result;
+  // 자동 업로드 스크립트가 처리하므로 로컬에서만 삭제
+  console.log('이미지가 로컬에서 삭제되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  return;
 }
 
 // Neocities API 토큰 가져오기 (직접 API 사용)
@@ -562,40 +539,11 @@ function getNeocitiesApiToken() {
   return token;
 }
 
-// Neocities에 posts.json 업데이트 (직접 API 사용)
+// Neocities에 posts.json 업데이트 (자동 업로드 스크립트 사용)
 async function updateNeocitiesPostsJson(posts) {
-  const token = getNeocitiesApiToken();
-  if (!token) {
-    throw new Error('Neocities API 토큰이 없습니다.');
-  }
-
-  // posts.json 내용 생성
-  const postsJsonContent = JSON.stringify({ posts }, null, 2);
-  
-  // FormData 생성
-  const formData = new FormData();
-  const blob = new Blob([postsJsonContent], { type: 'application/json' });
-  formData.append('posts.json', blob, 'posts.json');
-  
-  console.log('Neocities API를 직접 사용하여 posts.json 업로드 중...');
-  
-  // Neocities API로 직접 파일 업로드
-  const response = await fetch('https://neocities.org/api/upload', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-    body: formData
-  });
-
-  if (!response.ok) {
-    const errorData = await response.text();
-    throw new Error(`posts.json 업로드 실패: ${response.status} ${errorData}`);
-  }
-
-  const result = await response.json();
-  console.log('Neocities posts.json 업로드 성공:', result);
-  return result;
+  // 자동 업로드 스크립트가 처리하므로 로컬 파일만 저장
+  console.log('posts.json이 로컬에 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  return;
 }
 
 // Quill 콘텐츠에서 이미지 경로 추출

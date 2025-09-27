@@ -35,3 +35,7 @@ images/
 *.gif
 *.webp
 *.svg
+
+# Posts data (managed by Neocities API)
+src/posts.json
+posts.json

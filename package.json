@@ -7,6 +7,8 @@
     "build": "npx @11ty/eleventy",
     "build:prod": "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }} npx @11ty/eleventy",
     "serve": "npx @11ty/eleventy --serve --port=8080",
+    "upload": "node auto-upload.js",
+    "upload:posts": "curl -u \"dakimakura:3d5c5a20afe79623ec87904e336d01a0\" -F \"posts.json=@src/posts.json\" \"https://neocities.org/api/upload\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,7 +28,9 @@
     "@11ty/eleventy-plugin-bundle": "^3.0.7",
     "@11ty/eleventy-plugin-webc": "^0.10.0",
     "eleventy-plugin-embed-everything": "^1.0.0",
-    "googleapis": "^160.0.0"
+    "form-data": "^4.0.4",
+    "googleapis": "^160.0.0",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "html-minifier-terser": "^7.2.0"

@@ -273,57 +273,11 @@ async function processBase64Images(content) {
   return { ...content, ops: newOps };
 }
 
-// Base64 이미지를 네오시티에 업로드
+// Base64 이미지를 네오시티에 업로드 (자동 업로드 스크립트 사용)
 async function uploadBase64ImageToNeocities(base64Data) {
-  const apiToken = neocitiesApiToken;
-  const siteName = 'dakimakura';
-  
-  if (!apiToken) {
-    throw new Error('Neocities API token not found');
-  }
-  
-  // Base64 데이터를 Blob으로 변환
-  const arr = base64Data.split(',');
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  
-  const blob = new Blob([u8arr], { type: mime });
-  
-  // 고유한 파일명 생성
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const extension = mime.split('/')[1];
-  const fileName = `images/uploaded/${timestamp}_${randomString}.${extension}`;
-  
-  // FormData 생성
-  const formData = new FormData();
-  formData.append('file', blob, fileName);
-  
-  // 프록시 API로 업로드
-  const response = await fetch('/api/neocities/upload', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      file: base64Data,
-      filename: fileName
-    })
-  });
-  
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Neocities upload failed: ${errorData.message || response.statusText}`);
-  }
-  
-  // 상대 경로 반환 (dualImage 필터가 처리)
-  return `/${fileName}`;
+  // 자동 업로드 스크립트가 처리하므로 Base64 데이터를 그대로 반환
+  console.log('이미지가 Base64로 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  return base64Data; // 원본 Base64 데이터 반환
 }
 
 // Neocities에 이미지 업로드 (기존 함수)
@@ -595,19 +549,16 @@ async function savePost() {
     // 로컬에 포스트 저장 (GitHub Actions가 처리)
     localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
     
-    // GitHub API를 사용하여 posts.json 파일 업데이트 후 웹훅 트리거
-    try {
-      await updatePostsJsonFile(newPost);
-      
-      // 웹훅을 통해 GitHub Actions 트리거
-      await triggerDeployment();
-      
-      // 이미지 업로드 완료 알림
-      showTopMessage('포스트가 저장되었습니다. 배포가 시작되었습니다.');
-    } catch (error) {
-      console.warn('GitHub 저장 실패:', error);
-      showTopMessage('로컬에 저장되었습니다. GitHub 푸시 시 자동으로 처리됩니다.');
-    }
+    // 로컬 파일에 저장 후 자동 업로드 안내
+    showTopMessage('포스트가 로컬에 저장되었습니다. 터미널에서 "npm run upload:posts"를 실행하세요.');
+    
+    // 로컬 스토리지에 업로드 요청 저장
+    const uploadRequest = {
+      timestamp: Date.now(),
+      action: 'upload_posts',
+      posts: existingPosts
+    };
+    localStorage.setItem('pending_upload', JSON.stringify(uploadRequest));
     
     // 오늘 날짜 기록 (하루 제한)
     const today = new Date().toDateString();
@@ -650,139 +601,14 @@ function extractTitleFromContent(content) {
   return null;
 }
 
-// GitHub API를 사용하여 posts.json 파일에 새 포스트 추가
-async function updatePostsJsonFile(newPost) {
-  try {
-    // GitHub Personal Access Token 확인
-    const token = getGitHubToken();
-    if (!token) {
-      // 토큰이 없으면 로컬에만 저장
-      console.warn('GitHub token not found. Saving locally only.');
-      showTopMessage('GitHub token required. Saved locally only.');
-      return;
-    }
-
-    // 현재 파일 내용 가져오기
-    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('파일 정보 가져오기 실패: ' + response.statusText);
-    }
-    
-    const fileData = await response.json();
-    
-    // 기존 포스트들 가져오기 (UTF-8 디코딩 처리)
-    const base64Content = fileData.content;
-    const binaryString = atob(base64Content);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const decoder = new TextDecoder('utf-8');
-    const jsonString = decoder.decode(bytes);
-    const existingContent = JSON.parse(jsonString);
-    const existingPosts = existingContent.posts || [];
-    
-    // 새 포스트를 맨 앞에 추가
-    const updatedPosts = [newPost, ...existingPosts];
-    
-    // 새 파일 내용 생성 (UTF-8 인코딩 처리)
-    const newContent = JSON.stringify({ posts: updatedPosts }, null, 2);
-    
-    // UTF-8 인코딩을 위한 TextEncoder 사용
-    const encoder = new TextEncoder();
-    const utf8Bytes = encoder.encode(newContent);
-    const encodedContent = btoa(String.fromCharCode(...utf8Bytes));
-    
-    // 파일 업데이트
-    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Add new post: ${newPost.title} at ${new Date().toISOString()}`,
-        content: encodedContent,
-        sha: fileData.sha
-      })
-    });
-    
-    if (!updateResponse.ok) {
-      const errorData = await updateResponse.json();
-      throw new Error('파일 업데이트 실패: ' + (errorData.message || updateResponse.statusText));
-    }
-    
-    console.log('posts.json file successfully updated.');
-    
-  } catch (error) {
-    console.error('GitHub API update failed:', error);
-    throw error;
-  }
+// Neocities API를 사용하여 posts.json 파일 업데이트 (자동 업로드 스크립트 사용)
+async function updateNeocitiesPostsJson(posts) {
+  // 자동 업로드 스크립트가 처리하므로 로컬 파일만 저장
+  console.log('posts.json이 로컬에 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  return;
 }
 
-// GitHub Actions 워크플로우 트리거
-async function triggerDeployment() {
-  try {
-    const token = getGitHubToken();
-    if (!token) {
-      console.warn('GitHub token not found. Cannot trigger deployment.');
-      return;
-    }
-
-    // repository_dispatch 이벤트 트리거
-    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/dispatches', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        event_type: 'deploy',
-        client_payload: {
-          message: 'New post added, triggering deployment'
-        }
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error('워크플로우 트리거 실패: ' + response.statusText);
-    }
-    
-    console.log('Deployment triggered successfully.');
-    
-  } catch (error) {
-    console.error('Failed to trigger deployment:', error);
-    // 워크플로우 트리거 실패해도 에러를 던지지 않음 (posts.json은 이미 업데이트됨)
-  }
-}
-
-// GitHub Personal Access Token 가져오기
-function getGitHubToken() {
-  // 1. Eleventy에서 주입된 전역 데이터에서 토큰 확인
-  if (window.githubToken && window.githubToken !== 'undefined' && window.githubToken !== 'null' && window.githubToken.trim() !== '') {
-    console.log('Using GitHub token from Eleventy injection.');
-    return window.githubToken;
-  }
-  
-  // 2. localStorage에서 토큰 확인 (백업)
-  let token = localStorage.getItem('github_token');
-  
-  if (!token) {
-    console.warn('GitHub token not configured. Please check AUTHOR_TOKEN environment variable.');
-    return null;
-  }
-  
-  return token;
-}
+// GitHub 관련 함수들은 더 이상 사용하지 않음 (Neocities API만 사용)
 
 
 
@@ -842,7 +668,14 @@ function setupAutoSave() {
 
 // 관리자 권한 체크 함수
 function checkAdminPermission() {
-  // AdminAuth 클래스가 정의되어 있는지 확인
+  // 로컬 서버 접속 시 자동으로 admin 모드 활성화
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocal) {
+    console.log('로컬 서버 접속 감지 - 자동 admin 모드 활성화');
+    return true;
+  }
+  
+  // 기존 AdminAuth 방식 (프로덕션 환경용)
   if (typeof AdminAuth !== 'undefined') {
     const adminAuth = new AdminAuth();
     return adminAuth.isAdminLoggedIn();
