@@ -2,6 +2,7 @@ name: Upload Images to Neocities
 
 on:
   push:
+    branches: [ main ]
     paths:
       - 'src/_data/posts.json'
   workflow_dispatch:
