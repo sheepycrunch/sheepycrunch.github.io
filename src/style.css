@@ -109,6 +109,253 @@ body::-webkit-scrollbar {
   overflow: hidden;
 }
 
+/* Summernote 에디터 스타일 */
+#summernote-editor {
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm);
+  background: var(--bg-secondary);
+}
+
+.note-editor {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+}
+
+.note-toolbar {
+  background: var(--bg-tertiary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0 !important;
+}
+
+.note-btn-group {
+  background: transparent !important;
+}
+
+.note-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--border-radius-sm) !important;
+  transition: var(--transition-fast) !important;
+}
+
+.note-btn:hover {
+  background: var(--accent-primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+.note-btn.active {
+  background: var(--accent-primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+.note-editing-area {
+  background: var(--bg-secondary) !important;
+}
+
+.note-editable {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-family-base) !important;
+  font-size: var(--font-size-base) !important;
+  line-height: var(--line-height-base) !important;
+  padding: var(--spacing-md) !important;
+}
+
+.note-editable:focus {
+  outline: none !important;
+}
+
+.note-dropdown-menu {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.note-dropdown-item {
+  color: var(--text-primary) !important;
+  background: transparent !important;
+  transition: var(--transition-fast) !important;
+}
+
+.note-dropdown-item:hover {
+  background: var(--accent-primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+.note-dropdown-item.checked {
+  background: var(--accent-primary) !important;
+  color: var(--bg-primary) !important;
+}
+
+.note-color-palette {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+}
+
+.note-color-btn {
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+  transition: var(--transition-fast) !important;
+}
+
+.note-color-btn:hover {
+  transform: scale(1.1) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.note-modal {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.note-modal-content {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) !important;
+  color: var(--text-primary) !important;
+}
+
+.note-modal-header {
+  background: var(--bg-tertiary) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0 !important;
+}
+
+.note-modal-title {
+  color: var(--text-primary) !important;
+}
+
+.note-form-control {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--border-radius-sm) !important;
+}
+
+.note-form-control:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 249, 233, 0.2) !important;
+}
+
+.note-btn-primary {
+  background: var(--accent-primary) !important;
+  color: var(--bg-primary) !important;
+  border: 1px solid var(--accent-primary) !important;
+  border-radius: var(--border-radius-sm) !important;
+}
+
+.note-btn-primary:hover {
+  background: var(--accent-secondary) !important;
+  border-color: var(--accent-secondary) !important;
+}
+
+.note-btn-primary:disabled {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-light) !important;
+  cursor: not-allowed !important;
+}
+
+.note-statusbar {
+  background: var(--bg-tertiary) !important;
+  border-top: 1px solid var(--border-light) !important;
+  border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm) !important;
+}
+
+.note-resizebar {
+  background: var(--border-light) !important;
+}
+
+.note-icon-bar {
+  background: var(--text-secondary) !important;
+}
+
+/* Summernote 폰트 스타일 */
+.note-editable h1,
+.note-editable h2,
+.note-editable h3,
+.note-editable h4,
+.note-editable h5,
+.note-editable h6 {
+  color: var(--text-primary) !important;
+  font-family: var(--font-family-base) !important;
+}
+
+.note-editable p {
+  color: var(--text-primary) !important;
+  font-family: var(--font-family-base) !important;
+}
+
+.note-editable a {
+  color: var(--accent-primary) !important;
+}
+
+.note-editable a:hover {
+  color: var(--accent-secondary) !important;
+}
+
+.note-editable ul,
+.note-editable ol {
+  color: var(--text-primary) !important;
+}
+
+.note-editable blockquote {
+  border-left: 4px solid var(--accent-primary) !important;
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  margin: var(--spacing-md) 0 !important;
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0 !important;
+}
+
+.note-editable table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  margin: var(--spacing-md) 0 !important;
+}
+
+.note-editable table th,
+.note-editable table td {
+  border: 1px solid var(--border-light) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.note-editable table th {
+  background: var(--bg-tertiary) !important;
+  font-weight: bold !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .note-toolbar {
+    flex-wrap: wrap !important;
+  }
+  
+  .note-btn-group {
+    margin: 2px !important;
+  }
+  
+  .note-btn {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+  
+  .note-dropdown-menu {
+    max-width: 200px !important;
+  }
+  
+  .note-modal-content {
+    margin: 10px !important;
+    max-width: calc(100% - 20px) !important;
+  }
+}
+
 .write-form {
   display: flex;
   flex-direction: column;

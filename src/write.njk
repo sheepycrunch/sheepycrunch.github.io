@@ -45,7 +45,8 @@ permalink: "/write.html"
       
       <div class="form-group">
         <label for="post-content">{{ i18n.write.form.content | t(lang) }}</label>
-        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n.write.placeholders.content | t(lang) }}" rows="10"></textarea>
+        <div id="summernote-editor"></div>
+        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n.write.placeholders.content | t(lang) }}" rows="10" style="display: none;"></textarea>
       </div>
       
       <div class="form-group">
@@ -63,6 +64,12 @@ permalink: "/write.html"
   </div>
 </section>
 
+<!-- Summernote CSS -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet" type="text/css" media="all">
+
+<!-- jQuery and Summernote JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
 
 <script>
 // AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
@@ -347,6 +354,9 @@ function setupImageDrag() {
 
 // 임시저장 기능 (admin-panel.js 스타일)
 function saveDraft() {
+  // Summernote 내용을 textarea에 동기화
+  syncSummernoteToTextarea();
+  
   const content = document.getElementById('post-content').value;
   const tags = document.getElementById('post-tags').value;
   const category = document.getElementById('post-category').value;
@@ -375,6 +385,9 @@ function loadDraft() {
     document.getElementById('post-content').value = draft.content || '';
     document.getElementById('post-tags').value = draft.tags || '';
     document.getElementById('post-category').value = draft.category || 'txt';
+    
+    // Summernote에 내용 동기화
+    syncTextareaToSummernote();
     
     // 이미지 복원
     if (draft.image) {
@@ -509,6 +522,9 @@ function addTag(tag) {
 
 
 function savePost() {
+  // Summernote 내용을 textarea에 동기화
+  syncSummernoteToTextarea();
+  
   const category = document.getElementById('post-category').value;
   const content = document.getElementById('post-content').value;
   const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -544,6 +560,9 @@ function clearForm() {
   document.getElementById('post-category').value = 'txt';
   document.getElementById('post-content').value = '';
   document.getElementById('post-tags').value = '';
+  
+  // Summernote 에디터 초기화
+  $('#summernote-editor').summernote('code', '');
   
   // 이미지 관련 초기화
   document.getElementById('image-preview').style.display = 'none';
@@ -634,6 +653,9 @@ function setupAutoSave() {
   
   // 1분마다 자동 저장 (알림 없음)
   autoSaveInterval = setInterval(() => {
+    // Summernote 내용을 textarea에 동기화
+    syncSummernoteToTextarea();
+    
     const content = document.getElementById('post-content').value;
     if (content.trim()) {
       saveDraft();
@@ -657,6 +679,59 @@ function redirectTo404() {
   window.location.href = '/404.html';
 }
 
+// Summernote 에디터 초기화
+function initializeSummernote() {
+  $('#summernote-editor').summernote({
+    height: 300,
+    minHeight: 200,
+    maxHeight: 500,
+    focus: false,
+    lang: 'ko-KR',
+    toolbar: [
+      ['style', ['style']],
+      ['font', ['bold', 'underline', 'clear']],
+      ['fontname', ['fontname']],
+      ['fontsize', ['fontsize']],
+      ['color', ['color']],
+      ['para', ['ul', 'ol', 'paragraph']],
+      ['table', ['table']],
+      ['insert', ['link', 'picture', 'video']],
+      ['view', ['fullscreen', 'codeview', 'help']]
+    ],
+    fontNames: [
+      '맑은 고딕', '굴림체', '굴림', '바탕체', '바탕', '궁서',
+      '나눔고딕', 'Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS',
+      'Courier New', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'
+    ],
+    fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36', '50', '72', '96'],
+    callbacks: {
+      onChange: function(contents, $editable) {
+        // Summernote 내용이 변경될 때마다 숨겨진 textarea에 동기화
+        $('#post-content').val(contents);
+      },
+      onInit: function() {
+        // 에디터 초기화 완료 후 기존 내용 로드
+        const existingContent = $('#post-content').val();
+        if (existingContent) {
+          $('#summernote-editor').summernote('code', existingContent);
+        }
+      }
+    }
+  });
+}
+
+// Summernote 내용을 textarea에 동기화하는 함수
+function syncSummernoteToTextarea() {
+  const content = $('#summernote-editor').summernote('code');
+  $('#post-content').val(content);
+}
+
+// textarea 내용을 Summernote에 동기화하는 함수
+function syncTextareaToSummernote() {
+  const content = $('#post-content').val();
+  $('#summernote-editor').summernote('code', content);
+}
+
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
   // 관리자 권한 체크
@@ -664,6 +739,9 @@ document.addEventListener('DOMContentLoaded', function() {
     redirectTo404();
     return;
   }
+  
+  // Summernote 에디터 초기화
+  initializeSummernote();
   
   // 카테고리 로드
   loadCategories();
@@ -700,9 +778,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 하루 글 작성 제한 체크 (관리자 권한이 있으면 제한 없음)
   // checkDailyPostLimit(); // 이 줄을 주석 처리하여 하루 제한 취소
-  
-  // 텍스트 영역 자동 크기 조정
-  setupTextareaAutoResize();
 });
 
 // 하루 글 작성 제한 체크 함수
