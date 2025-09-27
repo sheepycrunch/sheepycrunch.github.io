@@ -1,6 +1,9 @@
 name: Upload Images to Neocities
 
 on:
+  push:
+    paths:
+      - 'src/_data/posts.json'
   workflow_dispatch:
     inputs:
       posts_data:
@@ -97,8 +100,8 @@ jobs:
         // 포스트 데이터 처리
         async function processPosts() {
           try {
-            const postsData = process.env.POSTS_DATA;
-            const posts = JSON.parse(postsData);
+            const postsData = fs.readFileSync('src/_data/posts.json', 'utf8');
+            const posts = JSON.parse(postsData).posts || [];
             let updated = false;
             
             for (const post of posts) {
@@ -167,7 +170,6 @@ jobs:
       env:
         NEOCITIES_API_KEY: ${{ secrets.NEOCITIES_API_KEY }}
         SITE_NAME: ${{ secrets.SITE_NAME }}
-        POSTS_DATA: ${{ github.event.inputs.posts_data }}
         
     - name: Commit and push changes
       run: |
