@@ -276,7 +276,12 @@ async function deletePost(postId) {
     await deletePostFromNeocities(postId);
     
     // 3. 관련 이미지 삭제
-    const imageDeleteResult = await deletePostImages(postId);
+    let imageDeleteResult = null;
+    try {
+      imageDeleteResult = await deletePostImages(postId);
+    } catch (error) {
+      console.warn('이미지 삭제 중 오류:', error);
+    }
     
     // 4. UI에서 제거
     removePostFromUI(postId);
@@ -322,15 +327,12 @@ async function deletePostFromLocal(postId) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
     }
     
-    // Neocities에 업데이트된 posts.json 업로드
-    try {
-      await updateNeocitiesPostsJson(filteredPosts);
-      console.log('Neocities에서 posts.json이 업데이트되었습니다.');
-    } catch (error) {
-      console.warn('Neocities 업데이트 실패:', error);
-      // 실패 시 로컬 스토리지에만 저장
-      localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
-    }
+    // 로컬 스토리지에 업데이트된 포스트 저장
+    localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
+    
+    // CORS 문제로 인해 Neocities API 호출을 건너뜀
+    console.log('CORS 정책으로 인해 Neocities 업데이트를 건너뜁니다.');
+    console.log('로컬 스토리지에 저장되었습니다.');
     
     console.log('로컬에서 포스트가 삭제되었습니다.');
     
@@ -348,7 +350,7 @@ async function deletePostFromLocal(postId) {
     }
     
     // 사용자에게 삭제 완료 알림
-    alert(`포스트가 삭제되었습니다!${imageMessage}\n\nNeocities에서도 삭제되었으므로 새로고침해도 다시 나타나지 않습니다.`);
+    alert(`포스트가 삭제되었습니다!${imageMessage}\n\nCORS 정책으로 인해 Neocities 자동 업데이트가 불가능합니다.\n\n수동으로 업데이트하려면:\n1. Neocities 대시보드에 로그인\n2. posts.json 파일을 수동으로 업데이트\n3. 또는 GitHub Actions를 통해 자동 동기화`);
     
   } catch (error) {
     console.error('로컬 포스트 삭제 오류:', error);
