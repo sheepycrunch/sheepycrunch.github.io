@@ -26,7 +26,8 @@ async function uploadImageToNeocities(buffer, fileName, mime) {
 
     const formData = new FormData();
     const blob = new Blob([buffer], { type: mime });
-    formData.append('file', blob, fileName);
+    const fullPath = `images/uploaded/${fileName}`;
+    formData.append('file', blob, fullPath);
 
     const response = await fetch('https://neocities.org/api/upload', {
       method: 'POST',
