@@ -32,46 +32,41 @@ async function loadDynamicPosts() {
     console.log('Environment check:', { hostname: window.location.hostname, isLocal });
     
     let response;
-    
-    // 모든 환경에서 Neocities에서 데이터 가져오기 (최신 데이터 보장)
-    try {
-      // 먼저 Neocities에서 시도
-      console.log('Fetching posts from Neocities...');
-      response = await fetch(CONFIG.neocitiesPostsUrl);
-    } catch (error) {
-      console.warn('Failed to fetch from Neocities, trying local fallback...');
+    if (isLocal) {
+      // 로컬 환경: /posts.json 직접 fetch
+      console.log('Local environment detected. Fetching from /posts.json');
       
-      // Neocities 실패 시 로컬 파일로 폴백
-      if (isLocal) {
+      try {
+        response = await fetch('/posts.json');
+        console.log('Local fetch response:', response.status);
+      } catch (error) {
+        console.error('Error fetching from /posts.json:', error);
+        // Eleventy 변수로 폴백 시도
         try {
-          response = await fetch('/posts.json');
-          console.log('Local fallback response:', response.status);
-        } catch (localError) {
-          console.error('Local fallback also failed:', localError);
-          // Eleventy 변수로 최종 폴백
-          try {
-            const posts = window.eleventyPosts || [];
-            if (posts && posts.length > 0) {
-              posts.forEach(post => {
-                const postElement = createPostElement(post);
-                dynamicPostsContainer.appendChild(postElement);
-              });
-              console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable (final fallback).`);
-              return;
-            }
-          } catch (fallbackError) {
-            console.error('All fallbacks failed:', fallbackError);
+          const posts = window.eleventyPosts || [];
+          if (posts && posts.length > 0) {
+            posts.forEach(post => {
+              const postElement = createPostElement(post);
+              dynamicPostsContainer.appendChild(postElement);
+            });
+            console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable (fallback).`);
+            return;
           }
-          return;
+        } catch (fallbackError) {
+          console.error('Fallback to Eleventy variable also failed:', fallbackError);
         }
-      } else {
-        // 프로덕션 환경에서 Neocities 실패 시 Nekoweb 시도
-        try {
-          response = await fetch(CONFIG.nekowebPostsUrl);
-        } catch (nekowebError) {
-          console.error('All data sources failed:', nekowebError);
-          return;
-        }
+        return;
+      }
+    } else {
+      // 프로덕션 환경: Neocities에서 가져오기
+      try {
+        // 먼저 Neocities에서 시도
+        console.log('Fetching posts from Neocities...');
+        response = await fetch(CONFIG.neocitiesPostsUrl);
+      } catch (error) {
+        console.warn('Failed to fetch from Neocities, trying Nekoweb...');
+        // Neocities 실패 시 Nekoweb에서 시도
+        response = await fetch(CONFIG.nekowebPostsUrl);
       }
     }
     
@@ -198,27 +193,23 @@ function convertQuillToHtml(quillContent) {
           
           html += text;
         } else if (op.insert && typeof op.insert === 'object' && op.insert.image) {
-          // 이미지 처리
+          // 이미지 처리 (dualImage 필터 로직 적용)
           const imagePath = op.insert.image;
-          
-          if (imagePath.startsWith('data:image/')) {
-            // Base64 이미지인 경우 그대로 사용
-            html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
-          } else if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+          if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
             // 이미 절대 URL인 경우 그대로 사용
             html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
           } else {
-            // 상대 경로인 경우 환경에 따라 URL 결정
+            // 환경에 따라 이미지 URL 결정
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
             
             if (isLocal) {
-              // 로컬 환경: Neocities URL 사용
+              // 로컬 환경: Neocities URL 사용 (dualImage 필터와 동일)
               html += `<img src="${CONFIG.neocitiesBaseUrl}/${cleanPath}" 
                            onerror="this.onerror=null; this.src='${CONFIG.nekowebBaseUrl}/${cleanPath}'" 
                            alt="이미지" style="max-width: 100%; height: auto;">`;
             } else {
-              // 프로덕션 환경: 상대 경로 사용
+              // 프로덕션 환경: 상대 경로 사용 (dualImage 필터와 동일)
               html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
             }
           }
@@ -698,32 +689,6 @@ function addAdminButtonsToStaticPosts() {
     }
   });
 }
-
-// posts.json 파일 저장 함수
-function savePostsToFile(postsData) {
-  try {
-    console.log('posts.json 파일 저장 요청됨:', postsData.length, '개 포스트');
-    
-    // 로컬 스토리지에 저장
-    localStorage.setItem('posts', JSON.stringify(postsData));
-    
-    // 자동 업로드 스크립트가 실행되도록 알림
-    if (typeof window !== 'undefined' && window.autoUpload) {
-      window.autoUpload.uploadPosts();
-    }
-    
-    console.log('posts.json 파일 저장 완료');
-  } catch (error) {
-    console.error('posts.json 파일 저장 오류:', error);
-  }
-}
-
-// posts-manager 객체를 전역으로 노출
-window.postsManager = {
-  savePostsToFile: savePostsToFile,
-  loadDynamicPosts: loadDynamicPosts,
-  convertStaticPosts: convertStaticPosts
-};
 
 // 페이지 로드 시 정적 포스트 변환 및 동적 포스트 로드
 document.addEventListener('DOMContentLoaded', function() {
