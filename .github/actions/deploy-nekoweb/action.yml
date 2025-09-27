@@ -23,10 +23,27 @@ runs:
       shell: bash
       run: |
         echo "🚀 Deploying to Nekoweb..."
+        echo "📋 Site name: ${{ inputs.site_name }}"
+        echo "📁 Dist directory: ${{ inputs.dist_dir }}"
         
         # Check if dist directory exists
         if [ ! -d "${{ inputs.dist_dir }}" ]; then
           echo "❌ Directory ${{ inputs.dist_dir }} not found!"
+          exit 1
+        fi
+        
+        # Test API connection first
+        echo "🔍 Testing API connection..."
+        
+        # Test with correct API endpoint
+        if curl -H "Authorization: ${{ inputs.api_key }}" \
+          "https://nekoweb.org/api/site/info" \
+          --silent --show-error --fail; then
+          echo "✅ API connection successful"
+          AUTH_HEADER="Authorization: ${{ inputs.api_key }}"
+        else
+          echo "❌ API connection failed"
+          echo "Please check your API key and site name"
           exit 1
         fi
         
@@ -39,15 +56,31 @@ runs:
             relative_path=${file#${{ inputs.dist_dir }}/}
             echo "📤 Uploading: $relative_path"
             
-            if curl -X POST \
-              -H "Authorization: Bearer ${{ inputs.api_key }}" \
+            # Get directory path for the file
+            dir_path=$(dirname "$relative_path")
+            if [ "$dir_path" = "." ]; then
+              dir_path="/"
+            else
+              dir_path="/$dir_path"
+            fi
+            
+            # Upload file using the correct API endpoint
+            response=$(curl -X POST \
+              -H "$AUTH_HEADER" \
+              -F "pathname=$dir_path" \
               -F "file=@$file" \
-              -F "path=$relative_path" \
-              "https://nekoweb.org/api/upload" \
-              --silent --show-error --fail; then
+              "https://nekoweb.org/api/files/upload" \
+              --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
+            
+            http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            body=$(echo $response | sed -e 's/HTTPSTATUS:.*//g')
+            
+            if [ $http_code -eq 200 ] || [ $http_code -eq 201 ]; then
+              echo "✅ Uploaded: $relative_path"
               ((upload_count++))
             else
-              echo "❌ Failed to upload: $relative_path"
+              echo "❌ Failed to upload: $relative_path (HTTP $http_code)"
+              echo "Response: $body"
               ((error_count++))
             fi
           fi
