@@ -521,7 +521,7 @@ module.exports = function(eleventyConfig) {
     return eleventyConfig.getFilter('t')(text, targetLang);
   });
   
-  // 이미지 경로를 네오시티와 네코웹 URL로 변환하는 필터 (둘 다 사용)
+  // 이미지 경로를 환경에 따라 변환하는 필터
   eleventyConfig.addFilter("dualImage", function(imagePath) {
     if (!imagePath) return "";
     
@@ -530,15 +530,22 @@ module.exports = function(eleventyConfig) {
       return imagePath;
     }
     
-    // 상대 경로를 네오시티와 네코웹 URL로 변환
-    const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
-    const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
-    const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
+    // 환경 변수로 배포 환경 확인
+    const isNeocitiesDeploy = process.env.NEOCITIES_DEPLOY === 'true';
     
-    // 네오시티와 네코웹 둘 다 사용하는 HTML 반환
-    return `<img src="${neocitiesUrl}/${cleanPath}" 
-                 onerror="this.onerror=null; this.src='${nekowebUrl}/${cleanPath}'" 
-                 alt="" />`;
+    if (isNeocitiesDeploy) {
+      // 네오시티 배포: 상대 경로 사용
+      return `<img src="${imagePath}" alt="" />`;
+    } else {
+      // 로컬 개발: 절대 URL 사용 (네오시티와 네코웹 둘 다 시도)
+      const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+      const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
+      const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
+      
+      return `<img src="${neocitiesUrl}/${cleanPath}" 
+                   onerror="this.onerror=null; this.src='${nekowebUrl}/${cleanPath}'" 
+                   alt="" />`;
+    }
   });
   
   // 기존 neocitiesImage 필터도 유지 (하위 호환성)
