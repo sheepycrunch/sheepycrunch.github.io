@@ -593,7 +593,7 @@ async function updatePostsJsonFile(newPost) {
 // GitHub Personal Access Token 가져오기
 function getGitHubToken() {
   // 1. Eleventy에서 주입된 전역 데이터에서 토큰 확인
-  if (window.githubToken && window.githubToken !== 'undefined' && window.githubToken !== 'null') {
+  if (window.githubToken && window.githubToken !== 'undefined' && window.githubToken !== 'null' && window.githubToken.trim() !== '') {
     console.log('Eleventy에서 주입된 GitHub 토큰을 사용합니다.');
     return window.githubToken;
   }

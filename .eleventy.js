@@ -1,5 +1,6 @@
 const { DateTime } = require("luxon");
 const GoogleSearchConsoleStats = require('./src/_plugins/google-search-console');
+const htmlmin = require('html-minifier-terser');
 
 module.exports = function(eleventyConfig) {
   // 환경변수에서 관리자 키 가져오기
@@ -605,6 +606,40 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("neocities.png");
+
+  // HTML 압축 설정 (프로덕션 빌드 시에만)
+  if (process.env.ELEVENTY_ENV === 'production') {
+    eleventyConfig.addTransform('htmlmin', async function(content, outputPath) {
+      if (outputPath && outputPath.endsWith('.html')) {
+        try {
+          const minified = await htmlmin.minify(content, {
+            removeComments: true,
+            removeRedundantAttributes: true,
+            removeScriptTypeAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            useShortDoctype: true,
+            minifyCSS: true,
+            minifyJS: true,
+            collapseWhitespace: true,
+            conservativeCollapse: true,
+            preserveLineBreaks: false,
+            removeEmptyAttributes: true,
+            removeOptionalTags: true,
+            removeEmptyElements: false,
+            lint: false,
+            keepClosingSlash: false,
+            caseSensitive: false,
+            minifyURLs: true
+          });
+          return minified;
+        } catch (err) {
+          console.error('HTML minification failed:', err);
+          return content;
+        }
+      }
+      return content;
+    });
+  }
 
   return {
     templateFormats: [

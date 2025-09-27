@@ -27,5 +27,8 @@
     "@11ty/eleventy-plugin-webc": "^0.10.0",
     "eleventy-plugin-embed-everything": "^1.0.0",
     "googleapis": "^160.0.0"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "^7.2.0"
   }
 }
