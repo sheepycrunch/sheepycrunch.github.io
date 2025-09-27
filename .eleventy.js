@@ -702,7 +702,17 @@ module.exports = function(eleventyConfig) {
 
     // 서버 설정
     serverOptions: {
-      port: 8080
+      port: 8080,
+      // API 라우트 추가
+      middleware: [
+        function(req, res, next) {
+          if (req.url === '/api/execute-workflow') {
+            const executeWorkflow = require('./src/api/execute-workflow');
+            return executeWorkflow(req, res);
+          }
+          next();
+        }
+      ]
     }
   };
 };

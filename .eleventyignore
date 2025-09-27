@@ -1,2 +1,2 @@
 # 프로덕션 빌드에서 제외할 파일들
-src/write.njk
+# src/write.njk은 .eleventy.js에서 환경변수로 제어

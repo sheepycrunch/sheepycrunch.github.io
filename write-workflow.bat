@@ -53,12 +53,23 @@ if %IMAGE_COUNT% GTR 0 (
 )
 
 echo.
-echo 2단계: 파일 복사 중...
+echo 2단계: 파일 복사 및 이미지 처리 중...
 
 REM posts.json 복사
 if exist "%TEMP_DIR%\posts.json" (
     copy "%TEMP_DIR%\posts.json" "src\posts.json" >nul
     echo ✓ posts.json 복사 완료
+    
+    REM Base64 이미지를 실제 파일로 변환
+    echo Base64 이미지 처리 중...
+    node process-images.js "src\posts.json"
+    if %ERRORLEVEL% NEQ 0 (
+        echo ⚠ 이미지 처리 중 오류 발생
+    ) else (
+        echo ✓ 이미지 처리 완료
+    )
+) else (
+    echo ⚠ posts.json을 찾을 수 없습니다.
 )
 
 REM 이미지 파일들 복사
