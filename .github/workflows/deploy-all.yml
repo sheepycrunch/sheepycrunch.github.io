@@ -48,7 +48,7 @@ jobs:
         echo "NPM version:"
         npm --version
         echo "Starting Eleventy build..."
-        npx @11ty/eleventy --verbose || {
+        npx @11ty/eleventy || {
           echo "Eleventy build failed with exit code $?"
           echo "Checking if _site directory was created:"
           ls -la _site/ || echo "_site directory not found"
