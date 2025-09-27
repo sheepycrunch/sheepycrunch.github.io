@@ -98,7 +98,7 @@ function convertQuillToHtml(quillContent) {
       }
     });
   } catch (error) {
-    console.error('Quill 변환 오류:', error);
+    console.error('Quill conversion error:', error);
     return '';
   }
   
@@ -122,7 +122,7 @@ function convertStaticPosts() {
         postElement.innerHTML = html;
         postElement.removeAttribute('data-quill-content');
       } catch (error) {
-        console.error('정적 포스트 변환 오류:', error);
+        console.error('Static post conversion error:', error);
         postElement.innerHTML = '';
       }
     }

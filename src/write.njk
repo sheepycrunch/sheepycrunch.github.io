@@ -134,31 +134,31 @@ function setupImageUpload() {
   const editorContainer = document.querySelector('.editor-container');
   const fileInput = document.getElementById('image-file-input');
   
-  console.log('setupImageUpload 함수가 호출되었습니다.');
+  console.log('setupImageUpload function called.');
   console.log('editorContainer:', editorContainer);
   console.log('fileInput:', fileInput);
   
   // 전체 페이지에 드래그 앤 드랍 이벤트 추가 (더 확실한 방법)
   document.addEventListener('dragover', (e) => {
     e.preventDefault();
-    console.log('페이지 전체 드래그 오버');
+    console.log('Page-wide drag over');
   });
   
   document.addEventListener('drop', (e) => {
     e.preventDefault();
-    console.log('페이지 전체 드롭 이벤트');
+    console.log('Page-wide drop event');
     
     // 에디터 영역 내부인지 확인
     const quillEditor = document.querySelector('.ql-editor');
     if (quillEditor && quillEditor.contains(e.target)) {
-      console.log('에디터 영역에서 드롭 감지');
+      console.log('Drop detected in editor area');
       
       const files = e.dataTransfer.files;
       if (files.length > 0 && files[0].type.startsWith('image/')) {
-        console.log('이미지 파일 감지:', files[0].name);
+        console.log('Image file detected:', files[0].name);
         handleImageFile(files[0]);
       } else {
-        console.log('이미지가 아닌 파일입니다.');
+        console.log('Non-image file detected.');
         alert(i18nData?.write?.messages?.imageOnly || '이미지 파일만 업로드할 수 있습니다.');
       }
     }
@@ -169,12 +169,12 @@ function setupImageUpload() {
     const quillEditor = document.querySelector('.ql-editor');
     
     if (!quillEditor) {
-      console.log('Quill 에디터가 아직 로드되지 않았습니다. 1초 후 다시 시도합니다.');
+      console.log('Quill editor not loaded yet. Retrying in 1 second.');
       setTimeout(attachClickEvents, 1000);
       return;
     }
     
-    console.log('클릭 이벤트를 등록합니다.');
+    console.log('Registering click events.');
     
     // 클릭으로 파일 선택 기능 비활성화 (드래그 앤 드랍만 사용)
     // quillEditor.addEventListener('click', (e) => {
@@ -189,26 +189,26 @@ function setupImageUpload() {
   // 파일 입력 이벤트
   fileInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
-      console.log('파일 선택됨:', e.target.files[0].name);
+      console.log('File selected:', e.target.files[0].name);
       handleImageFile(e.target.files[0]);
     }
   });
   
   function handleImageFile(file) {
-    console.log('handleImageFile 호출됨:', file.name, file.type);
+    console.log('handleImageFile called:', file.name, file.type);
     
     if (!file.type.startsWith('image/')) {
       alert(i18nData.write.messages.imageOnly);
       return;
     }
     
-    console.log('이미지 파일 처리 시작:', file.name);
+    console.log('Starting image file processing:', file.name);
     
-    // 임시로 Base64로 저장 (포스트 저장 시 GitHub Actions를 통해 Neocities에 업로드)
+    // 임시로 Base64로 저장 (포스트 저장 시 Neocities에 자동 업로드)
     const reader = new FileReader();
     reader.onload = (e) => {
       insertImageToEditor(e.target.result);
-      showTopMessage('이미지가 임시로 저장되었습니다. 포스트 저장 시 Neocities에 업로드됩니다.');
+      showTopMessage('이미지가 임시로 저장되었습니다. 포스트 저장 시 자동으로 업로드됩니다.');
     };
     reader.readAsDataURL(file);
   }
@@ -223,10 +223,10 @@ function setupImageUpload() {
       editor.insertEmbed(index, 'image', imageUrl);
       editor.setSelection(index + 1);
       
-      console.log('이미지가 성공적으로 삽입되었습니다.');
+      console.log('Image successfully inserted.');
     } catch (error) {
-      console.error('이미지 삽입 중 오류:', error);
-      alert('이미지 삽입 중 오류가 발생했습니다.');
+      console.error('Error inserting image:', error);
+      alert('An error occurred while inserting the image.');
     }
   }
 
@@ -242,7 +242,7 @@ function setupImageUpload() {
   attachClickEvents();
 }
 
-// Base64 이미지를 처리하는 함수 (GitHub Actions에서 사용)
+// Base64 이미지를 Neocities에 업로드하는 함수
 async function processBase64Images(content) {
   if (!content || !content.ops) return content;
   
@@ -250,14 +250,83 @@ async function processBase64Images(content) {
   
   for (const op of content.ops) {
     if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
-      // Base64 이미지는 그대로 유지 (GitHub Actions에서 처리)
-      newOps.push(op);
+      try {
+        console.log('Processing Base64 image...');
+        
+        // Base64를 Blob으로 변환
+        const base64Data = op.insert.image;
+        const arr = base64Data.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        
+        const blob = new Blob([u8arr], { type: mime });
+        
+        // Neocities에 업로드
+        const neocitiesUrl = await uploadImageToNeocities(blob, mime);
+        
+        // 새로운 op 생성 (Neocities URL 사용)
+        newOps.push({
+          insert: {
+            image: neocitiesUrl
+          }
+        });
+        
+        console.log(`Image uploaded: ${neocitiesUrl}`);
+        
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        // 실패한 경우 원본 유지
+        newOps.push(op);
+      }
     } else {
       newOps.push(op);
     }
   }
   
   return { ...content, ops: newOps };
+}
+
+// Neocities에 이미지 업로드
+async function uploadImageToNeocities(blob, mimeType) {
+  const apiToken = neocitiesApiToken;
+  const siteName = 'dakimakura';
+  
+  if (!apiToken) {
+    throw new Error('Neocities API token not found');
+  }
+  
+  // 고유한 파일명 생성
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  const extension = mimeType.split('/')[1];
+  const fileName = `images/uploaded/${timestamp}_${randomString}.${extension}`;
+  
+  // FormData 생성
+  const formData = new FormData();
+  formData.append('file', blob, fileName);
+  
+  // Neocities API 호출
+  const response = await fetch(`https://neocities.org/api/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`
+    },
+    body: formData
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.text();
+    throw new Error(`Upload failed: ${response.status} ${errorData}`);
+  }
+  
+  const result = await response.json();
+  return `https://${siteName}.neocities.org/${fileName}`;
 }
 
 // Base64 이미지가 있는지 확인
@@ -286,8 +355,8 @@ async function saveDraft() {
   try {
     // editor가 초기화되었는지 확인
     if (!editor) {
-      console.log('에디터가 아직 초기화되지 않았습니다.');
-      alert('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      console.log('Editor not initialized yet.');
+      alert('Editor not ready. Please try again in a moment.');
       return;
     }
     
@@ -301,10 +370,10 @@ async function saveDraft() {
     };
     
     localStorage.setItem('write-draft', JSON.stringify(draft));
-    showTopMessage('임시저장되었습니다.');
+    showTopMessage('Draft saved.');
   } catch (error) {
-    console.error('저장 중 오류:', error);
-    showTopMessage('저장 중 오류가 발생했습니다.');
+    console.error('Error saving:', error);
+    showTopMessage('An error occurred while saving.');
   }
 }
 
@@ -327,8 +396,8 @@ async function loadDraft() {
       // 상단 메시지 표시
       showTopMessage(i18nData?.write?.messages?.draftLoaded || '임시저장된 내용을 불러왔습니다.');
     } catch (error) {
-      console.error('불러오기 중 오류:', error);
-      showTopMessage('불러오기 중 오류가 발생했습니다.');
+    console.error('Error loading:', error);
+    showTopMessage('An error occurred while loading.');
     }
   } else {
     showTopMessage(i18nData?.write?.messages?.noDraft || '임시저장된 내용이 없습니다.');
@@ -345,10 +414,10 @@ function setupTagSuggestions() {
     const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
     const allTags = new Set();
     
-    console.log('전체 포스트 데이터:', posts);
+    console.log('All posts data:', posts);
     
     posts.forEach(post => {
-      console.log('포스트 태그:', post.tags, '타입:', typeof post.tags);
+      console.log('Post tags:', post.tags, 'type:', typeof post.tags);
       if (post.tags) {
         if (Array.isArray(post.tags)) {
           // 배열인 경우
@@ -365,7 +434,7 @@ function setupTagSuggestions() {
       }
     });
     
-    console.log('추출된 태그들:', Array.from(allTags));
+    console.log('Extracted tags:', Array.from(allTags));
     return Array.from(allTags);
   }
   
@@ -446,8 +515,8 @@ async function savePost() {
   try {
     // editor가 초기화되었는지 확인
     if (!editor) {
-      console.log('에디터가 아직 초기화되지 않았습니다.');
-      alert('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      console.log('Editor not initialized yet.');
+      alert('Editor not ready. Please try again in a moment.');
       return;
     }
     
@@ -459,8 +528,16 @@ async function savePost() {
       return;
     }
     
-    // Base64 이미지 처리 (GitHub Actions에서 Neocities로 업로드)
-    const processedContent = await processBase64Images(content);
+    // Base64 이미지 처리 (Neocities로 직접 업로드)
+    showTopMessage('이미지를 업로드하는 중...');
+    let processedContent;
+    try {
+      processedContent = await processBase64Images(content);
+    } catch (error) {
+      console.error('이미지 업로드 중 오류 발생:', error);
+      showTopMessage('이미지 업로드 중 오류가 발생했습니다. 포스트는 저장되지만 이미지는 base64로 유지됩니다.');
+      processedContent = content; // 원본 내용 사용
+    }
     
     // 기존 포스트들 가져오기
     const existingPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
@@ -485,10 +562,8 @@ async function savePost() {
     try {
       await updatePostsJsonFile(newPost);
       
-      // Base64 이미지가 있는 경우 알림
-      if (hasBase64Images([newPost])) {
-        showTopMessage('Base64 이미지가 감지되었습니다. GitHub 푸시 시 자동으로 Neocities에 업로드됩니다.');
-      }
+      // 이미지 업로드 완료 알림
+      showTopMessage('이미지 업로드가 완료되었습니다.');
     } catch (error) {
       console.warn('GitHub 저장 실패:', error);
       showTopMessage('로컬에 저장되었습니다. GitHub 푸시 시 자동으로 처리됩니다.');
@@ -502,7 +577,7 @@ async function savePost() {
     editor.setContents([]);
     document.getElementById('post-tags').value = '';
     
-    console.log('새 포스트 저장됨:', newPost);
+    console.log('New post saved:', newPost);
     showTopMessage(i18nData?.write?.messages?.saveSuccess || '포스트가 저장되었습니다.');
     
     // 통계 업데이트 이벤트 발생
@@ -513,8 +588,8 @@ async function savePost() {
     
     
   } catch (error) {
-    console.error('저장 중 오류:', error);
-    showTopMessage('저장 중 오류가 발생했습니다: ' + error.message);
+    console.error('Error saving:', error);
+    showTopMessage('An error occurred while saving: ' + error.message);
   }
 }
 
@@ -542,8 +617,8 @@ async function updatePostsJsonFile(newPost) {
     const token = getGitHubToken();
     if (!token) {
       // 토큰이 없으면 로컬에만 저장
-      console.warn('GitHub 토큰이 없습니다. 로컬에만 저장됩니다.');
-      showTopMessage('GitHub 토큰이 필요합니다. 로컬에만 저장되었습니다.');
+      console.warn('GitHub token not found. Saving locally only.');
+      showTopMessage('GitHub token required. Saved locally only.');
       return;
     }
 
@@ -593,10 +668,10 @@ async function updatePostsJsonFile(newPost) {
       throw new Error('파일 업데이트 실패: ' + (errorData.message || updateResponse.statusText));
     }
     
-    console.log('posts.json 파일이 성공적으로 업데이트되었습니다.');
+    console.log('posts.json file successfully updated.');
     
   } catch (error) {
-    console.error('GitHub API 업데이트 실패:', error);
+    console.error('GitHub API update failed:', error);
     throw error;
   }
 }
@@ -605,7 +680,7 @@ async function updatePostsJsonFile(newPost) {
 function getGitHubToken() {
   // 1. Eleventy에서 주입된 전역 데이터에서 토큰 확인
   if (window.githubToken && window.githubToken !== 'undefined' && window.githubToken !== 'null' && window.githubToken.trim() !== '') {
-    console.log('Eleventy에서 주입된 GitHub 토큰을 사용합니다.');
+    console.log('Using GitHub token from Eleventy injection.');
     return window.githubToken;
   }
   
@@ -613,7 +688,7 @@ function getGitHubToken() {
   let token = localStorage.getItem('github_token');
   
   if (!token) {
-    console.warn('GitHub 토큰이 설정되지 않았습니다. AUTHOR_TOKEN 환경변수를 확인하세요.');
+    console.warn('GitHub token not configured. Please check AUTHOR_TOKEN environment variable.');
     return null;
   }
   
@@ -671,7 +746,7 @@ function setupAutoSave() {
         // 알림 없이 조용히 저장
       }
     } catch (error) {
-      console.error('자동 저장 중 오류:', error);
+      console.error('Auto-save error:', error);
     }
   }, 60000); // 1분 = 60000ms
 }
@@ -687,8 +762,8 @@ function checkAdminPermission() {
 }
 
 // 권한이 없으면 404 페이지로 리다이렉트
-function redirectTo404() {
-  window.location.href = '/404.html';
+function redirectToLogin() {
+  window.location.href = '/login.html';
 }
 
 
@@ -699,7 +774,7 @@ let editor;
 function initializeQuillJS() {
   // Quill.js가 로드되었는지 확인
   if (typeof Quill === 'undefined') {
-    console.error('Quill.js가 로드되지 않았습니다.');
+    console.error('Quill.js not loaded.');
     return;
   }
 
@@ -725,7 +800,7 @@ function initializeQuillJS() {
   });
 
 
-  console.log('Quill.js가 성공적으로 초기화되었습니다.');
+  console.log('Quill.js successfully initialized.');
 }
 
 
@@ -733,7 +808,7 @@ function initializeQuillJS() {
 document.addEventListener('DOMContentLoaded', function() {
   // 관리자 권한 체크
   if (!checkAdminPermission()) {
-    redirectTo404();
+    redirectToLogin();
     return;
   }
   

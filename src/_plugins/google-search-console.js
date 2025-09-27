@@ -14,7 +14,7 @@ class GoogleSearchConsoleStats {
       // 서비스 계정 키 파일 경로 (환경변수에서 가져오기)
       const keyFile = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
       if (!keyFile) {
-        console.warn('GOOGLE_SERVICE_ACCOUNT_KEY 환경변수가 설정되지 않았습니다.');
+        console.warn('GOOGLE_SERVICE_ACCOUNT_KEY environment variable not set.');
         return null;
       }
 
@@ -26,7 +26,7 @@ class GoogleSearchConsoleStats {
       this.searchconsole = google.searchconsole({ version: 'v1', auth: this.auth });
       return this.auth;
     } catch (error) {
-      console.error('Google Search Console 인증 실패:', error);
+      console.error('Google Search Console authentication failed:', error);
       return null;
     }
   }
@@ -49,7 +49,7 @@ class GoogleSearchConsoleStats {
 
       return response.data.rows || [];
     } catch (error) {
-      console.error(`검색 분석 데이터 가져오기 실패 (${siteUrl}):`, error);
+      console.error(`Failed to fetch search analytics data (${siteUrl}):`, error);
       return [];
     }
   }
