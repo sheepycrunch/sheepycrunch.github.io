@@ -41,4 +41,4 @@ src/posts.json
 posts.json
 
 # Environment variables (contains sensitive data)
-.env
+*.env
