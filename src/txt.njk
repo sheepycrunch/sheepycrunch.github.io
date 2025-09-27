@@ -52,49 +52,19 @@ async function loadDynamicPosts() {
   const dynamicPostsContainer = document.getElementById('dynamic-posts');
   
   try {
-    // 환경에 따라 posts.json 경로 결정
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    console.log('Environment check:', { hostname: window.location.hostname, isLocal });
+    // 로컬/프로덕션 모두 Neocities에서 가져오기 (이미지와 동일한 방식)
+    const neocitiesUrl = 'https://dakimakura.neocities.org/posts.json';
+    const nekowebUrl = 'https://dakimakura.nekoweb.org/posts.json';
     
     let response;
-    if (isLocal) {
-      // 로컬 환경: Eleventy에서 주입된 JavaScript 변수 사용
-      console.log('Local environment detected. Using Eleventy JavaScript variable.');
-      
-      try {
-        const posts = window.eleventyPosts || [];
-        
-        if (posts && posts.length > 0) {
-          // 모든 포스트 표시 (카테고리 필터링 제거)
-          // 최신 포스트부터 표시
-          posts.forEach(post => {
-            const postElement = createPostElement(post);
-            dynamicPostsContainer.appendChild(postElement);
-          });
-          
-          console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable.`);
-          return;
-        } else {
-          console.log('No saved posts found in Eleventy variable.');
-          return;
-        }
-      } catch (error) {
-        console.error('Error accessing posts data:', error);
-        return;
-      }
-    } else {
-      // 프로덕션 환경: Neocities에서 가져오기
-      const neocitiesUrl = 'https://dakimakura.neocities.org/posts.json';
-      const nekowebUrl = 'https://dakimakura.nekoweb.org/posts.json';
-      
-      try {
-        // 먼저 Neocities에서 시도
-        response = await fetch(neocitiesUrl);
-      } catch (error) {
-        console.warn('Failed to fetch from Neocities, trying Nekoweb...');
-        // Neocities 실패 시 Nekoweb에서 시도
-        response = await fetch(nekowebUrl);
-      }
+    try {
+      // 먼저 Neocities에서 시도
+      console.log('Fetching posts from Neocities...');
+      response = await fetch(neocitiesUrl);
+    } catch (error) {
+      console.warn('Failed to fetch from Neocities, trying Nekoweb...');
+      // Neocities 실패 시 Nekoweb에서 시도
+      response = await fetch(nekowebUrl);
     }
     
     if (response.ok) {
@@ -113,9 +83,9 @@ async function loadDynamicPosts() {
         dynamicPostsContainer.appendChild(postElement);
       });
       
-      console.log(`Loaded ${posts.length} dynamic posts from ${isLocal ? 'local' : 'Neocities'}.`);
+      console.log(`Loaded ${posts.length} dynamic posts from Neocities.`);
     } else {
-      console.warn(`Failed to fetch posts from ${isLocal ? 'local' : 'Neocities'}.`);
+      console.warn('Failed to fetch posts from Neocities.');
       dynamicPostsContainer.innerHTML = '<p>Failed to load posts.</p>';
     }
   } catch (error) {
