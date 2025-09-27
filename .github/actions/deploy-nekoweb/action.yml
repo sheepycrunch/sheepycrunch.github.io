@@ -111,14 +111,14 @@ runs:
             dir_path="/$dir_path"
           fi
           
-          # Use the edit endpoint for file uploads
-          # pathname should be the full file path, not just directory
+          # Use the upload endpoint for file uploads
+          # Try with full file path as pathname first
           file_path="/$relative_path"
           response=$(curl -X POST \
             -H "$AUTH_HEADER" \
             -F "pathname=$file_path" \
-            -F "content=@$file" \
-            "https://nekoweb.org/api/files/edit" \
+            -F "files=@$file" \
+            "https://nekoweb.org/api/files/upload" \
             --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
           
           http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -142,7 +142,7 @@ runs:
             echo "  - Relative path: $relative_path"
             echo "  - File path: $file_path"
             echo "  - Full file path: $file"
-            echo "  - API endpoint: https://nekoweb.org/api/files/edit"
+            echo "  - API endpoint: https://nekoweb.org/api/files/upload"
             echo "  - Auth header: $AUTH_HEADER"
             ((error_count+=1))
           fi
