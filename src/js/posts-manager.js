@@ -286,9 +286,22 @@ async function deletePost(postId) {
     // 4. UI에서 제거
     removePostFromUI(postId);
     
+    // 이미지 삭제 결과 메시지 생성
+    let imageMessage = '';
+    if (imageDeleteResult && imageDeleteResult.total > 0) {
+      if (imageDeleteResult.deleted.length > 0) {
+        imageMessage += `\n\n이미지 삭제: ${imageDeleteResult.deleted.length}개 성공`;
+      }
+      if (imageDeleteResult.failed.length > 0) {
+        imageMessage += `\n이미지 삭제 실패: ${imageDeleteResult.failed.length}개`;
+      }
+    } else {
+      imageMessage += '\n\n관련 이미지가 없습니다.';
+    }
+    
     // UI 업데이트를 위해 약간의 지연
     setTimeout(() => {
-      alert('글이 성공적으로 삭제되었습니다.');
+      alert(`글이 성공적으로 삭제되었습니다!${imageMessage}\n\nCORS 정책으로 인해 Neocities 자동 업데이트가 불가능합니다.\n\n수동으로 업데이트하려면:\n1. Neocities 대시보드에 로그인\n2. posts.json 파일을 수동으로 업데이트\n3. 또는 GitHub Actions를 통해 자동 동기화`);
     }, 100);
   } catch (error) {
     console.error('포스트 삭제 중 오류 발생:', error);
@@ -335,22 +348,6 @@ async function deletePostFromLocal(postId) {
     console.log('로컬 스토리지에 저장되었습니다.');
     
     console.log('로컬에서 포스트가 삭제되었습니다.');
-    
-    // 이미지 삭제 결과 메시지 생성
-    let imageMessage = '';
-    if (imageDeleteResult && imageDeleteResult.total > 0) {
-      if (imageDeleteResult.deleted.length > 0) {
-        imageMessage += `\n\n이미지 삭제: ${imageDeleteResult.deleted.length}개 성공`;
-      }
-      if (imageDeleteResult.failed.length > 0) {
-        imageMessage += `\n이미지 삭제 실패: ${imageDeleteResult.failed.length}개`;
-      }
-    } else {
-      imageMessage += '\n\n관련 이미지가 없습니다.';
-    }
-    
-    // 사용자에게 삭제 완료 알림
-    alert(`포스트가 삭제되었습니다!${imageMessage}\n\nCORS 정책으로 인해 Neocities 자동 업데이트가 불가능합니다.\n\n수동으로 업데이트하려면:\n1. Neocities 대시보드에 로그인\n2. posts.json 파일을 수동으로 업데이트\n3. 또는 GitHub Actions를 통해 자동 동기화`);
     
   } catch (error) {
     console.error('로컬 포스트 삭제 오류:', error);
