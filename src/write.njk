@@ -301,7 +301,7 @@ async function saveDraft() {
     };
     
     localStorage.setItem('write-draft', JSON.stringify(draft));
-    showTopMessage('임시저장되었습니다. (로컬에만 저장)');
+    showTopMessage('임시저장되었습니다.');
   } catch (error) {
     console.error('저장 중 오류:', error);
     showTopMessage('저장 중 오류가 발생했습니다.');
