@@ -1,10 +1,12 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # 비활성화됨 - deploy-all.yml에서 통합 관리
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  workflow_dispatch: # 수동 실행 가능
 
 jobs:
   build-and-deploy:
