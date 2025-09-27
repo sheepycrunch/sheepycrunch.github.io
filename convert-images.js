@@ -19,8 +19,8 @@ function base64ToBuffer(base64Data) {
 // GitHub Pages에 이미지 저장
 async function saveImageToGitHub(buffer, fileName, mime) {
   try {
-    // 이미지 파일을 _site/images/uploaded에 저장 (Eleventy가 복사함)
-    const imagesDir = '_site/images/uploaded';
+    // 이미지 파일을 assets/uploaded에 저장 (GitHub Pages에서 직접 호스팅)
+    const imagesDir = 'assets/uploaded';
     if (!fs.existsSync(imagesDir)) {
       fs.mkdirSync(imagesDir, { recursive: true });
     }
@@ -31,7 +31,7 @@ async function saveImageToGitHub(buffer, fileName, mime) {
     console.log(`Image saved locally: ${filePath}`);
     
     // GitHub Pages URL 반환
-    return `https://sheepycrunch.github.io/images/uploaded/${fileName}`;
+    return `https://sheepycrunch.github.io/assets/uploaded/${fileName}`;
   } catch (error) {
     throw new Error(`Failed to save image: ${error.message}`);
   }
