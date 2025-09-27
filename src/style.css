@@ -109,11 +109,241 @@ body::-webkit-scrollbar {
   overflow: hidden;
 }
 
+/* 커스텀 툴바 스타일 */
+.note-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+  margin-bottom: 0;
+}
+
+.note-btn-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  position: relative;
+}
+
+.note-btn-group.note-break {
+  width: 1px;
+  height: 20px;
+  background: var(--border-light);
+  margin: 0 var(--spacing-sm);
+}
+
+.note-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-width: 28px;
+  height: 28px;
+}
+
+.note-btn:hover {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.note-btn.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.note-btn.dropdown-toggle {
+  position: relative;
+  padding-right: 20px;
+}
+
+.note-icon-caret {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.note-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 120px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  display: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.note-btn-group:hover .note-dropdown-menu {
+  display: block;
+}
+
+.note-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: var(--font-size-small);
+  transition: var(--transition-fast);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.note-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.note-dropdown-item:hover {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.note-dropdown-item.checked {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+}
+
+.note-icon-menu-check {
+  font-size: 10px;
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.note-dropdown-item.checked .note-icon-menu-check {
+  opacity: 1;
+}
+
+.note-palette {
+  padding: var(--spacing-sm);
+}
+
+.note-palette-title {
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+  text-align: center;
+}
+
+.note-color-palette {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.note-color-row {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: center;
+}
+
+.note-color-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.note-color-btn:hover {
+  transform: scale(1.2);
+  border-color: var(--accent-primary);
+  z-index: 1;
+}
+
+.note-dimension-picker {
+  position: relative;
+  width: 160px;
+  height: 120px;
+  margin: var(--spacing-sm);
+}
+
+.note-dimension-picker-mousecatcher {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  cursor: crosshair;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-sm);
+}
+
+.note-dimension-picker-highlighted {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-primary);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.note-dimension-picker-unhighlighted {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 19px,
+    var(--border-light) 19px,
+    var(--border-light) 20px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 19px,
+    var(--border-light) 19px,
+    var(--border-light) 20px
+  );
+  pointer-events: none;
+}
+
+.note-dimension-display {
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
 /* Summernote 에디터 스타일 */
 #summernote-editor {
   border: 1px solid var(--border-light);
-  border-radius: var(--border-radius-sm);
+  border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
   background: var(--bg-secondary);
+  transition: var(--transition-normal);
+}
+
+#summernote-editor.dragover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
+  box-shadow: 0 0 0 2px rgba(255, 249, 233, 0.2);
 }
 
 .note-editor {
@@ -1442,4 +1672,50 @@ table td {
   text-align: center;
   margin: 0;
   line-height: var(--line-height-base);
+}
+
+/* Undo/Redo 버튼 스타일 */
+.writer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.editor-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-start;
+}
+
+.save-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+#undo-btn, #redo-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-small);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: var(--transition-fast);
+}
+
+#undo-btn span, #redo-btn span {
+  font-size: var(--font-size-base);
+  font-weight: bold;
+}
+
+#undo-btn.disabled, #redo-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+#undo-btn:not(.disabled):hover, #redo-btn:not(.disabled):hover {
+  background: var(--accent-secondary);
+  color: var(--text-primary);
 }

@@ -1,64 +1,320 @@
 ---
 layout: layout.njk
-title: "{{ i18n.sections.write | t(lang) }}"
-description: "{{ i18n.sections.write | t(lang) }}"
+title: "글 작성"
+description: "글 작성"
 lang: "en"
 permalink: "/write.html"
 ---
 
 <section id="content">
-  <h2>{{ i18n.write.title | t(lang) }}</h2>
+  <h2>{{ "글 작성" | t(lang) }}</h2>
   
   <div class="write-container">
     <div id="i18n-data" style="display: none;">{{ i18n | dump | safe }}</div>
     <div class="write-form">
       <div class="form-group">
-        <label for="post-category">{{ i18n.write.form.category | t(lang) }}</label>
+        <label for="post-category">{{ "카테고리" | t(lang) }}</label>
         <select id="post-category" class="form-input">
-          <option value="txt">{{ i18n.write.categories.txt | t(lang) }}</option>
-          <option value="gallery">{{ i18n.write.categories.gallery | t(lang) }}</option>
-          <option value="archive">{{ i18n.write.categories.archive | t(lang) }}</option>
+          <option value="txt">{{ "일반" | t(lang) }}</option>
+          <option value="gallery">{{ "갤러리" | t(lang) }}</option>
+          <option value="archive">{{ "아카이브" | t(lang) }}</option>
         </select>
       </div>
       
       <div class="form-group">
-        <label for="post-image">{{ i18n.write.form.image | t(lang) }}</label>
-        <div class="image-upload-area" id="image-upload-area">
-          <div class="upload-method" id="file-upload-method">
-            <div class="drag-drop-zone" id="drag-drop-zone">
-              <p>{{ i18n.write.placeholders.dragDrop | t(lang) }}</p>
-              <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
+        <label for="post-content">{{ "내용" | t(lang) }}</label>
+        
+        <!-- 커스텀 툴바 -->
+        <div class="note-toolbar" role="toolbar">
+          <!-- HTML 보기 토글 -->
+          <div class="note-btn-group note-mybutton">
+            <button type="button" class="note-btn" tabindex="-1" aria-label="Toggle Code View">
+              <label><input type="checkbox" id="chk_html"> HTML</label>
+            </button>
+          </div>
+          
+          <div class="note-btn-group note-break"></div>
+          
+          <!-- 글꼴 선택 -->
+          <div class="note-btn-group note-fontname">
+            <div class="note-btn-group">
+              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="글꼴">
+                <span class="note-current-fontname" style="font-family: '맑은 고딕';">맑은 고딕</span> 
+                <span class="note-icon-caret">▼</span>
+              </button>
+              <div class="note-dropdown-menu note-check dropdown-fontname" role="list" aria-label="글꼴">
+                <a class="note-dropdown-item checked" href="#" data-value="맑은 고딕" role="listitem" aria-label="맑은 고딕">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '맑은 고딕'">맑은 고딕</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="굴림체" role="listitem" aria-label="굴림체">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '굴림체'">굴림체</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="굴림" role="listitem" aria-label="굴림">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '굴림'">굴림</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="바탕체" role="listitem" aria-label="바탕체">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '바탕체'">바탕체</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="바탕" role="listitem" aria-label="바탕">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '바탕'">바탕</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="궁서" role="listitem" aria-label="궁서">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '궁서'">궁서</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="나눔고딕" role="listitem" aria-label="나눔고딕">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: '나눔고딕'">나눔고딕</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="helvetica" role="listitem" aria-label="helvetica">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'helvetica'">helvetica</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Arial" role="listitem" aria-label="Arial">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Arial'">Arial</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Arial Black" role="listitem" aria-label="Arial Black">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Arial Black'">Arial Black</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Comic Sans MS" role="listitem" aria-label="Comic Sans MS">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Comic Sans MS'">Comic Sans MS</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Courier New" role="listitem" aria-label="Courier New">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Courier New'">Courier New</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Impact" role="listitem" aria-label="Impact">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Impact'">Impact</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Tahoma" role="listitem" aria-label="Tahoma">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Tahoma'">Tahoma</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Times New Roman" role="listitem" aria-label="Times New Roman">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Times New Roman'">Times New Roman</span>
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="Verdana" role="listitem" aria-label="Verdana">
+                  <i class="note-icon-menu-check">✓</i> 
+                  <span style="font-family: 'Verdana'">Verdana</span>
+                </a>
+              </div>
             </div>
           </div>
           
-          <div class="image-preview" id="image-preview" style="display: none;">
-            <div class="image-container">
-              <div class="image-crop-container">
-                <img id="preview-img" src="" alt="{{ i18n.write.preview.title | t(lang) }}" />
-                <div class="crop-overlay" id="crop-overlay"></div>
+          <!-- 글자 크기 -->
+          <div class="note-btn-group note-fontsize">
+            <div class="note-btn-group">
+              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="글자 크기">
+                <span class="note-current-fontsize">12</span> 
+                <span class="note-icon-caret">▼</span>
+              </button>
+              <div class="note-dropdown-menu note-check dropdown-fontsize" role="list" aria-label="글자 크기">
+                <a class="note-dropdown-item" href="#" data-value="8" role="listitem" aria-label="8">
+                  <i class="note-icon-menu-check">✓</i> 8
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="9" role="listitem" aria-label="9">
+                  <i class="note-icon-menu-check">✓</i> 9
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="10" role="listitem" aria-label="10">
+                  <i class="note-icon-menu-check">✓</i> 10
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="11" role="listitem" aria-label="11">
+                  <i class="note-icon-menu-check">✓</i> 11
+                </a>
+                <a class="note-dropdown-item checked" href="#" data-value="12" role="listitem" aria-label="12">
+                  <i class="note-icon-menu-check">✓</i> 12
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="14" role="listitem" aria-label="14">
+                  <i class="note-icon-menu-check">✓</i> 14
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="16" role="listitem" aria-label="16">
+                  <i class="note-icon-menu-check">✓</i> 16
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="18" role="listitem" aria-label="18">
+                  <i class="note-icon-menu-check">✓</i> 18
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="20" role="listitem" aria-label="20">
+                  <i class="note-icon-menu-check">✓</i> 20
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="22" role="listitem" aria-label="22">
+                  <i class="note-icon-menu-check">✓</i> 22
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="24" role="listitem" aria-label="24">
+                  <i class="note-icon-menu-check">✓</i> 24
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="28" role="listitem" aria-label="28">
+                  <i class="note-icon-menu-check">✓</i> 28
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="30" role="listitem" aria-label="30">
+                  <i class="note-icon-menu-check">✓</i> 30
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="36" role="listitem" aria-label="36">
+                  <i class="note-icon-menu-check">✓</i> 36
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="50" role="listitem" aria-label="50">
+                  <i class="note-icon-menu-check">✓</i> 50
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="72" role="listitem" aria-label="72">
+                  <i class="note-icon-menu-check">✓</i> 72
+                </a>
+                <a class="note-dropdown-item" href="#" data-value="96" role="listitem" aria-label="96">
+                  <i class="note-icon-menu-check">✓</i> 96
+                </a>
               </div>
             </div>
-            <button type="button" id="remove-image">{{ i18n.write.form.removeImage | t(lang) }}</button>
+          </div>
+          
+          <!-- 텍스트 스타일 -->
+          <div class="note-btn-group note-style">
+            <button type="button" class="note-btn note-btn-bold" tabindex="-1" aria-label="굵게 (CTRL+B)">
+              <i class="note-icon-bold">B</i>
+            </button>
+            <button type="button" class="note-btn note-btn-italic" tabindex="-1" aria-label="기울임꼴 (CTRL+I)">
+              <i class="note-icon-italic">I</i>
+            </button>
+            <button type="button" class="note-btn note-btn-underline" tabindex="-1" aria-label="밑줄 (CTRL+U)">
+              <i class="note-icon-underline">U</i>
+            </button>
+            <button type="button" class="note-btn note-btn-strikethrough" tabindex="-1" aria-label="취소선 (CTRL+SHIFT+S)">
+              <i class="note-icon-strikethrough">S</i>
+            </button>
+            <button type="button" class="note-btn" tabindex="-1" aria-label="서식 지우기 (CTRL+\)">
+              <i class="note-icon-eraser">✎</i>
+            </button>
+          </div>
+          
+          <!-- 색상 선택 -->
+          <div class="note-btn-group note-color">
+            <div class="note-btn-group note-color note-color-all">
+              <button type="button" class="note-btn note-current-color-button" tabindex="-1" aria-label="마지막으로 사용한 색" data-backcolor="transparent" data-forecolor="#FF0000">
+                <i class="note-icon-font note-recent-color" style="background-color: transparent; color: rgb(255, 0, 0);">A</i>
+              </button>
+              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="다른 색 선택">
+                <span class="note-icon-caret">▼</span>
+              </button>
+              <div class="note-dropdown-menu" role="list">
+                <div class="note-palette">
+                  <div class="note-palette-title">글자색</div>
+                  <div class="note-color-palette">
+                    <div class="note-color-row">
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#000000" data-event="foreColor" data-value="#000000" data-title="Black" aria-label="Black" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#FF0000" data-event="foreColor" data-value="#FF0000" data-title="Red" aria-label="Red" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#00FF00" data-event="foreColor" data-value="#00FF00" data-title="Green" aria-label="Green" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#0000FF" data-event="foreColor" data-value="#0000FF" data-title="Blue" aria-label="Blue" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#FFFF00" data-event="foreColor" data-value="#FFFF00" data-title="Yellow" aria-label="Yellow" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#FF00FF" data-event="foreColor" data-value="#FF00FF" data-title="Magenta" aria-label="Magenta" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#00FFFF" data-event="foreColor" data-value="#00FFFF" data-title="Cyan" aria-label="Cyan" data-toggle="button" tabindex="-1"></button>
+                      <button type="button" class="note-btn note-color-btn" style="background-color:#FFFFFF" data-event="foreColor" data-value="#FFFFFF" data-title="White" aria-label="White" data-toggle="button" tabindex="-1"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 표 삽입 -->
+          <div class="note-btn-group note-table">
+            <div class="note-btn-group">
+              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="표">
+                <i class="note-icon-table">⊞</i> 
+                <span class="note-icon-caret">▼</span>
+              </button>
+              <div class="note-dropdown-menu note-table" role="list" aria-label="표">
+                <div class="note-dimension-picker">
+                  <div class="note-dimension-picker-mousecatcher" data-event="insertTable" data-value="1x1" style="width: 10em; height: 10em;"></div>
+                  <div class="note-dimension-picker-highlighted"></div>
+                  <div class="note-dimension-picker-unhighlighted"></div>
+                </div>
+                <div class="note-dimension-display">1 x 1</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 문단 정렬 -->
+          <div class="note-btn-group note-para">
+            <button type="button" class="note-btn" tabindex="-1" aria-label="글머리 기호 (CTRL+SHIFT+NUM7)">
+              <i class="note-icon-unorderedlist">•</i>
+            </button>
+            <button type="button" class="note-btn" tabindex="-1" aria-label="번호 매기기 (CTRL+SHIFT+NUM8)">
+              <i class="note-icon-orderedlist">1.</i>
+            </button>
+            <div class="note-btn-group">
+              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="문단 정렬">
+                <i class="note-icon-align-left">◀</i> 
+                <span class="note-icon-caret">▼</span>
+              </button>
+              <div class="note-dropdown-menu" role="list">
+                <div class="note-btn-group note-align">
+                  <button type="button" class="note-btn" tabindex="-1" aria-label="왼쪽 정렬 (CTRL+SHIFT+L)">
+                    <i class="note-icon-align-left">◀</i>
+                  </button>
+                  <button type="button" class="note-btn" tabindex="-1" aria-label="가운데 정렬 (CTRL+SHIFT+E)">
+                    <i class="note-icon-align-center">◐</i>
+                  </button>
+                  <button type="button" class="note-btn" tabindex="-1" aria-label="오른쪽 정렬 (CTRL+SHIFT+R)">
+                    <i class="note-icon-align-right">▶</i>
+                  </button>
+                  <button type="button" class="note-btn" tabindex="-1" aria-label="양쪽 정렬 (CTRL+SHIFT+J)">
+                    <i class="note-icon-align-justify">◈</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 실행 취소/재실행 -->
+          <div class="note-btn-group note-view">
+            <button type="button" class="note-btn" tabindex="-1" aria-label="실행 취소 (CTRL+Z)">
+              <i class="note-icon-undo">↶</i>
+            </button>
+            <button type="button" class="note-btn" tabindex="-1" aria-label="재실행 (CTRL+Y)">
+              <i class="note-icon-redo">↷</i>
+            </button>
+          </div>
+          
+          <!-- 링크 삽입 -->
+          <div class="note-btn-group note-insert">
+            <button type="button" class="note-btn" tabindex="-1" aria-label="링크 (CTRL+K)">
+              <i class="note-icon-link">🔗</i>
+            </button>
           </div>
         </div>
+        
+        <div id="summernote-editor" class="drag-drop-editor"></div>
+        <textarea id="post-content" class="form-textarea" placeholder="{{ "내용을 입력하세요..." | t(lang) }}" rows="10" style="display: none;"></textarea>
+        <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
       </div>
       
       <div class="form-group">
-        <label for="post-content">{{ i18n.write.form.content | t(lang) }}</label>
-        <div id="summernote-editor"></div>
-        <textarea id="post-content" class="form-textarea" placeholder="{{ i18n.write.placeholders.content | t(lang) }}" rows="10" style="display: none;"></textarea>
-      </div>
-      
-      <div class="form-group">
-        <label for="post-tags">{{ i18n.write.form.tags | t(lang) }}</label>
-        <input type="text" id="post-tags" class="form-input" placeholder="{{ i18n.write.placeholders.tags | t(lang) }}" />
+        <label for="post-tags">{{ "태그 (영어만)" | t(lang) }}</label>
+        <input type="text" id="post-tags" class="form-input" placeholder="{{ "예: daily, thoughts, review" | t(lang) }}" />
         <div class="tag-suggestions" id="tag-suggestions"></div>
       </div>
       
       <div class="writer-actions">
-        <button id="save-draft-writer" class="button secondary">{{ i18n.write.form.saveDraft | t(lang) }}</button>
-        <button id="load-draft-writer" class="button secondary">{{ i18n.write.form.loadDraft | t(lang) }}</button>
-        <button id="save-post" class="button">{{ i18n.write.form.save | t(lang) }}</button>
+        <div class="editor-controls">
+          <button id="undo-btn" class="button secondary" title="실행 취소 (Ctrl+Z)">
+            <span>↶</span> 실행취소
+          </button>
+          <button id="redo-btn" class="button secondary" title="다시 실행 (Ctrl+Y)">
+            <span>↷</span> 다시실행
+          </button>
+        </div>
+        <div class="save-controls">
+          <button id="save-draft-writer" class="button secondary">{{ "임시저장" | t(lang) }}</button>
+          <button id="load-draft-writer" class="button secondary">{{ "임시저장 불러오기" | t(lang) }}</button>
+          <button id="save-post" class="button">{{ "저장" | t(lang) }}</button>
+        </div>
       </div>
     </div>
   </div>
@@ -139,28 +395,24 @@ window.AdminAuth = AdminAuth;
 // i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
-// 이미지 업로드 기능 (admin-panel.js 스타일)
+// Summernote 에디터에 이미지 드래그 앤 드랍 기능 추가
 function setupImageUpload() {
-  const dragDropZone = document.getElementById('drag-drop-zone');
+  const summernoteEditor = document.getElementById('summernote-editor');
   const fileInput = document.getElementById('image-file-input');
-  const imagePreview = document.getElementById('image-preview');
-  const previewImg = document.getElementById('preview-img');
-  const removeImageBtn = document.getElementById('remove-image');
-  const fileUploadMethod = document.getElementById('file-upload-method');
   
-  // 드래그앤드랍 이벤트 (admin-panel.js 스타일)
-  dragDropZone.addEventListener('dragover', (e) => {
+  // Summernote 에디터에 드래그 앤 드랍 이벤트 추가
+  summernoteEditor.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dragDropZone.classList.add('dragover');
+    summernoteEditor.classList.add('dragover');
   });
   
-  dragDropZone.addEventListener('dragleave', () => {
-    dragDropZone.classList.remove('dragover');
+  summernoteEditor.addEventListener('dragleave', () => {
+    summernoteEditor.classList.remove('dragover');
   });
   
-  dragDropZone.addEventListener('drop', (e) => {
+  summernoteEditor.addEventListener('drop', (e) => {
     e.preventDefault();
-    dragDropZone.classList.remove('dragover');
+    summernoteEditor.classList.remove('dragover');
     
     const files = e.dataTransfer.files;
     if (files.length > 0 && files[0].type.startsWith('image/')) {
@@ -169,7 +421,7 @@ function setupImageUpload() {
   });
   
   // 클릭으로 파일 선택
-  dragDropZone.addEventListener('click', () => {
+  summernoteEditor.addEventListener('click', () => {
     fileInput.click();
   });
   
@@ -177,16 +429,6 @@ function setupImageUpload() {
     if (e.target.files.length > 0) {
       handleImageFile(e.target.files[0]);
     }
-  });
-  
-  // 이미지 제거
-  removeImageBtn.addEventListener('click', () => {
-    imagePreview.style.display = 'none';
-    fileUploadMethod.style.display = 'block';
-    previewImg.src = '';
-    fileInput.value = '';
-    // 이미지 제거 시 미리보기 업데이트
-    updatePreview();
   });
   
   function handleImageFile(file) {
@@ -197,160 +439,13 @@ function setupImageUpload() {
     
     const reader = new FileReader();
     reader.onload = (e) => {
-      // Data URL로 설정
-      previewImg.src = e.target.result;
-      imagePreview.style.display = 'block';
-      fileUploadMethod.style.display = 'none';
-      // 카테고리에 맞게 이미지 크롭 적용
-      applyImageCrop();
-      // 이미지 로드 후 드래그 기능 설정
-      setTimeout(() => {
-        setupImageDrag();
-      }, 100);
+      // Summernote 에디터에 이미지 삽입
+      $('#summernote-editor').summernote('insertImage', e.target.result);
     };
     reader.readAsDataURL(file);
   }
-  
-  
 }
 
-// 카테고리에 맞게 이미지 크롭 적용
-function applyImageCrop() {
-  const category = document.getElementById('post-category').value;
-  const previewImg = document.getElementById('preview-img');
-  
-  if (!previewImg.src) return;
-  
-  // 기존 스타일 초기화
-  previewImg.style.objectFit = '';
-  previewImg.style.objectPosition = '';
-  previewImg.style.aspectRatio = '';
-  previewImg.style.width = '';
-  previewImg.style.height = '';
-  
-  switch(category) {
-    case 'gallery':
-      // 갤러리: 정사각형 크롭 (실제 갤러리와 동일)
-      previewImg.style.objectFit = 'cover';
-      previewImg.style.objectPosition = '50% 50%';
-      previewImg.style.aspectRatio = '1 / 1';
-      previewImg.style.width = '200px';
-      previewImg.style.height = '200px';
-      break;
-    case 'txt':
-      // 일반: 가로형 크롭 (실제 txt 포스트와 동일)
-      previewImg.style.objectFit = 'cover';
-      previewImg.style.objectPosition = '50% 50%';
-      previewImg.style.aspectRatio = '3 / 2';
-      previewImg.style.width = '300px';
-      previewImg.style.height = '200px';
-      break;
-    case 'archive':
-      // 아카이브: 썸네일 크롭 (실제 아카이브와 동일)
-      previewImg.style.objectFit = 'cover';
-      previewImg.style.objectPosition = '50% 50%';
-      previewImg.style.aspectRatio = '4 / 3';
-      previewImg.style.width = '120px';
-      previewImg.style.height = '90px';
-      break;
-  }
-  
-  console.log('이미지 크롭 적용:', category, previewImg.style.objectPosition);
-  
-  // 드래그 기능 설정
-  setupImageDrag();
-  
-  // 드래그 오버레이 텍스트 설정
-  const cropOverlay = document.getElementById('crop-overlay');
-  if (cropOverlay) {
-    cropOverlay.setAttribute('data-text', i18nData.write.messages.dragToCrop);
-  }
-}
-
-// 이미지 드래그로 크롭 위치 조정
-function setupImageDrag() {
-  const previewImg = document.getElementById('preview-img');
-  const cropOverlay = document.getElementById('crop-overlay');
-  
-  if (!previewImg.src) return;
-  
-  let isDragging = false;
-  let startX = 0;
-  let startY = 0;
-  let startObjectPosition = '';
-  
-  function startDrag(e) {
-    isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-    startObjectPosition = previewImg.style.objectPosition || '50% 50%';
-    
-    // 드래그 중 클래스 추가
-    cropOverlay.classList.add('dragging');
-    
-    console.log('드래그 시작:', startObjectPosition);
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  
-  function drag(e) {
-    if (!isDragging) return;
-    
-    const deltaX = e.clientX - startX;
-    const deltaY = e.clientY - startY;
-    
-    // 현재 object-position 파싱
-    const [currentX, currentY] = startObjectPosition.split(' ').map(p => parseFloat(p.replace('%', '')));
-    
-    // 드래그 감도 조정 (방향 반대로)
-    const sensitivity = 0.4;
-    const newX = currentX - (deltaX * sensitivity);
-    const newY = currentY - (deltaY * sensitivity);
-    
-    // 범위 제한 (0% ~ 100%)
-    const clampedX = Math.max(0, Math.min(100, newX));
-    const clampedY = Math.max(0, Math.min(100, newY));
-    
-    const newPosition = `${clampedX}% ${clampedY}%`;
-    previewImg.style.objectPosition = newPosition;
-    
-    console.log('드래그 중:', newPosition);
-    e.preventDefault();
-    e.stopPropagation();
-  }
-  
-  function stopDrag() {
-    isDragging = false;
-    
-    // 드래그 중 클래스 제거
-    cropOverlay.classList.remove('dragging');
-    
-    console.log('드래그 종료:', previewImg.style.objectPosition);
-  }
-  
-  // 기존 이벤트 리스너 제거
-  cropOverlay.removeEventListener('mousedown', startDrag);
-  document.removeEventListener('mousemove', drag);
-  document.removeEventListener('mouseup', stopDrag);
-  
-  // 새로운 이벤트 리스너 설정
-  cropOverlay.addEventListener('mousedown', startDrag);
-  document.addEventListener('mousemove', drag);
-  document.addEventListener('mouseup', stopDrag);
-  
-  // 터치 이벤트도 추가
-  cropOverlay.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startDrag(e.touches[0]);
-  });
-  
-  document.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    drag(e.touches[0]);
-  });
-  
-  document.addEventListener('touchend', stopDrag);
-}
 
 // 임시저장 기능 (admin-panel.js 스타일)
 function saveDraft() {
@@ -361,14 +456,9 @@ function saveDraft() {
   const tags = document.getElementById('post-tags').value;
   const category = document.getElementById('post-category').value;
   
-  // 이미지 URL 가져오기 (미리보기에서)
-  const previewImg = document.getElementById('preview-img');
-  const image = previewImg && previewImg.src ? previewImg.src : '';
-  
   const draft = { 
     content, 
     tags, 
-    image, 
     category,
     savedAt: new Date().toISOString() 
   };
@@ -388,24 +478,6 @@ function loadDraft() {
     
     // Summernote에 내용 동기화
     syncTextareaToSummernote();
-    
-    // 이미지 복원
-    if (draft.image) {
-      const imagePreview = document.getElementById('image-preview');
-      const previewImg = document.getElementById('preview-img');
-      const fileUploadMethod = document.getElementById('file-upload-method');
-      
-      previewImg.src = draft.image;
-      imagePreview.style.display = 'block';
-      fileUploadMethod.style.display = 'none';
-      // 이미지 크롭 적용
-      applyImageCrop();
-    }
-    
-    // 임시저장 불러오기 후 드래그 기능 설정
-    setTimeout(() => {
-      setupImageDrag();
-    }, 100);
     
     // 상단 메시지 표시
     showTopMessage(i18nData.write.messages.draftLoaded);
@@ -528,7 +600,6 @@ function savePost() {
   const category = document.getElementById('post-category').value;
   const content = document.getElementById('post-content').value;
   const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
-  const imageSrc = document.getElementById('preview-img').src;
   
   if (!content.trim()) {
     alert(i18nData.write.messages.noContent);
@@ -540,7 +611,6 @@ function savePost() {
     id: Date.now(),
     date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.').replace(/\s/g, ''),
     category: category,
-    image: imageSrc || null,
     description: content,
     tags: tags
   };
@@ -564,11 +634,8 @@ function clearForm() {
   // Summernote 에디터 초기화
   $('#summernote-editor').summernote('code', '');
   
-  // 이미지 관련 초기화
-  document.getElementById('image-preview').style.display = 'none';
-  document.getElementById('file-upload-method').style.display = 'block';
+  // 파일 입력 초기화
   document.getElementById('image-file-input').value = '';
-  document.getElementById('preview-img').src = '';
 }
 
 // 카테고리 동적 로드
@@ -679,6 +746,193 @@ function redirectTo404() {
   window.location.href = '/404.html';
 }
 
+// 커스텀 툴바 기능 초기화
+function initializeCustomToolbar() {
+  // HTML 보기 토글
+  const htmlToggle = document.getElementById('chk_html');
+  if (htmlToggle) {
+    htmlToggle.addEventListener('change', function() {
+      if (this.checked) {
+        $('#summernote-editor').summernote('codeview.toggle');
+      }
+    });
+  }
+
+  // 글꼴 선택
+  const fontDropdown = document.querySelector('.dropdown-fontname');
+  if (fontDropdown) {
+    const fontItems = fontDropdown.querySelectorAll('.note-dropdown-item');
+    fontItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const fontName = this.getAttribute('data-value');
+        
+        // Summernote에 글꼴 적용
+        $('#summernote-editor').summernote('fontName', fontName);
+        
+        // 현재 선택된 글꼴 업데이트
+        const currentFont = document.querySelector('.note-current-fontname');
+        if (currentFont) {
+          currentFont.textContent = fontName;
+          currentFont.style.fontFamily = `'${fontName}'`;
+        }
+        
+        // 체크 표시 업데이트
+        fontItems.forEach(fontItem => fontItem.classList.remove('checked'));
+        this.classList.add('checked');
+      });
+    });
+  }
+
+  // 글자 크기 선택
+  const sizeDropdown = document.querySelector('.dropdown-fontsize');
+  if (sizeDropdown) {
+    const sizeItems = sizeDropdown.querySelectorAll('.note-dropdown-item');
+    sizeItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        const fontSize = this.getAttribute('data-value');
+        
+        // Summernote에 글자 크기 적용
+        $('#summernote-editor').summernote('fontSize', fontSize);
+        
+        // 현재 선택된 크기 업데이트
+        const currentSize = document.querySelector('.note-current-fontsize');
+        if (currentSize) {
+          currentSize.textContent = fontSize;
+        }
+        
+        // 체크 표시 업데이트
+        sizeItems.forEach(sizeItem => sizeItem.classList.remove('checked'));
+        this.classList.add('checked');
+      });
+    });
+  }
+
+  // 텍스트 스타일 버튼들
+  const boldBtn = document.querySelector('.note-btn-bold');
+  if (boldBtn) {
+    boldBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('bold');
+      this.classList.toggle('active');
+    });
+  }
+
+  const italicBtn = document.querySelector('.note-btn-italic');
+  if (italicBtn) {
+    italicBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('italic');
+      this.classList.toggle('active');
+    });
+  }
+
+  const underlineBtn = document.querySelector('.note-btn-underline');
+  if (underlineBtn) {
+    underlineBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('underline');
+      this.classList.toggle('active');
+    });
+  }
+
+  const strikethroughBtn = document.querySelector('.note-btn-strikethrough');
+  if (strikethroughBtn) {
+    strikethroughBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('strikethrough');
+      this.classList.toggle('active');
+    });
+  }
+
+  const eraserBtn = document.querySelector('.note-icon-eraser').parentElement;
+  if (eraserBtn) {
+    eraserBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('removeFormat');
+    });
+  }
+
+  // 색상 선택
+  const colorBtns = document.querySelectorAll('.note-color-btn');
+  colorBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const color = this.getAttribute('data-value');
+      const event = this.getAttribute('data-event');
+      
+      if (event === 'foreColor') {
+        $('#summernote-editor').summernote('foreColor', color);
+      } else if (event === 'backColor') {
+        $('#summernote-editor').summernote('backColor', color);
+      }
+    });
+  });
+
+  // 표 삽입
+  const tableBtn = document.querySelector('.note-icon-table').parentElement;
+  if (tableBtn) {
+    tableBtn.addEventListener('click', function() {
+      // 간단한 표 삽입 (3x3)
+      const tableHtml = '<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>';
+      $('#summernote-editor').summernote('pasteHTML', tableHtml);
+    });
+  }
+
+  // 문단 정렬
+  const alignBtns = document.querySelectorAll('.note-align .note-btn');
+  alignBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const icon = this.querySelector('i');
+      if (icon.classList.contains('note-icon-align-left')) {
+        $('#summernote-editor').summernote('justifyLeft');
+      } else if (icon.classList.contains('note-icon-align-center')) {
+        $('#summernote-editor').summernote('justifyCenter');
+      } else if (icon.classList.contains('note-icon-align-right')) {
+        $('#summernote-editor').summernote('justifyRight');
+      } else if (icon.classList.contains('note-icon-align-justify')) {
+        $('#summernote-editor').summernote('justifyFull');
+      }
+    });
+  });
+
+  // 목록
+  const unorderedListBtn = document.querySelector('.note-icon-unorderedlist').parentElement;
+  if (unorderedListBtn) {
+    unorderedListBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('insertUnorderedList');
+    });
+  }
+
+  const orderedListBtn = document.querySelector('.note-icon-orderedlist').parentElement;
+  if (orderedListBtn) {
+    orderedListBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('insertOrderedList');
+    });
+  }
+
+  // 실행 취소/재실행
+  const undoBtn = document.querySelector('.note-icon-undo').parentElement;
+  if (undoBtn) {
+    undoBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('undo');
+    });
+  }
+
+  const redoBtn = document.querySelector('.note-icon-redo').parentElement;
+  if (redoBtn) {
+    redoBtn.addEventListener('click', function() {
+      $('#summernote-editor').summernote('redo');
+    });
+  }
+
+  // 링크 삽입
+  const linkBtn = document.querySelector('.note-icon-link').parentElement;
+  if (linkBtn) {
+    linkBtn.addEventListener('click', function() {
+      const url = prompt('링크 URL을 입력하세요:');
+      if (url) {
+        $('#summernote-editor').summernote('createLink', url);
+      }
+    });
+  }
+}
+
 // Summernote 에디터 초기화
 function initializeSummernote() {
   $('#summernote-editor').summernote({
@@ -687,17 +941,7 @@ function initializeSummernote() {
     maxHeight: 500,
     focus: false,
     lang: 'ko-KR',
-    toolbar: [
-      ['style', ['style']],
-      ['font', ['bold', 'underline', 'clear']],
-      ['fontname', ['fontname']],
-      ['fontsize', ['fontsize']],
-      ['color', ['color']],
-      ['para', ['ul', 'ol', 'paragraph']],
-      ['table', ['table']],
-      ['insert', ['link', 'picture', 'video']],
-      ['view', ['fullscreen', 'codeview', 'help']]
-    ],
+    toolbar: false, // 기본 툴바 비활성화
     fontNames: [
       '맑은 고딕', '굴림체', '굴림', '바탕체', '바탕', '궁서',
       '나눔고딕', 'Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS',
@@ -708,6 +952,8 @@ function initializeSummernote() {
       onChange: function(contents, $editable) {
         // Summernote 내용이 변경될 때마다 숨겨진 textarea에 동기화
         $('#post-content').val(contents);
+        // undo/redo 버튼 상태 업데이트
+        updateUndoRedoButtons();
       },
       onInit: function() {
         // 에디터 초기화 완료 후 기존 내용 로드
@@ -715,6 +961,11 @@ function initializeSummernote() {
         if (existingContent) {
           $('#summernote-editor').summernote('code', existingContent);
         }
+        // 초기 버튼 상태 설정
+        updateUndoRedoButtons();
+        
+        // 커스텀 툴바 초기화
+        initializeCustomToolbar();
       }
     }
   });
@@ -730,6 +981,63 @@ function syncSummernoteToTextarea() {
 function syncTextareaToSummernote() {
   const content = $('#post-content').val();
   $('#summernote-editor').summernote('code', content);
+}
+
+// Undo/Redo 기능 함수들
+function performUndo() {
+  $('#summernote-editor').summernote('undo');
+  updateUndoRedoButtons();
+}
+
+function performRedo() {
+  $('#summernote-editor').summernote('redo');
+  updateUndoRedoButtons();
+}
+
+// Undo/Redo 버튼 상태 업데이트
+function updateUndoRedoButtons() {
+  const undoBtn = document.getElementById('undo-btn');
+  const redoBtn = document.getElementById('redo-btn');
+  
+  if (undoBtn && redoBtn) {
+    // Summernote의 undo/redo 히스토리 상태 확인
+    const editor = $('#summernote-editor');
+    const undoAvailable = editor.summernote('isUndoable');
+    const redoAvailable = editor.summernote('isRedoable');
+    
+    // 버튼 활성화/비활성화
+    undoBtn.disabled = !undoAvailable;
+    redoBtn.disabled = !redoAvailable;
+    
+    // 시각적 피드백
+    if (undoAvailable) {
+      undoBtn.classList.remove('disabled');
+    } else {
+      undoBtn.classList.add('disabled');
+    }
+    
+    if (redoAvailable) {
+      redoBtn.classList.remove('disabled');
+    } else {
+      redoBtn.classList.add('disabled');
+    }
+  }
+}
+
+// 키보드 단축키 설정
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', function(e) {
+    // Ctrl+Z (Undo)
+    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      performUndo();
+    }
+    // Ctrl+Y 또는 Ctrl+Shift+Z (Redo)
+    else if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
+      e.preventDefault();
+      performRedo();
+    }
+  });
 }
 
 // 이벤트 리스너 설정
@@ -760,15 +1068,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('load-draft-writer').addEventListener('click', loadDraft);
   document.getElementById('save-post').addEventListener('click', savePost);
   
-  // 카테고리 변경 이벤트
-  const categorySelect = document.getElementById('post-category');
+  // Undo/Redo 버튼 이벤트 연결
+  document.getElementById('undo-btn').addEventListener('click', performUndo);
+  document.getElementById('redo-btn').addEventListener('click', performRedo);
   
-  categorySelect.addEventListener('change', () => {
-    // 카테고리 변경 시 이미지 크롭 적용
-    if (document.getElementById('preview-img').src) {
-      applyImageCrop();
-    }
-  });
+  // 키보드 단축키 설정
+  setupKeyboardShortcuts();
+  
+  // 카테고리 변경 이벤트 (이제는 특별한 처리가 필요 없음)
+  const categorySelect = document.getElementById('post-category');
   
   // 페이지 로드 시 임시저장 자동 불러오기
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
