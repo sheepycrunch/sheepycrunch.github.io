@@ -7,6 +7,13 @@
   <link rel="icon" href="neocities.png">
   <link href="/css/reset.css" rel="stylesheet" type="text/css" media="all">
   <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  
+  <!-- 전역 설정 변수들 -->
+  <script>
+    window.SITE_NAME = '{{ siteName }}';
+    window.NEOCITIES_URL = '{{ neocitiesUrl }}';
+    window.NEKOWEB_URL = '{{ nekowebUrl }}';
+  </script>
   {% if description %}
   <meta name="description" content="{{ description }}">
   {% endif %}

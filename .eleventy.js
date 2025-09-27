@@ -14,10 +14,14 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addGlobalData("githubToken", githubToken);
   
   // 환경변수에서 URL 정보 가져오기
-  const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
+  const siteName = process.env.SITE_NAME || 'dakimakura';
+  const neocitiesUrl = process.env.NEOCITIES_URL || `https://${siteName}.neocities.org`;
+  const nekowebUrl = process.env.NEKOWEB_URL || `https://${siteName}.nekoweb.org`;
   
   // 전역 데이터로 추가
+  eleventyConfig.addGlobalData("siteName", siteName);
   eleventyConfig.addGlobalData("neocitiesUrl", neocitiesUrl);
+  eleventyConfig.addGlobalData("nekowebUrl", nekowebUrl);
   
   // Neocities API 토큰
   const neocitiesApiToken = process.env.NEOCITIES_API_KEY;
