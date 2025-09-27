@@ -9,604 +9,36 @@ permalink: "/write.html"
 <section id="content">
   <h2>{{ "글 작성" | t(lang) }}</h2>
   
-  <div class="write-container">
-    <div id="i18n-data" style="display: none;">{{ i18n | dump | safe }}</div>
-    <div class="write-form">
-      <div class="form-group">
-        <label for="post-category">{{ "카테고리" | t(lang) }}</label>
-        <select id="post-category" class="form-input">
-          <option value="txt">{{ "일반" | t(lang) }}</option>
-          <option value="gallery">{{ "갤러리" | t(lang) }}</option>
-          <option value="archive">{{ "아카이브" | t(lang) }}</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label for="post-content">{{ "내용" | t(lang) }}</label>
-        
-        <!-- 커스텀 툴바 -->
-        <div class="note-toolbar" role="toolbar">
-          <!-- HTML 보기 토글 -->
-          <div class="note-btn-group note-mybutton">
-            <button type="button" class="note-btn" tabindex="-1" aria-label="Toggle Code View">
-              <label><input type="checkbox" id="chk_html"> HTML</label>
-            </button>
-          </div>
-          
-          <div class="note-btn-group note-break"></div>
-          
-          <!-- 글꼴 선택 -->
-          <div class="note-btn-group note-fontname">
-            <div class="note-btn-group">
-              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="글꼴">
-                <span class="note-current-fontname" style="font-family: '맑은 고딕';">맑은 고딕</span> 
-                <span class="note-icon-caret">▼</span>
-              </button>
-              <div class="note-dropdown-menu note-check dropdown-fontname" role="list" aria-label="글꼴">
-                <a class="note-dropdown-item checked" href="#" data-value="맑은 고딕" role="listitem" aria-label="맑은 고딕">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '맑은 고딕'">맑은 고딕</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="굴림체" role="listitem" aria-label="굴림체">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '굴림체'">굴림체</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="굴림" role="listitem" aria-label="굴림">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '굴림'">굴림</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="바탕체" role="listitem" aria-label="바탕체">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '바탕체'">바탕체</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="바탕" role="listitem" aria-label="바탕">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '바탕'">바탕</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="궁서" role="listitem" aria-label="궁서">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '궁서'">궁서</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="나눔고딕" role="listitem" aria-label="나눔고딕">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: '나눔고딕'">나눔고딕</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="helvetica" role="listitem" aria-label="helvetica">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'helvetica'">helvetica</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Arial" role="listitem" aria-label="Arial">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Arial'">Arial</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Arial Black" role="listitem" aria-label="Arial Black">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Arial Black'">Arial Black</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Comic Sans MS" role="listitem" aria-label="Comic Sans MS">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Comic Sans MS'">Comic Sans MS</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Courier New" role="listitem" aria-label="Courier New">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Courier New'">Courier New</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Impact" role="listitem" aria-label="Impact">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Impact'">Impact</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Tahoma" role="listitem" aria-label="Tahoma">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Tahoma'">Tahoma</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Times New Roman" role="listitem" aria-label="Times New Roman">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Times New Roman'">Times New Roman</span>
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="Verdana" role="listitem" aria-label="Verdana">
-                  <i class="note-icon-menu-check">✓</i> 
-                  <span style="font-family: 'Verdana'">Verdana</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 글자 크기 -->
-          <div class="note-btn-group note-fontsize">
-            <div class="note-btn-group">
-              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="글자 크기">
-                <span class="note-current-fontsize">12</span> 
-                <span class="note-icon-caret">▼</span>
-              </button>
-              <div class="note-dropdown-menu note-check dropdown-fontsize" role="list" aria-label="글자 크기">
-                <a class="note-dropdown-item" href="#" data-value="8" role="listitem" aria-label="8">
-                  <i class="note-icon-menu-check">✓</i> 8
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="9" role="listitem" aria-label="9">
-                  <i class="note-icon-menu-check">✓</i> 9
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="10" role="listitem" aria-label="10">
-                  <i class="note-icon-menu-check">✓</i> 10
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="11" role="listitem" aria-label="11">
-                  <i class="note-icon-menu-check">✓</i> 11
-                </a>
-                <a class="note-dropdown-item checked" href="#" data-value="12" role="listitem" aria-label="12">
-                  <i class="note-icon-menu-check">✓</i> 12
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="14" role="listitem" aria-label="14">
-                  <i class="note-icon-menu-check">✓</i> 14
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="16" role="listitem" aria-label="16">
-                  <i class="note-icon-menu-check">✓</i> 16
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="18" role="listitem" aria-label="18">
-                  <i class="note-icon-menu-check">✓</i> 18
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="20" role="listitem" aria-label="20">
-                  <i class="note-icon-menu-check">✓</i> 20
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="22" role="listitem" aria-label="22">
-                  <i class="note-icon-menu-check">✓</i> 22
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="24" role="listitem" aria-label="24">
-                  <i class="note-icon-menu-check">✓</i> 24
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="28" role="listitem" aria-label="28">
-                  <i class="note-icon-menu-check">✓</i> 28
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="30" role="listitem" aria-label="30">
-                  <i class="note-icon-menu-check">✓</i> 30
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="36" role="listitem" aria-label="36">
-                  <i class="note-icon-menu-check">✓</i> 36
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="50" role="listitem" aria-label="50">
-                  <i class="note-icon-menu-check">✓</i> 50
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="72" role="listitem" aria-label="72">
-                  <i class="note-icon-menu-check">✓</i> 72
-                </a>
-                <a class="note-dropdown-item" href="#" data-value="96" role="listitem" aria-label="96">
-                  <i class="note-icon-menu-check">✓</i> 96
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 텍스트 스타일 -->
-          <div class="note-btn-group note-style">
-            <button type="button" class="note-btn note-btn-bold" tabindex="-1" aria-label="굵게 (CTRL+B)">
-              <i class="note-icon-bold">B</i>
-            </button>
-            <button type="button" class="note-btn note-btn-italic" tabindex="-1" aria-label="기울임꼴 (CTRL+I)">
-              <i class="note-icon-italic">I</i>
-            </button>
-            <button type="button" class="note-btn note-btn-underline" tabindex="-1" aria-label="밑줄 (CTRL+U)">
-              <i class="note-icon-underline">U</i>
-            </button>
-            <button type="button" class="note-btn note-btn-strikethrough" tabindex="-1" aria-label="취소선 (CTRL+SHIFT+S)">
-              <i class="note-icon-strikethrough">S</i>
-            </button>
-            <button type="button" class="note-btn" tabindex="-1" aria-label="서식 지우기 (CTRL+\)">
-              <i class="note-icon-eraser">✎</i>
-            </button>
-          </div>
-          
-          <!-- 색상 선택 -->
-          <div class="note-btn-group note-color">
-            <div class="note-btn-group note-color note-color-all">
-              <button type="button" class="note-btn note-current-color-button" tabindex="-1" aria-label="마지막으로 사용한 색" data-backcolor="transparent" data-forecolor="#FF0000">
-                <i class="note-icon-font note-recent-color" style="background-color: transparent; color: rgb(255, 0, 0);">A</i>
-              </button>
-              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="다른 색 선택">
-                <span class="note-icon-caret">▼</span>
-              </button>
-              <div class="note-dropdown-menu" role="list">
-                <div class="note-palette">
-                  <div class="note-palette-title">글자색</div>
-                  <div class="note-color-palette">
-                    <div class="note-color-row">
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#000000" data-event="foreColor" data-value="#000000" data-title="Black" aria-label="Black" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#FF0000" data-event="foreColor" data-value="#FF0000" data-title="Red" aria-label="Red" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#00FF00" data-event="foreColor" data-value="#00FF00" data-title="Green" aria-label="Green" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#0000FF" data-event="foreColor" data-value="#0000FF" data-title="Blue" aria-label="Blue" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#FFFF00" data-event="foreColor" data-value="#FFFF00" data-title="Yellow" aria-label="Yellow" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#FF00FF" data-event="foreColor" data-value="#FF00FF" data-title="Magenta" aria-label="Magenta" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#00FFFF" data-event="foreColor" data-value="#00FFFF" data-title="Cyan" aria-label="Cyan" data-toggle="button" tabindex="-1"></button>
-                      <button type="button" class="note-btn note-color-btn" style="background-color:#FFFFFF" data-event="foreColor" data-value="#FFFFFF" data-title="White" aria-label="White" data-toggle="button" tabindex="-1"></button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 표 삽입 -->
-          <div class="note-btn-group note-table">
-            <div class="note-btn-group">
-              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="표">
-                <i class="note-icon-table">⊞</i> 
-                <span class="note-icon-caret">▼</span>
-              </button>
-              <div class="note-dropdown-menu note-table" role="list" aria-label="표">
-                <div class="note-dimension-picker">
-                  <div class="note-dimension-picker-mousecatcher" data-event="insertTable" data-value="1x1" style="width: 10em; height: 10em;"></div>
-                  <div class="note-dimension-picker-highlighted"></div>
-                  <div class="note-dimension-picker-unhighlighted"></div>
-                </div>
-                <div class="note-dimension-display">1 x 1</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 문단 정렬 -->
-          <div class="note-btn-group note-para">
-            <button type="button" class="note-btn" tabindex="-1" aria-label="글머리 기호 (CTRL+SHIFT+NUM7)">
-              <i class="note-icon-unorderedlist">•</i>
-            </button>
-            <button type="button" class="note-btn" tabindex="-1" aria-label="번호 매기기 (CTRL+SHIFT+NUM8)">
-              <i class="note-icon-orderedlist">1.</i>
-            </button>
-            <div class="note-btn-group">
-              <button type="button" class="note-btn dropdown-toggle" tabindex="-1" data-toggle="dropdown" aria-label="문단 정렬">
-                <i class="note-icon-align-left">◀</i> 
-                <span class="note-icon-caret">▼</span>
-              </button>
-              <div class="note-dropdown-menu" role="list">
-                <div class="note-btn-group note-align">
-                  <button type="button" class="note-btn" tabindex="-1" aria-label="왼쪽 정렬 (CTRL+SHIFT+L)">
-                    <i class="note-icon-align-left">◀</i>
-                  </button>
-                  <button type="button" class="note-btn" tabindex="-1" aria-label="가운데 정렬 (CTRL+SHIFT+E)">
-                    <i class="note-icon-align-center">◐</i>
-                  </button>
-                  <button type="button" class="note-btn" tabindex="-1" aria-label="오른쪽 정렬 (CTRL+SHIFT+R)">
-                    <i class="note-icon-align-right">▶</i>
-                  </button>
-                  <button type="button" class="note-btn" tabindex="-1" aria-label="양쪽 정렬 (CTRL+SHIFT+J)">
-                    <i class="note-icon-align-justify">◈</i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 실행 취소/재실행 -->
-          <div class="note-btn-group note-view">
-            <button type="button" class="note-btn" tabindex="-1" aria-label="실행 취소 (CTRL+Z)">
-              <i class="note-icon-undo">↶</i>
-            </button>
-            <button type="button" class="note-btn" tabindex="-1" aria-label="재실행 (CTRL+Y)">
-              <i class="note-icon-redo">↷</i>
-            </button>
-          </div>
-          
-          <!-- 링크 삽입 -->
-          <div class="note-btn-group note-insert">
-            <button type="button" class="note-btn" tabindex="-1" aria-label="링크 (CTRL+K)">
-              <i class="note-icon-link">🔗</i>
-            </button>
-          </div>
-        </div>
-        
-        <div class="editor-container">
-          <div id="post-content" class="form-textarea" contenteditable="true" placeholder="{{ "내용을 입력하세요..." | t(lang) }}" rows="10"></div>
-        </div>
-        <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
-      </div>
-      
-      <div class="form-group">
-        <label for="post-tags">{{ "태그 (영어만)" | t(lang) }}</label>
-        <input type="text" id="post-tags" class="form-input" placeholder="{{ "예: daily, thoughts, review" | t(lang) }}" />
-        <div class="tag-suggestions" id="tag-suggestions"></div>
-      </div>
-      
-      <div class="writer-actions">
-        <div class="editor-controls">
-          <button id="undo-btn" class="button secondary" title="실행 취소 (Ctrl+Z)">
-            <span>↶</span> 실행취소
-          </button>
-          <button id="redo-btn" class="button secondary" title="다시 실행 (Ctrl+Y)">
-            <span>↷</span> 다시실행
-          </button>
-        </div>
-        <div class="save-controls">
-          <button id="save-draft-writer" class="button secondary">{{ "임시저장" | t(lang) }}</button>
-          <button id="load-draft-writer" class="button secondary">{{ "임시저장 불러오기" | t(lang) }}</button>
-          <button id="save-post" class="button">{{ "저장" | t(lang) }}</button>
-        </div>
-      </div>
+  <div id="i18n-data" style="display: none;">{{ i18n | dump | safe }}</div>
+  <div class="form-group">
+    <label>{{ "내용" | t(lang) }}</label>
+    
+    
+    <div class="editor-container">
+      <div id="post-content"></div>
+    </div>
+    <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
+  </div>
+  
+  <div class="form-group">
+    <label for="post-tags">{{ "태그 (영어만)" | t(lang) }}</label>
+    <input type="text" id="post-tags" class="form-input" placeholder="{{ "예: daily, thoughts, review" | t(lang) }}" />
+    <div class="tag-suggestions" id="tag-suggestions"></div>
+  </div>
+  
+  <div class="writer-actions">
+    <div class="save-controls">
+      <button id="save-draft-writer" class="button secondary">{{ "임시저장" | t(lang) }}</button>
+      <button id="load-draft-writer" class="button secondary">{{ "임시저장 불러오기" | t(lang) }}</button>
+      <button id="save-post" class="button">{{ "저장" | t(lang) }}</button>
     </div>
   </div>
 </section>
 
-<!-- 에디터 CSS는 인라인으로 처리 -->
 
-<style>
-/* 커스텀 툴바 스타일 */
-.note-toolbar {
-  border: none;
-  border-radius: 4px;
-  padding: 8px;
-  background: #f8f9fa;
-  margin-bottom: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
-}
-
-.note-btn-group {
-  position: relative;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.note-btn {
-  display: inline-block;
-  padding: 6px 12px;
-  margin: 0;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.42857143;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: middle;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: #fff;
-  color: #333;
-  text-decoration: none;
-  user-select: none;
-}
-
-.note-btn:hover {
-  background: #e6e6e6;
-  border-color: #adadad;
-}
-
-.note-btn.active {
-  background: #337ab7;
-  color: #fff;
-  border-color: #2e6da4;
-}
-
-.note-btn.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.note-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
-  display: none;
-  min-width: 160px;
-  padding: 5px 0;
-  margin: 0; /* 갭 제거 */
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 6px 12px rgba(0,0,0,.175);
-}
-
-.note-dropdown-item {
-  display: block;
-  padding: 3px 20px;
-  clear: both;
-  font-weight: normal;
-  line-height: 1.42857143;
-  color: #333;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.note-dropdown-item:hover {
-  background: #f5f5f5;
-  color: #262626;
-  text-decoration: none;
-}
-
-.note-dropdown-item.checked {
-  background: #337ab7;
-  color: #fff;
-}
-
-.note-icon-menu-check {
-  margin-right: 8px;
-  font-weight: bold;
-}
-
-.note-color-palette {
-  padding: 10px;
-}
-
-.note-color-row {
-  display: flex;
-  gap: 2px;
-  margin-bottom: 2px;
-}
-
-.note-color-btn {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  border-radius: 2px;
-}
-
-.note-color-btn:hover {
-  border-color: #333;
-  transform: scale(1.1);
-}
-
-.note-dimension-picker {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 10px;
-}
-
-.note-dimension-picker-mousecatcher {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 19px,
-    #ddd 19px,
-    #ddd 20px
-  ),
-  repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 19px,
-    #ddd 19px,
-    #ddd 20px
-  );
-}
-
-.note-dimension-display {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.note-break {
-  width: 1px;
-  height: 20px;
-  background: #ddd;
-  margin: 0 5px;
-}
-
-/* 드래그 앤 드랍 스타일 */
-.drag-drop-editor.dragover {
-  border: 2px dashed #007bff;
-  background: rgba(0, 123, 255, 0.1);
-}
-
-/* 태그 제안 스타일 */
-.tag-suggestions {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-}
-
-.tag-button {
-  display: inline-block;
-  padding: 4px 8px;
-  margin: 2px;
-  background: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.tag-button:hover {
-  background: #e0e0e0;
-}
-
-.existing-tags-title,
-.filtered-tags-title {
-  padding: 8px 12px;
-  font-weight: bold;
-  background: #f8f9fa;
-  border-bottom: 1px solid #ddd;
-}
-
-.no-results {
-  padding: 12px;
-  color: #666;
-  text-align: center;
-}
-
-/* 상단 메시지 스타일 */
-#top-message {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #28a745;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-#top-message.show {
-  opacity: 1;
-}
-
-/* 하루 제한 메시지 */
-.daily-limit-message {
-  margin: 20px 0;
-  padding: 20px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* 에디터 컨테이너 스타일 */
-.editor-container {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #fff;
-  min-height: 200px;
-}
-
-#post-content {
-  width: 100%;
-  min-height: 200px;
-  padding: 15px;
-  border: none;
-  outline: none;
-  font-family: '맑은 고딕', sans-serif;
-  font-size: 14px;
-  line-height: 1.5;
-  resize: vertical;
-  overflow-y: auto;
-}
-
-#post-content:empty:before {
-  content: attr(placeholder);
-  color: #999;
-  font-style: italic;
-}
-
-#post-content:focus {
-  outline: none;
-}
-
-/* 드래그 앤 드랍 스타일 */
-.editor-container.dragover {
-  border: 2px dashed #007bff;
-  background: rgba(0, 123, 255, 0.1);
-}
-</style>
-
-<!-- 에디터 JavaScript는 인라인으로 처리 -->
+<!-- Quill.js JavaScript -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
 <script>
 // AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
@@ -678,105 +110,164 @@ const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
 // 이미지 드래그 앤 드랍 기능
 function setupImageUpload() {
-  const editor = document.getElementById('post-content');
+  const editorContainer = document.querySelector('.editor-container');
   const fileInput = document.getElementById('image-file-input');
   
-  // 에디터에 드래그 앤 드랍 이벤트 추가
-  editor.addEventListener('dragover', (e) => {
+  console.log('setupImageUpload 함수가 호출되었습니다.');
+  console.log('editorContainer:', editorContainer);
+  console.log('fileInput:', fileInput);
+  
+  // 전체 페이지에 드래그 앤 드랍 이벤트 추가 (더 확실한 방법)
+  document.addEventListener('dragover', (e) => {
     e.preventDefault();
-    editor.parentElement.classList.add('dragover');
+    console.log('페이지 전체 드래그 오버');
   });
   
-  editor.addEventListener('dragleave', () => {
-    editor.parentElement.classList.remove('dragover');
-  });
-  
-  editor.addEventListener('drop', (e) => {
+  document.addEventListener('drop', (e) => {
     e.preventDefault();
-    editor.parentElement.classList.remove('dragover');
+    console.log('페이지 전체 드롭 이벤트');
     
-    const files = e.dataTransfer.files;
-    if (files.length > 0 && files[0].type.startsWith('image/')) {
-      handleImageFile(files[0]);
+    // 에디터 영역 내부인지 확인
+    const quillEditor = document.querySelector('.ql-editor');
+    if (quillEditor && quillEditor.contains(e.target)) {
+      console.log('에디터 영역에서 드롭 감지');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0 && files[0].type.startsWith('image/')) {
+        console.log('이미지 파일 감지:', files[0].name);
+        handleImageFile(files[0]);
+      } else {
+        console.log('이미지가 아닌 파일입니다.');
+        alert(i18nData?.write?.messages?.imageOnly || '이미지 파일만 업로드할 수 있습니다.');
+      }
     }
   });
   
-  // 클릭으로 파일 선택
-  editor.addEventListener('click', () => {
-    fileInput.click();
-  });
+  // Quill 에디터가 완전히 로드된 후에 클릭 이벤트 등록
+  function attachClickEvents() {
+    const quillEditor = document.querySelector('.ql-editor');
+    
+    if (!quillEditor) {
+      console.log('Quill 에디터가 아직 로드되지 않았습니다. 1초 후 다시 시도합니다.');
+      setTimeout(attachClickEvents, 1000);
+      return;
+    }
+    
+    console.log('클릭 이벤트를 등록합니다.');
+    
+    // 클릭으로 파일 선택 기능 비활성화 (드래그 앤 드랍만 사용)
+    // quillEditor.addEventListener('click', (e) => {
+    //   // 툴바 버튼 클릭이 아닌 경우에만 파일 선택 다이얼로그 열기
+    //   if (!e.target.closest('.ql-toolbar')) {
+    //     console.log('에디터 영역 클릭 - 파일 선택 다이얼로그 열기');
+    //     fileInput.click();
+    //   }
+    // });
+  }
   
+  // 파일 입력 이벤트
   fileInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
+      console.log('파일 선택됨:', e.target.files[0].name);
       handleImageFile(e.target.files[0]);
     }
   });
   
   function handleImageFile(file) {
+    console.log('handleImageFile 호출됨:', file.name, file.type);
+    
     if (!file.type.startsWith('image/')) {
       alert(i18nData.write.messages.imageOnly);
       return;
     }
     
+    console.log('이미지 파일 처리 시작:', file.name);
+    
     const reader = new FileReader();
     reader.onload = (e) => {
-      // 에디터에 이미지 삽입
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.maxWidth = '100%';
-      img.style.height = 'auto';
-      
-      // 현재 커서 위치에 이미지 삽입
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        range.insertNode(img);
-        range.setStartAfter(img);
-        range.setEndAfter(img);
-        selection.removeAllRanges();
-        selection.addRange(range);
-      } else {
-        editor.appendChild(img);
+      try {
+        console.log('파일 읽기 완료, 에디터에 삽입 시도');
+        
+        // Quill 에디터에 이미지 삽입
+        const range = editor.getSelection();
+        const index = range ? range.index : editor.getLength();
+        
+        editor.insertEmbed(index, 'image', e.target.result);
+        
+        // 커서를 이미지 다음으로 이동
+        editor.setSelection(index + 1);
+        
+        console.log('이미지가 성공적으로 삽입되었습니다.');
+      } catch (error) {
+        console.error('이미지 삽입 중 오류:', error);
+        alert('이미지 삽입 중 오류가 발생했습니다.');
       }
-      
-      // 변경 이벤트 발생
-      editor.dispatchEvent(new Event('input', { bubbles: true }));
     };
+    
+    reader.onerror = (error) => {
+      console.error('파일 읽기 오류:', error);
+      alert('파일 읽기 중 오류가 발생했습니다.');
+    };
+    
     reader.readAsDataURL(file);
   }
+  
+  // 클릭 이벤트 등록 시작
+  attachClickEvents();
 }
 
 
 // 임시저장 기능
-function saveDraft() {
-  const content = document.getElementById('post-content').innerHTML;
-  const tags = document.getElementById('post-tags').value;
-  const category = document.getElementById('post-category').value;
-  
-  const draft = { 
-    content, 
-    tags, 
-    category,
-    savedAt: new Date().toISOString() 
-  };
-  
-  localStorage.setItem('write-draft', JSON.stringify(draft));
-  showTopMessage(i18nData.write.messages.draftSaved);
+async function saveDraft() {
+  try {
+    // editor가 초기화되었는지 확인
+    if (!editor) {
+      console.log('에디터가 아직 초기화되지 않았습니다.');
+      alert('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    
+    const content = editor.getContents();
+    const tags = document.getElementById('post-tags').value;
+    
+    const draft = { 
+      content, 
+      tags,
+      savedAt: new Date().toISOString() 
+    };
+    
+    localStorage.setItem('write-draft', JSON.stringify(draft));
+    showTopMessage(i18nData?.write?.messages?.draftSaved || '임시저장되었습니다.');
+  } catch (error) {
+    console.error('저장 중 오류:', error);
+    showTopMessage('저장 중 오류가 발생했습니다.');
+  }
 }
 
 // 임시저장 불러오기
-function loadDraft() {
+async function loadDraft() {
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
   
   if (draft.content) {
-    document.getElementById('post-content').innerHTML = draft.content || '';
-    document.getElementById('post-tags').value = draft.tags || '';
-    document.getElementById('post-category').value = draft.category || 'txt';
-    
-    // 상단 메시지 표시
-    showTopMessage(i18nData.write.messages.draftLoaded);
+    try {
+      // editor가 초기화되었는지 확인
+      if (!editor) {
+        console.log('에디터가 아직 초기화되지 않았습니다. 1초 후 다시 시도합니다.');
+        setTimeout(loadDraft, 1000);
+        return;
+      }
+      
+      editor.setContents(draft.content);
+      document.getElementById('post-tags').value = draft.tags || '';
+      
+      // 상단 메시지 표시
+      showTopMessage(i18nData?.write?.messages?.draftLoaded || '임시저장된 내용을 불러왔습니다.');
+    } catch (error) {
+      console.error('불러오기 중 오류:', error);
+      showTopMessage('불러오기 중 오류가 발생했습니다.');
+    }
   } else {
-    alert(i18nData.write.messages.noDraft);
+    showTopMessage(i18nData?.write?.messages?.noDraft || '임시저장된 내용이 없습니다.');
   }
 }
 
@@ -828,8 +319,8 @@ function setupTagSuggestions() {
       suggestions.style.display = 'block';
     } else {
       suggestions.innerHTML = `
-        <div class="existing-tags-title">${i18nData.write.messages.existingTags}</div>
-        <div class="no-results">${i18nData.write.messages.noTagsAvailable}</div>
+        <div class="existing-tags-title">${i18nData?.write?.messages?.existingTags || '기존 태그'}</div>
+        <div class="no-results">${i18nData?.write?.messages?.noTagsAvailable || '사용 가능한 태그가 없습니다.'}</div>
       `;
       suggestions.style.display = 'block';
     }
@@ -850,7 +341,7 @@ function setupTagSuggestions() {
       
       if (filteredTags.length > 0) {
         suggestions.innerHTML = `
-          <div class="filtered-tags-title">${i18nData.write.messages.searchResults}</div>
+          <div class="filtered-tags-title">${i18nData?.write?.messages?.searchResults || '검색 결과:'}</div>
           <div class="filtered-tags-list">
             ${filteredTags.slice(0, 10).map(tag => 
               `<span class="tag-button" onclick="addTag('${tag}')">${tag}</span>`
@@ -859,7 +350,7 @@ function setupTagSuggestions() {
         `;
         suggestions.style.display = 'block';
       } else {
-        suggestions.innerHTML = `<div class="no-results">${i18nData.write.messages.noResults}</div>`;
+        suggestions.innerHTML = `<div class="no-results">${i18nData?.write?.messages?.noResults || '검색 결과가 없습니다.'}</div>`;
         suggestions.style.display = 'block';
       }
     } else {
@@ -887,84 +378,175 @@ function addTag(tag) {
 }
 
 
-function savePost() {
-  const category = document.getElementById('post-category').value;
-  const content = document.getElementById('post-content').innerHTML;
-  const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
-  
-  if (!content.trim()) {
-    alert(i18nData.write.messages.noContent);
-    return;
-  }
-  
-  // 실제로는 서버에 저장해야 함
-  const newPost = {
-    id: Date.now(),
-    date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.').replace(/\s/g, ''),
-    category: category,
-    description: content,
-    tags: tags
-  };
-  
-  // 오늘 날짜 기록 (하루 제한)
-  const today = new Date().toDateString();
-  localStorage.setItem('last-post-date', today);
-  
-  console.log('새 포스트:', newPost);
-  alert(i18nData.write.messages.saveSuccess);
-  
-  // 폼 비활성화
-  disableForm();
-}
-
-function clearForm() {
-  document.getElementById('post-category').value = 'txt';
-  document.getElementById('post-content').innerHTML = '';
-  document.getElementById('post-tags').value = '';
-  
-  // 파일 입력 초기화
-  document.getElementById('image-file-input').value = '';
-}
-
-// 카테고리 동적 로드
-function loadCategories() {
-  const categorySelect = document.getElementById('post-category');
-  const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
-  
-  // 기존 카테고리 추출
-  const existingCategories = new Set();
-  posts.forEach(post => {
-    if (post.category) {
-      existingCategories.add(post.category);
+async function savePost() {
+  try {
+    // editor가 초기화되었는지 확인
+    if (!editor) {
+      console.log('에디터가 아직 초기화되지 않았습니다.');
+      alert('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
     }
-  });
+    
+    const content = editor.getContents();
+    const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    
+    if (!content || !content.ops || content.ops.length === 0) {
+      showTopMessage(i18nData?.write?.messages?.noContent || '내용을 입력해주세요.');
+      return;
+    }
+    
+    // 새 포스트 생성
+    const newPost = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.').replace(/\s/g, ''),
+      description: content,
+      tags: tags,
+      createdAt: new Date().toISOString(),
+      title: extractTitleFromContent(content) || '제목 없음'
+    };
+    
+    // 기존 포스트들 불러오기
+    const existingPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    
+    // 새 포스트 추가
+    existingPosts.unshift(newPost); // 최신 포스트가 맨 위에 오도록
+    
+    // localStorage에 저장
+    localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
+    
+    // GitHub API를 사용하여 posts.json 파일 업데이트 (선택사항)
+    try {
+      await updatePostsJsonFile(existingPosts);
+    } catch (error) {
+      console.warn('GitHub 저장 실패, 로컬에만 저장됨:', error);
+    }
+    
+    // 오늘 날짜 기록 (하루 제한)
+    const today = new Date().toDateString();
+    localStorage.setItem('last-post-date', today);
+    
+    // 에디터 초기화
+    editor.setContents([]);
+    document.getElementById('post-tags').value = '';
+    
+    console.log('새 포스트 저장됨:', newPost);
+    showTopMessage(i18nData?.write?.messages?.saveSuccess || '포스트가 저장되었습니다.');
+    
+  } catch (error) {
+    console.error('저장 중 오류:', error);
+    showTopMessage('저장 중 오류가 발생했습니다: ' + error.message);
+  }
+}
+
+// Quill 콘텐츠에서 제목 추출
+function extractTitleFromContent(content) {
+  if (!content || !content.ops) return null;
   
-  // 기본 카테고리와 기존 카테고리 결합
-  const allCategories = [
-    { value: 'txt', label: i18nData.write.categories.txt },
-    { value: 'gallery', label: i18nData.write.categories.gallery },
-    { value: 'archive', label: i18nData.write.categories.archive }
-  ];
-  
-  // 기존 카테고리 추가 (중복 제거)
-  Array.from(existingCategories).forEach(category => {
-    if (!allCategories.find(cat => cat.value === category)) {
-      const label = category === 'gallery' ? i18nData.write.categories.gallery : 
-                   category === 'archive' ? i18nData.write.categories.archive : 
-                   category === 'txt' ? i18nData.write.categories.txt : "";
-      
-      // 빈 라벨이 아닌 경우만 추가
-      if (label !== "") {
-        allCategories.push({ value: category, label: label });
+  // 첫 번째 텍스트 블록에서 제목 추출
+  for (const op of content.ops) {
+    if (op.insert && typeof op.insert === 'string') {
+      const text = op.insert.trim();
+      if (text.length > 0) {
+        // 첫 줄을 제목으로 사용 (50자 제한)
+        return text.split('\n')[0].substring(0, 50);
       }
     }
-  });
-  
-  // 셀렉트 옵션 업데이트
-  categorySelect.innerHTML = allCategories.map(cat => 
-    `<option value="${cat.value}">${cat.label}</option>`
-  ).join('');
+  }
+  return null;
 }
+
+// GitHub API를 사용하여 posts.json 파일 업데이트
+async function updatePostsJsonFile(posts) {
+  try {
+    // GitHub Personal Access Token 확인
+    const token = getGitHubToken();
+    if (!token) {
+      console.warn('GitHub 토큰이 없습니다. 로컬에만 저장됩니다.');
+      showTopMessage('GitHub 토큰이 필요합니다. 로컬에만 저장되었습니다.');
+      return;
+    }
+
+    // 현재 파일 내용 가져오기
+    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/_data/posts.json', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('파일 정보 가져오기 실패: ' + response.statusText);
+    }
+    
+    const fileData = await response.json();
+    
+    // 새 파일 내용 생성
+    const newContent = JSON.stringify({ posts: posts }, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
+    
+    // 파일 업데이트
+    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/_data/posts.json', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Update posts.json - Add new post at ${new Date().toISOString()}`,
+        content: encodedContent,
+        sha: fileData.sha
+      })
+    });
+    
+    if (!updateResponse.ok) {
+      const errorData = await updateResponse.json();
+      throw new Error('파일 업데이트 실패: ' + (errorData.message || updateResponse.statusText));
+    }
+    
+    console.log('posts.json 파일이 성공적으로 업데이트되었습니다.');
+    showTopMessage('포스트가 성공적으로 저장되었습니다!');
+    
+  } catch (error) {
+    console.error('GitHub API 업데이트 실패:', error);
+    showTopMessage('저장 실패: ' + error.message + ' (로컬에만 저장됨)');
+  }
+}
+
+// GitHub Personal Access Token 가져오기
+function getGitHubToken() {
+  // 1. 환경변수에서 토큰 확인 (빌드 시점에 주입됨)
+  if (window.GITHUB_TOKEN && window.GITHUB_TOKEN !== 'undefined') {
+    console.log('환경변수에서 GitHub 토큰을 사용합니다.');
+    return window.GITHUB_TOKEN;
+  }
+  
+  // 2. localStorage에서 토큰 확인
+  let token = localStorage.getItem('github_token');
+  
+  if (!token) {
+    // 3. 사용자에게 토큰 입력 요청 (백업)
+    token = prompt(`GitHub Personal Access Token이 필요합니다.
+
+토큰을 얻는 방법:
+1. GitHub > Settings > Developer settings > Personal access tokens > Tokens (classic)
+2. "Generate new token" 클릭
+3. 권한: "repo" (전체 저장소 접근) 선택
+4. 생성된 토큰을 복사하여 여기에 붙여넣기
+
+토큰을 입력하세요:`);
+    
+    if (token && token.trim()) {
+      localStorage.setItem('github_token', token.trim());
+      return token.trim();
+    }
+  }
+  
+  return token;
+}
+
+
 
 // 상단 메시지 표시
 function showTopMessage(message) {
@@ -1007,11 +589,15 @@ function setupAutoSave() {
   let autoSaveInterval;
   
   // 1분마다 자동 저장 (알림 없음)
-  autoSaveInterval = setInterval(() => {
-    const content = document.getElementById('post-content').innerHTML;
-    if (content.trim()) {
-      saveDraft();
-      // 알림 없이 조용히 저장
+  autoSaveInterval = setInterval(async () => {
+    try {
+      const content = editor.getContents();
+      if (content && content.ops && content.ops.length > 0) {
+        saveDraft();
+        // 알림 없이 조용히 저장
+      }
+    } catch (error) {
+      console.error('자동 저장 중 오류:', error);
     }
   }, 60000); // 1분 = 60000ms
 }
@@ -1031,274 +617,43 @@ function redirectTo404() {
   window.location.href = '/404.html';
 }
 
-// 간단한 에디터 툴바 기능
-function initializeSimpleEditorToolbar() {
-  // 드롭다운 메뉴 토글 기능
-  function setupDropdownToggle() {
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach(toggle => {
-      toggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // 다른 드롭다운 닫기
-        document.querySelectorAll('.note-dropdown-menu').forEach(menu => {
-          if (menu !== this.nextElementSibling) {
-            menu.style.display = 'none';
-          }
-        });
-        
-        // 현재 드롭다운 토글
-        const dropdown = this.nextElementSibling;
-        if (dropdown) {
-          const isVisible = dropdown.style.display === 'block';
-          dropdown.style.display = isVisible ? 'none' : 'block';
-        }
-      });
-    });
-    
-    // 외부 클릭 시 드롭다운 닫기
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.note-btn-group') && !e.target.closest('.note-dropdown-menu')) {
-        document.querySelectorAll('.note-dropdown-menu').forEach(menu => {
-          menu.style.display = 'none';
-        });
-      }
-    });
-    
-    // 드롭다운 메뉴 내부 클릭 시 닫히지 않도록
-    document.addEventListener('click', function(e) {
-      if (e.target.closest('.note-dropdown-menu')) {
-        e.stopPropagation();
-      }
-    });
-  }
-  
-  // 드롭다운 토글 설정
-  setupDropdownToggle();
 
-  // 텍스트 스타일 버튼들
-  const boldBtn = document.querySelector('.note-btn-bold');
-  if (boldBtn) {
-    boldBtn.addEventListener('click', function() {
-      document.execCommand('bold');
-      this.classList.toggle('active');
-    });
+
+// Quill.js 에디터 초기화
+let editor;
+
+function initializeQuillJS() {
+  // Quill.js가 로드되었는지 확인
+  if (typeof Quill === 'undefined') {
+    console.error('Quill.js가 로드되지 않았습니다.');
+    return;
   }
 
-  const italicBtn = document.querySelector('.note-btn-italic');
-  if (italicBtn) {
-    italicBtn.addEventListener('click', function() {
-      document.execCommand('italic');
-      this.classList.toggle('active');
-    });
-  }
-
-  const underlineBtn = document.querySelector('.note-btn-underline');
-  if (underlineBtn) {
-    underlineBtn.addEventListener('click', function() {
-      document.execCommand('underline');
-      this.classList.toggle('active');
-    });
-  }
-
-  const strikethroughBtn = document.querySelector('.note-btn-strikethrough');
-  if (strikethroughBtn) {
-    strikethroughBtn.addEventListener('click', function() {
-      document.execCommand('strikeThrough');
-      this.classList.toggle('active');
-    });
-  }
-
-  const eraserBtn = document.querySelector('.note-icon-eraser').parentElement;
-  if (eraserBtn) {
-    eraserBtn.addEventListener('click', function() {
-      document.execCommand('removeFormat');
-    });
-  }
-
-  // 색상 선택
-  const colorBtns = document.querySelectorAll('.note-color-btn');
-  colorBtns.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const color = this.getAttribute('data-value');
-      const event = this.getAttribute('data-event');
-      
-      if (event === 'foreColor') {
-        document.execCommand('foreColor', false, color);
-        // 현재 색상 버튼 업데이트
-        const currentColorBtn = document.querySelector('.note-current-color-button');
-        if (currentColorBtn) {
-          currentColorBtn.setAttribute('data-forecolor', color);
-          const colorIcon = currentColorBtn.querySelector('.note-recent-color');
-          if (colorIcon) {
-            colorIcon.style.color = color;
-          }
-        }
-      } else if (event === 'backColor') {
-        document.execCommand('backColor', false, color);
-        // 현재 배경색 버튼 업데이트
-        const currentColorBtn = document.querySelector('.note-current-color-button');
-        if (currentColorBtn) {
-          currentColorBtn.setAttribute('data-backcolor', color);
-          const colorIcon = currentColorBtn.querySelector('.note-recent-color');
-          if (colorIcon) {
-            colorIcon.style.backgroundColor = color;
-          }
-        }
-      }
-      
-      // 색상 선택 후 드롭다운 닫기
-      const colorDropdown = this.closest('.note-dropdown-menu');
-      if (colorDropdown) {
-        colorDropdown.style.display = 'none';
-      }
-    });
-  });
-
-  // 표 삽입
-  const tableBtn = document.querySelector('.note-icon-table').parentElement;
-  if (tableBtn) {
-    tableBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      // 간단한 표 삽입 (3x3)
-      const tableHtml = '<table border="1" style="border-collapse: collapse; width: 100%;"><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr></table>';
-      document.execCommand('insertHTML', false, tableHtml);
-    });
-  }
-
-  // 문단 정렬
-  const alignBtns = document.querySelectorAll('.note-align .note-btn');
-  alignBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      const icon = this.querySelector('i');
-      if (icon.classList.contains('note-icon-align-left')) {
-        document.execCommand('justifyLeft');
-      } else if (icon.classList.contains('note-icon-align-center')) {
-        document.execCommand('justifyCenter');
-      } else if (icon.classList.contains('note-icon-align-right')) {
-        document.execCommand('justifyRight');
-      } else if (icon.classList.contains('note-icon-align-justify')) {
-        document.execCommand('justifyFull');
-      }
-    });
-  });
-
-  // 목록
-  const unorderedListBtn = document.querySelector('.note-icon-unorderedlist').parentElement;
-  if (unorderedListBtn) {
-    unorderedListBtn.addEventListener('click', function() {
-      document.execCommand('insertUnorderedList');
-    });
-  }
-
-  const orderedListBtn = document.querySelector('.note-icon-orderedlist').parentElement;
-  if (orderedListBtn) {
-    orderedListBtn.addEventListener('click', function() {
-      document.execCommand('insertOrderedList');
-    });
-  }
-
-  // 링크 삽입
-  const linkBtn = document.querySelector('.note-icon-link').parentElement;
-  if (linkBtn) {
-    linkBtn.addEventListener('click', function() {
-      const url = prompt('링크 URL을 입력하세요:');
-      if (url) {
-        document.execCommand('createLink', false, url);
-      }
-    });
-  }
-}
-
-// 간단한 에디터 초기화
-function initializeSimpleEditor() {
-  const editor = document.getElementById('post-content');
-  
-  // 에디터 포커스 설정
-  editor.addEventListener('focus', function() {
-    this.style.outline = 'none';
-  });
-  
-  // 에디터 변경 이벤트
-  editor.addEventListener('input', function() {
-    // 변경 이벤트 발생
-    this.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  
-  // 툴바 초기화
-  initializeSimpleEditorToolbar();
-}
-
-// Undo/Redo 기능 함수들
-function performUndo() {
-  try {
-    document.execCommand('undo');
-    updateUndoRedoButtons();
-  } catch (e) {
-    console.error('Undo error:', e);
-  }
-}
-
-function performRedo() {
-  try {
-    document.execCommand('redo');
-    updateUndoRedoButtons();
-  } catch (e) {
-    console.error('Redo error:', e);
-  }
-}
-
-// Undo/Redo 버튼 상태 업데이트
-function updateUndoRedoButtons() {
-  const undoBtn = document.getElementById('undo-btn');
-  const redoBtn = document.getElementById('redo-btn');
-  
-  if (undoBtn && redoBtn) {
-    // 간단한 상태 확인 (실제로는 더 정교한 구현이 필요)
-    const editor = document.getElementById('post-content');
-    const hasContent = editor.innerHTML.trim() !== '';
-    
-    // 버튼 활성화/비활성화 (간단한 구현)
-    undoBtn.disabled = !hasContent;
-    redoBtn.disabled = !hasContent;
-    
-    // 시각적 피드백
-    if (hasContent) {
-      undoBtn.classList.remove('disabled');
-      redoBtn.classList.remove('disabled');
-    } else {
-      undoBtn.classList.add('disabled');
-      redoBtn.classList.add('disabled');
-    }
-  }
-}
-
-// 키보드 단축키 설정
-function setupKeyboardShortcuts() {
-  document.addEventListener('keydown', function(e) {
-    // 에디터가 포커스되어 있을 때만 단축키 적용
-    const editor = document.getElementById('post-content');
-    if (document.activeElement !== editor) {
-      return;
-    }
-    
-    // Ctrl+Z (Undo)
-    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
-      e.preventDefault();
-      performUndo();
-    }
-    // Ctrl+Y 또는 Ctrl+Shift+Z (Redo)
-    else if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'z')) {
-      e.preventDefault();
-      performRedo();
+  editor = new Quill('#post-content', {
+    theme: 'snow',
+    bounds: '#post-content',
+    modules: {
+      toolbar: [
+        [{ 'font': ['Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 'Arial'] }],
+        [{ 'header': [1, 2, 3, false] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'align': [] }, { 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image']
+      ]
     }
   });
+
+  // 에디터 내용이 변경될 때마다 이벤트 발생
+  editor.on('text-change', function() {
+    document.getElementById('post-content').dispatchEvent(new Event('input', { bubbles: true }));
+  });
+
+
+  console.log('Quill.js가 성공적으로 초기화되었습니다.');
 }
 
-// 전역 변수로 에디터 초기화 상태 관리
-let isEditorInitialized = false;
 
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
@@ -1308,25 +663,19 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // 이미 초기화되었으면 중복 실행 방지
-  if (isEditorInitialized) {
-    return;
-  }
+  // Quill.js 에디터 초기화 (약간의 지연을 두어 CDN 로딩 완료 후 실행)
+  setTimeout(() => {
+    initializeQuillJS();
+  }, 100);
   
-  // 간단한 에디터 초기화
-  initializeSimpleEditor();
-  
-  // 초기화 완료 표시
-  isEditorInitialized = true;
-  
-  // 카테고리 로드
-  loadCategories();
-  
-  // 이미지 업로드 설정
-  setupImageUpload();
+  // 카테고리 로드 (비활성화)
+  // loadCategories();
   
   // 태그 제안 설정
   setupTagSuggestions();
+  
+  // 이미지 업로드 설정
+  setupImageUpload();
   
   // 자동 저장 설정
   setupAutoSave();
@@ -1336,91 +685,14 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('load-draft-writer').addEventListener('click', loadDraft);
   document.getElementById('save-post').addEventListener('click', savePost);
   
-  // Undo/Redo 버튼 이벤트 연결
-  document.getElementById('undo-btn').addEventListener('click', performUndo);
-  document.getElementById('redo-btn').addEventListener('click', performRedo);
-  
-  // 키보드 단축키 설정
-  setupKeyboardShortcuts();
-  
   // 페이지 로드 시 임시저장 자동 불러오기
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
   if (draft.content) {
     loadDraft();
   }
   
-  // 하루 글 작성 제한 체크 (관리자 권한이 있으면 제한 없음)
-  // checkDailyPostLimit(); // 이 줄을 주석 처리하여 하루 제한 취소
 });
 
-// 하루 글 작성 제한 체크 함수
-function checkDailyPostLimit() {
-  // 개발자 모드 체크 (F12 또는 개발자 도구가 열려있는지 확인)
-  const isDevMode = localStorage.getItem('dev-mode') === 'true' || 
-                    window.outerHeight - window.innerHeight > 200; // 개발자 도구가 열려있으면 높이 차이가 큼
-  
-  if (isDevMode) {
-    console.log('개발자 모드: 하루 글 작성 제한 비활성화');
-    return; // 개발자 모드에서는 제한 없음
-  }
-  
-  const today = new Date().toDateString();
-  const lastPostDate = localStorage.getItem('last-post-date');
-  
-  if (lastPostDate === today) {
-    // 오늘 이미 글을 작성했으면 폼 비활성화
-    disableForm();
-    showTopMessage(i18nData.write.messages.dailyLimitReached);
-  }
-}
 
-// 폼 비활성화 함수
-function disableForm() {
-  const form = document.querySelector('.write-form');
-  const inputs = form.querySelectorAll('input, textarea, select, button');
-  
-  inputs.forEach(input => {
-    input.disabled = true;
-    input.style.opacity = '0.5';
-    input.style.cursor = 'not-allowed';
-  });
-  
-  // 저장 버튼 숨기기
-  const saveButton = document.getElementById('save-post');
-  if (saveButton) {
-    saveButton.style.display = 'none';
-  }
-  
-  // 제한 메시지 표시
-  const limitMessage = document.createElement('div');
-  limitMessage.className = 'daily-limit-message';
-  limitMessage.innerHTML = `
-    <div style="text-align: center; padding: var(--spacing-lg); background: var(--bg-secondary); border-radius: var(--border-radius-sm); margin: var(--spacing-lg) 0;">
-      <h3 style="color: var(--accent-primary); margin: 0 0 var(--spacing-sm) 0;">${i18nData.write.messages.dailyLimitTitle}</h3>
-      <p style="color: var(--text-secondary); margin: 0;">${i18nData.write.messages.dailyLimitDescription}</p>
-    </div>
-  `;
-  
-  form.insertBefore(limitMessage, form.firstChild);
-}
 
-// 텍스트 영역 자동 크기 조정 함수
-function setupTextareaAutoResize() {
-  const textarea = document.getElementById('post-content');
-  if (!textarea) return;
-  
-  function autoResize() {
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
-  }
-  
-  // 초기 크기 설정
-  autoResize();
-  
-  // 입력 시마다 크기 조정
-  textarea.addEventListener('input', autoResize);
-  textarea.addEventListener('paste', () => {
-    setTimeout(autoResize, 10);
-  });
-}
 </script>

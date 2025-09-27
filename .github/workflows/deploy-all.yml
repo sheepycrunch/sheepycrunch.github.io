@@ -60,6 +60,7 @@ jobs:
         NEOCITIES_URL: https://${{ secrets.SITE_NAME }}.neocities.org
         NEKOWEB_URL: https://${{ secrets.SITE_NAME }}.nekoweb.org
         ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
+        AUTHOR_TOKEN: ${{ secrets.AUTHOR_TOKEN }}
       
     - name: Deploy to Neocities
       uses: bcomnes/deploy-to-neocities@v1

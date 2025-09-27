@@ -9,7 +9,8 @@ permalink: "/txt.html"
 <section id="content">
   <h2>{{ i18n.txt.title | t(lang) }}</h2>
   
-  <div class="post-list">
+  <div class="post-list" id="post-list">
+    <!-- 정적 포스트들 (빌드 시점) -->
     {% for item in posts.posts %}
       {% if item.category == "txt" %}
       <div class="post-item">
@@ -36,6 +37,152 @@ permalink: "/txt.html"
       </div>
       {% endif %}
     {% endfor %}
+    
+    <!-- 동적 포스트들 (JavaScript로 로드) -->
+    <div id="dynamic-posts"></div>
   </div>
 </section>
+
+<script>
+// 동적 포스트 로드
+async function loadDynamicPosts() {
+  const dynamicPostsContainer = document.getElementById('dynamic-posts');
+  
+  try {
+    // GitHub에서 posts.json 파일 가져오기
+    const response = await fetch('https://raw.githubusercontent.com/sheepycrunch/sheepycrunch.github.io/main/src/_data/posts.json');
+    
+    if (response.ok) {
+      const data = await response.json();
+      const posts = data.posts || [];
+      
+      if (posts.length === 0) {
+        console.log('저장된 포스트가 없습니다.');
+        return;
+      }
+      
+      // 최신 포스트부터 표시
+      posts.forEach(post => {
+        const postElement = createPostElement(post);
+        dynamicPostsContainer.appendChild(postElement);
+      });
+      
+      console.log(`${posts.length}개의 포스트를 로드했습니다.`);
+    } else {
+      console.warn('GitHub에서 포스트를 가져올 수 없습니다. 로컬 데이터를 사용합니다.');
+      loadLocalPosts();
+    }
+  } catch (error) {
+    console.error('포스트 로드 중 오류:', error);
+    loadLocalPosts();
+  }
+}
+
+// 로컬 포스트 로드 (백업)
+function loadLocalPosts() {
+  const dynamicPostsContainer = document.getElementById('dynamic-posts');
+  const posts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+  
+  if (posts.length === 0) {
+    return;
+  }
+  
+  // 최신 포스트부터 표시
+  posts.forEach(post => {
+    const postElement = createPostElement(post);
+    dynamicPostsContainer.appendChild(postElement);
+  });
+}
+
+// 포스트 요소 생성
+function createPostElement(post) {
+  const postDiv = document.createElement('div');
+  postDiv.className = 'post-item';
+  
+  // Quill 콘텐츠를 HTML로 변환
+  const contentHtml = convertQuillToHtml(post.description);
+  
+  // 태그 버튼들 생성
+  const tagButtons = post.tags ? post.tags.map(tag => 
+    `<button class="tag-button" onclick="searchByTag('${tag}')">#${tag}</button>`
+  ).join('') : '';
+  
+  postDiv.innerHTML = `
+    <div class="post-content">
+      <div class="post-text">${contentHtml}</div>
+      <div class="post-footer">
+        <div class="post-meta">${post.date}</div>
+        ${post.tags ? `<div class="post-tags">${tagButtons}</div>` : ''}
+      </div>
+    </div>
+  `;
+  
+  return postDiv;
+}
+
+// Quill Delta를 HTML로 변환
+function convertQuillToHtml(quillContent) {
+  if (!quillContent || !quillContent.ops) {
+    return '<p>내용이 없습니다.</p>';
+  }
+  
+  let html = '';
+  
+  quillContent.ops.forEach(op => {
+    if (op.insert) {
+      if (typeof op.insert === 'string') {
+        let text = op.insert;
+        
+        // 줄바꿈 처리
+        text = text.replace(/\n/g, '<br>');
+        
+        // 스타일 적용
+        if (op.attributes) {
+          if (op.attributes.bold) text = `<strong>${text}</strong>`;
+          if (op.attributes.italic) text = `<em>${text}</em>`;
+          if (op.attributes.underline) text = `<u>${text}</u>`;
+          if (op.attributes.strike) text = `<s>${text}</s>`;
+          
+          // 헤더 처리
+          if (op.attributes.header) {
+            const level = op.attributes.header;
+            text = `<h${level}>${text}</h${level}>`;
+          }
+          
+          // 색상 처리
+          if (op.attributes.color) {
+            text = `<span style="color: ${op.attributes.color}">${text}</span>`;
+          }
+          if (op.attributes.background) {
+            text = `<span style="background-color: ${op.attributes.background}">${text}</span>`;
+          }
+        }
+        
+        html += text;
+      } else if (op.insert.image) {
+        // 이미지 처리
+        html += `<img src="${op.insert.image}" alt="이미지" style="max-width: 100%; height: auto;">`;
+      }
+    }
+  });
+  
+  // 빈 내용 처리
+  if (!html.trim()) {
+    html = '<p>내용이 없습니다.</p>';
+  }
+  
+  return html;
+}
+
+// 태그로 검색
+function searchByTag(tag) {
+  // 검색 페이지로 이동하거나 현재 페이지에서 필터링
+  window.location.href = `/search.html?q=${encodeURIComponent(tag)}`;
+}
+
+// 페이지 로드 시 동적 포스트 로드
+document.addEventListener('DOMContentLoaded', function() {
+  loadDynamicPosts();
+});
+</script>
 

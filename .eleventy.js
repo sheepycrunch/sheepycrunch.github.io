@@ -7,6 +7,10 @@ module.exports = function(eleventyConfig) {
   // 전역 데이터로 추가
   eleventyConfig.addGlobalData("adminSecretKey", adminSecretKey);
   
+  // GitHub 토큰 가져오기
+  const githubToken = process.env.AUTHOR_TOKEN;
+  eleventyConfig.addGlobalData("githubToken", githubToken);
+  
   // 환경변수에서 URL 정보 가져오기
   const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
   const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
@@ -504,7 +508,10 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addTransform("inject-admin-key", function(content, outputPath) {
     if (outputPath && outputPath.endsWith('.html')) {
       // HTML 파일에서 JavaScript에 환경변수 주입
-      const scriptTag = `<script>window.ADMIN_SECRET_KEY = '${adminSecretKey}';</script>`;
+      const scriptTag = `<script>
+        window.ADMIN_SECRET_KEY = '${adminSecretKey}';
+        window.GITHUB_TOKEN = '${githubToken}';
+      </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);
     }
     return content;
@@ -557,6 +564,11 @@ module.exports = function(eleventyConfig) {
       includes: "_includes",
       data: "_data",
       output: "_site"
+    },
+
+    // 서버 설정
+    serverOptions: {
+      port: 8080
     }
   };
 };
