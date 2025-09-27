@@ -140,6 +140,44 @@ function insertImageToEditor(imagePath, localPath) {
   }
 }
 
+// 통합 워크플로우 실행
+function executeWriteWorkflow() {
+  // 로컬 서버에서만 실행
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    try {
+      const shell = new ActiveXObject('WScript.Shell');
+      // 통합 워크플로우 실행 (다운로드 → 복사 → 빌드 → 배포 → 정리)
+      shell.Run('write-workflow.bat', 1, false);
+      showTopMessage('통합 워크플로우가 시작되었습니다. (다운로드 → 복사 → 빌드 → 배포 → 정리)');
+    } catch (error) {
+      console.error('실행 오류:', error);
+      showTopMessage('자동 실행에 실패했습니다. 수동으로 write-workflow.bat를 실행하세요.');
+    }
+  } else {
+    showTopMessage('로컬 서버에서만 자동 실행이 가능합니다. 수동으로 write-workflow.bat를 실행하세요.');
+  }
+}
+
+// 파일 복사 및 배포 실행
+function executeCopyAndDeploy() {
+  // 로컬 서버에서만 실행
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    try {
+      const shell = new ActiveXObject('WScript.Shell');
+      // 1. 파일 복사 실행
+      shell.Run('copy-files.bat', 1, true);
+      // 2. 배포 실행
+      shell.Run('deploy-local.bat', 1, false);
+      showTopMessage('파일 복사 및 배포가 자동으로 시작되었습니다.');
+    } catch (error) {
+      console.error('실행 오류:', error);
+      showTopMessage('자동 실행에 실패했습니다. 수동으로 copy-files.bat와 deploy-local.bat를 실행하세요.');
+    }
+  } else {
+    showTopMessage('로컬 서버에서만 자동 실행이 가능합니다. 수동으로 copy-files.bat와 deploy-local.bat를 실행하세요.');
+  }
+}
+
 // 자동 배포 스크립트 실행
 function executeDeployScript() {
   // 로컬 서버에서만 실행
@@ -361,9 +399,9 @@ async function savePost() {
     const postsData = { posts: existingPosts };
     const postsJson = JSON.stringify(postsData, null, 2);
     
-    // 로컬 파일에 저장
+    // posts.json 파일 다운로드 (수동으로 src/ 폴더에 저장 필요)
     try {
-      // Blob을 사용하여 파일 다운로드 시뮬레이션
+      // Blob을 사용하여 파일 다운로드
       const blob = new Blob([postsJson], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -375,11 +413,11 @@ async function savePost() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showTopMessage('포스트가 저장되었습니다. 자동 배포를 시작합니다...');
+      showTopMessage('파일이 다운로드되었습니다. 자동으로 복사하고 배포합니다...');
       
-      // 자동 배포 실행
+      // 통합 워크플로우 실행
       setTimeout(() => {
-        executeDeployScript();
+        executeWriteWorkflow();
       }, 1000);
       
     } catch (error) {
