@@ -153,8 +153,18 @@ jobs:
             if (updated) {
               // 업데이트된 포스트를 GitHub에 저장
               const fs = require('fs');
-              fs.writeFileSync('src/_data/posts.json', JSON.stringify(posts, null, 2));
+              const updatedPostsData = JSON.stringify({posts: posts}, null, 2);
+              fs.writeFileSync('src/_data/posts.json', updatedPostsData);
               console.log('Posts updated with Neocities URLs');
+              
+              // posts.json을 Neocities에도 업로드
+              try {
+                const postsBuffer = Buffer.from(updatedPostsData, 'utf8');
+                const postsUrl = await uploadToNeocities(postsBuffer, 'posts.json');
+                console.log(`Posts.json uploaded to Neocities: ${postsUrl}`);
+              } catch (error) {
+                console.error('Failed to upload posts.json to Neocities:', error);
+              }
             }
             
           } catch (error) {
