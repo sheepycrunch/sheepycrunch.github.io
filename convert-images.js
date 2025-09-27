@@ -16,24 +16,37 @@ function base64ToBuffer(base64Data) {
   return { buffer: Buffer.from(u8arr), mime };
 }
 
-// GitHub Pages에 이미지 저장
-async function saveImageToGitHub(buffer, fileName, mime) {
+// 네오시티에 이미지 업로드
+async function uploadImageToNeocities(buffer, fileName, mime) {
   try {
-    // 이미지 파일을 images/uploaded에 저장 (GitHub Pages에서 직접 호스팅)
-    const imagesDir = 'images/uploaded';
-    if (!fs.existsSync(imagesDir)) {
-      fs.mkdirSync(imagesDir, { recursive: true });
+    const neocitiesApiKey = process.env.NEOCITIES_API_KEY;
+    if (!neocitiesApiKey) {
+      throw new Error('NEOCITIES_API_KEY environment variable not set');
     }
+
+    const formData = new FormData();
+    const blob = new Blob([buffer], { type: mime });
+    formData.append('file', blob, fileName);
+
+    const response = await fetch('https://neocities.org/api/upload', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${neocitiesApiKey}`
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Neocities upload failed: ${errorData.message || response.statusText}`);
+    }
+
+    console.log(`Image uploaded to Neocities: ${fileName}`);
     
-    const filePath = `${imagesDir}/${fileName}`;
-    fs.writeFileSync(filePath, buffer);
-    
-    console.log(`Image saved locally: ${filePath}`);
-    
-    // GitHub Pages URL 반환
-    return `https://sheepycrunch.github.io/images/uploaded/${fileName}`;
+    // 네오시티 URL 반환
+    return `https://dakimakura.neocities.org/images/uploaded/${fileName}`;
   } catch (error) {
-    throw new Error(`Failed to save image: ${error.message}`);
+    throw new Error(`Failed to upload image to Neocities: ${error.message}`);
   }
 }
 
@@ -64,10 +77,10 @@ async function processPosts() {
               const extension = mime.split('/')[1];
               const fileName = `${timestamp}_${randomString}.${extension}`;
               
-              // GitHub Pages에 저장
-              const imageUrl = await saveImageToGitHub(buffer, fileName, mime);
+              // 네오시티에 업로드
+                    const imageUrl = await uploadImageToNeocities(buffer, fileName, mime);
               
-              // 새로운 op 생성 (GitHub Pages URL 사용)
+              // 새로운 op 생성 (네오시티 URL 사용)
               newOps.push({
                 insert: {
                   image: imageUrl
@@ -94,7 +107,7 @@ async function processPosts() {
     if (updated) {
       // 업데이트된 포스트를 파일에 저장
       fs.writeFileSync('src/_data/posts.json', JSON.stringify({ posts }, null, 2));
-      console.log('Posts updated with GitHub Pages URLs');
+      console.log('Posts updated with Neocities URLs');
     } else {
       console.log('No base64 images found to convert');
     }
