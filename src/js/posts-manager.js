@@ -281,7 +281,10 @@ async function deletePost(postId) {
     // 4. UI에서 제거
     removePostFromUI(postId);
     
-    alert('글이 성공적으로 삭제되었습니다.');
+    // UI 업데이트를 위해 약간의 지연
+    setTimeout(() => {
+      alert('글이 성공적으로 삭제되었습니다.');
+    }, 100);
   } catch (error) {
     console.error('포스트 삭제 중 오류 발생:', error);
     alert('포스트 삭제 중 오류가 발생했습니다: ' + error.message);
@@ -546,15 +549,34 @@ function extractImagePaths(quillContent) {
 
 // UI에서 포스트 제거
 function removePostFromUI(postId) {
+  console.log('UI에서 포스트 제거 시도:', postId);
+  
   // 동적 포스트에서 제거
   const dynamicPosts = document.querySelectorAll('#dynamic-posts .post-item[data-post-id="' + postId + '"]');
-  dynamicPosts.forEach(post => post.remove());
+  console.log('동적 포스트 찾음:', dynamicPosts.length);
+  dynamicPosts.forEach(post => {
+    console.log('동적 포스트 제거 중:', post);
+    post.remove();
+  });
+  
+  // 모든 포스트에서 제거 (동적 + 정적)
+  const allPosts = document.querySelectorAll('.post-item[data-post-id="' + postId + '"]');
+  console.log('모든 포스트 찾음:', allPosts.length);
+  allPosts.forEach(post => {
+    console.log('포스트 제거 중:', post);
+    post.remove();
+  });
   
   // 정적 포스트에서 제거 (페이지 새로고침 필요)
   const staticPosts = document.querySelectorAll('.post-item[data-post-id="' + postId + '"]');
+  console.log('정적 포스트 찾음:', staticPosts.length);
+  
   if (staticPosts.length > 0) {
+    console.log('정적 포스트가 있으므로 페이지 새로고침');
     // 정적 포스트가 있는 경우 페이지 새로고침
     window.location.reload();
+  } else {
+    console.log('정적 포스트가 없으므로 새로고침하지 않음');
   }
 }
 
