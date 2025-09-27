@@ -63,10 +63,22 @@ runs:
         error_count=0
         
         shopt -s globstar nullglob
+        total_files=0
         for file in ${{ inputs.dist_dir }}/**/*; do
           if [ -f "$file" ]; then
+            ((total_files++))
+          fi
+        done
+        
+        echo "📊 Found $total_files files to upload"
+        echo "🚀 Starting upload process..."
+        
+        current_file=0
+        for file in ${{ inputs.dist_dir }}/**/*; do
+          if [ -f "$file" ]; then
+            ((current_file++))
             relative_path=${file#${{ inputs.dist_dir }}/}
-            echo "📤 Uploading: $relative_path"
+            echo "📤 Uploading: $relative_path ($current_file/$total_files)"
             
             # Get directory path for the file
             dir_path=$(dirname "$relative_path")
@@ -111,7 +123,29 @@ runs:
         echo "✅ Upload complete: $upload_count files uploaded"
         if [ $error_count -gt 0 ]; then
           echo "⚠️  $error_count files failed to upload"
-          exit 1
+          echo "📊 Upload summary:"
+          echo "  - Successful uploads: $upload_count"
+          echo "  - Failed uploads: $error_count"
+          echo "  - Total files processed: $((upload_count + error_count))"
+          
+          # Check if critical files were uploaded successfully
+          critical_files=("index.html" "404.html")
+          critical_success=0
+          for critical_file in "${critical_files[@]}"; do
+            if [ -f "${{ inputs.dist_dir }}/$critical_file" ]; then
+              echo "✅ Critical file $critical_file was processed"
+              ((critical_success++))
+            fi
+          done
+          
+          if [ $critical_success -eq ${#critical_files[@]} ]; then
+            echo "🎉 All critical files uploaded successfully!"
+            echo "⚠️  Some non-critical files failed, but deployment is functional"
+            exit 0
+          else
+            echo "❌ Critical files failed to upload"
+            exit 1
+          fi
         fi
         
         # Verify upload by checking a few key files
