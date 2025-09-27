@@ -112,15 +112,15 @@ window.AdminAuth = AdminAuth;
 // i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
-// GitHub 토큰을 JavaScript에서 사용할 수 있도록 전역 변수 설정
-window.githubToken = window.githubToken;
+// GitHub API는 프록시를 통해 사용 (토큰은 서버에서 관리)
+window.githubToken = 'proxy';
 
-// Neocities API 토큰을 JavaScript에서 사용할 수 있도록 전역 변수 설정
-const neocitiesApiToken = window.neocitiesApiToken;
+// Neocities API는 프록시를 통해 사용 (토큰은 서버에서 관리)
+const neocitiesApiToken = 'proxy';
 
-// Neocities API 설정
+// Neocities API 설정 (프록시 사용)
 const NEOCITIES_CONFIG = {
-  apiUrl: 'https://neocities.org/api',
+  apiUrl: '/api/neocities', // 프록시 API 사용
   siteName: 'dakimakura', // Neocities 사이트 이름
   apiToken: neocitiesApiToken
 };
@@ -305,13 +305,16 @@ async function uploadBase64ImageToNeocities(base64Data) {
   const formData = new FormData();
   formData.append('file', blob, fileName);
   
-  // 네오시티 API로 업로드
-  const response = await fetch('https://neocities.org/api/upload', {
+  // 프록시 API로 업로드
+  const response = await fetch('/api/neocities/upload', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiToken}`
+      'Content-Type': 'application/json'
     },
-    body: formData
+    body: JSON.stringify({
+      file: base64Data,
+      filename: fileName
+    })
   });
   
   if (!response.ok) {
@@ -345,14 +348,17 @@ async function uploadImageToNeocities(blob, mimeType) {
   const formData = new FormData();
   formData.append('file', blob, fileName);
   
-  // Neocities API 호출
-  console.log('Uploading to Neocities:', fileName);
-  const response = await fetch(`https://neocities.org/api/upload`, {
+  // 프록시 API 호출
+  console.log('Uploading to Neocities via proxy:', fileName);
+  const response = await fetch('/api/neocities/upload', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiToken}`
+      'Content-Type': 'application/json'
     },
-    body: formData
+    body: JSON.stringify({
+      file: base64Data,
+      filename: fileName
+    })
   });
   
   console.log('Upload response status:', response.status);

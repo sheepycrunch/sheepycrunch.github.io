@@ -392,11 +392,11 @@ async function deletePostFromLocal(postId) {
   }
 }
 
-// GitHub 토큰 가져오기
+// GitHub 토큰 가져오기 (프록시 API 사용)
 function getGitHubToken() {
-  const token = window.githubToken || null;
-  console.log('GitHub 토큰 확인:', token ? '토큰 있음' : '토큰 없음');
-  return token;
+  // 프록시 API를 사용하므로 토큰은 서버에서 관리됨
+  console.log('GitHub API 프록시 사용');
+  return 'proxy'; // 프록시 사용을 나타내는 플래그
 }
 
 // Neocities API를 사용하여 posts.json 업데이트
@@ -516,39 +516,25 @@ async function deletePostImages(postId) {
   }
 }
 
-// Neocities에서 이미지 삭제
+// Neocities에서 이미지 삭제 (프록시 API 사용)
 async function deleteImageFromNeocities(imagePath) {
-  const neocitiesApiToken = getNeocitiesApiToken();
-  if (!neocitiesApiToken) {
-    throw new Error('Neocities API token이 필요합니다.');
-  }
-
   // 이미지 경로에서 파일명 추출
   let fileName = imagePath;
   if (imagePath.includes('/')) {
     fileName = imagePath.split('/').pop();
   }
   
-  console.log(`이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
+  console.log(`프록시 API를 통해 이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
   
-  // Neocities API로 파일 삭제 (cURL 방식)
-  const formData = new FormData();
-  formData.append('filenames[]', fileName);
-  
-  console.log('Neocities API 호출 시도:', {
-    url: 'https://neocities.org/api/delete',
-    method: 'POST',
-    token: neocitiesApiToken ? '있음' : '없음',
-    fileName: fileName
-  });
-  
-  const response = await fetch(`https://neocities.org/api/delete`, {
+  // 프록시 API로 파일 삭제
+  const response = await fetch('/api/neocities/delete', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${neocitiesApiToken}`,
-      'User-Agent': 'sheepycrunch.github.io',
+      'Content-Type': 'application/json',
     },
-    body: formData
+    body: JSON.stringify({
+      filenames: [fileName]
+    })
   });
 
   if (!response.ok) {
@@ -562,39 +548,33 @@ async function deleteImageFromNeocities(imagePath) {
   return result;
 }
 
-// Neocities API 토큰 가져오기
+// Neocities API 토큰 가져오기 (프록시 API 사용)
 function getNeocitiesApiToken() {
-  const token = window.neocitiesApiToken || null;
-  console.log('Neocities API 토큰 확인:', token ? '토큰 있음' : '토큰 없음');
-  return token;
+  // 프록시 API를 사용하므로 토큰은 서버에서 관리됨
+  console.log('Neocities API 프록시 사용');
+  return 'proxy'; // 프록시 사용을 나타내는 플래그
 }
 
-// Neocities에 posts.json 업데이트
+// Neocities에 posts.json 업데이트 (프록시 API 사용)
 async function updateNeocitiesPostsJson(posts) {
-  const neocitiesApiToken = getNeocitiesApiToken();
-  if (!neocitiesApiToken) {
-    throw new Error('Neocities API token이 필요합니다.');
-  }
-
   // posts.json 내용 생성
   const postsJsonContent = JSON.stringify({ posts }, null, 2);
   
   // Blob으로 변환
   const blob = new Blob([postsJsonContent], { type: 'application/json' });
   
-  // FormData 생성
-  const formData = new FormData();
-  formData.append('file', blob, 'posts.json');
+  console.log('프록시 API를 통해 posts.json 업로드 중...');
   
-  console.log('Neocities에 posts.json 업로드 중...');
-  
-  // Neocities API로 파일 업로드
-  const response = await fetch('https://neocities.org/api/upload', {
+  // 프록시 API로 파일 업로드
+  const response = await fetch('/api/neocities/upload', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${neocitiesApiToken}`,
+      'Content-Type': 'application/json',
     },
-    body: formData
+    body: JSON.stringify({
+      file: postsJsonContent,
+      filename: 'posts.json'
+    })
   });
 
   if (!response.ok) {
