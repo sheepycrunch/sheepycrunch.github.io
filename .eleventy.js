@@ -1,4 +1,5 @@
 const { DateTime } = require("luxon");
+const GoogleSearchConsoleStats = require('./src/_plugins/google-search-console');
 
 module.exports = function(eleventyConfig) {
   // 환경변수에서 관리자 키 가져오기
@@ -19,6 +20,40 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addGlobalData("neocitiesUrl", neocitiesUrl);
   eleventyConfig.addGlobalData("nekowebUrl", nekowebUrl);
   
+  // 구글 서치콘솔 통계 초기화
+  let searchConsoleStats = {
+    totalClicks: 0,
+    totalImpressions: 0,
+    averageCtr: 0,
+    lastUpdated: new Date().toISOString()
+  };
+
+  // 구글 서치콘솔 통계 가져오기 (비동기)
+  const initSearchConsoleStats = async () => {
+    try {
+      const gsc = new GoogleSearchConsoleStats();
+      const siteUrls = [
+        process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org',
+        process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org'
+      ];
+      
+      const stats = await gsc.getRecentStats(siteUrls);
+      if (stats && stats.totals) {
+        searchConsoleStats = {
+          totalClicks: stats.totals.totalClicks,
+          totalImpressions: stats.totals.totalImpressions,
+          averageCtr: stats.totals.averageCtr,
+          lastUpdated: new Date().toISOString()
+        };
+      }
+    } catch (error) {
+      console.warn('구글 서치콘솔 통계 로드 실패:', error.message);
+    }
+  };
+
+  // 통계 초기화 실행
+  initSearchConsoleStats();
+
   // 사이트 설정 데이터
   const siteConfig = {
     title: "dakimakura",
@@ -29,7 +64,8 @@ module.exports = function(eleventyConfig) {
     social: {
     },
     stats: {
-      visitors: 0
+      visitors: 0,
+      searchConsole: searchConsoleStats
     },
     navigation: [
       { name: "txt", url: "/txt.html" },
@@ -46,8 +82,29 @@ module.exports = function(eleventyConfig) {
     }
   };
 
+  // 포스트 수 계산 함수
+  const calculatePostCount = (collections) => {
+    let count = 0;
+    
+    // posts.json의 포스트 수
+    if (collections.posts) {
+      count += collections.posts.length;
+    }
+    
+    // 기본 페이지들 (txt, gallery, archive, links, search, write, login)
+    const basicPages = ['txt', 'gallery', 'archive', 'links', 'search', 'write', 'login'];
+    count += basicPages.length;
+    
+    return count;
+  };
+
   // 사이트 데이터 추가
   eleventyConfig.addGlobalData("site", siteConfig);
+  
+  // 포스트 수 계산을 위한 컬렉션 필터
+  eleventyConfig.addFilter("postCount", function(collections) {
+    return calculatePostCount(collections);
+  });
   
   // i18n 데이터 동적 생성
   const generateI18nData = (config) => ({
@@ -511,6 +568,7 @@ module.exports = function(eleventyConfig) {
       const scriptTag = `<script>
         window.ADMIN_SECRET_KEY = '${adminSecretKey}';
         window.GITHUB_TOKEN = '${githubToken}';
+        window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);
     }

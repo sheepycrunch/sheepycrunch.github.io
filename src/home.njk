@@ -76,7 +76,8 @@ lang: "en"
 
 <!-- 사이트 통계 -->
 <section class="site-stats">
-  <p id="site-stats">{{ i18n.stats.posts | autoTranslate("en") }}: {{ realPostCount }}, {{ i18n.stats.visitors | autoTranslate("en") }}: {{ site.stats.visitors }}, {{ i18n.stats.lastUpdate | autoTranslate("en") }}: <span id="last-update">Loading...</span></p>
+  <p id="site-stats">{{ i18n.stats.posts | autoTranslate("en") }}: <span id="post-count">{{ collections.all | postCount }}</span>, {{ i18n.stats.visitors | autoTranslate("en") }}: <span id="visitor-count">{{ site.stats.visitors }}</span>, {{ i18n.stats.lastUpdate | autoTranslate("en") }}: <span id="last-update">Loading...</span></p>
+  <p id="search-stats" style="display: none;">검색 통계 로딩 중...</p>
 </section>
 
 <!-- JavaScript 파일들 -->

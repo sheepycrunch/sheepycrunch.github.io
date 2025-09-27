@@ -432,6 +432,12 @@ async function savePost() {
     console.log('새 포스트 저장됨:', newPost);
     showTopMessage(i18nData?.write?.messages?.saveSuccess || '포스트가 저장되었습니다.');
     
+    // 통계 업데이트 이벤트 발생
+    if (window.statsManager) {
+      window.statsManager.updatePostCount();
+    }
+    window.dispatchEvent(new CustomEvent('postUpdated'));
+    
   } catch (error) {
     console.error('저장 중 오류:', error);
     showTopMessage('저장 중 오류가 발생했습니다: ' + error.message);

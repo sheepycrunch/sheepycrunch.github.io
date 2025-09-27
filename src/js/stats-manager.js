@@ -11,10 +11,10 @@ class StatsManager {
   
   init() {
     this.loadStats();
-    this.updateStats();
-    this.setupEventListeners();
-    // 페이지 로드 시 즉시 마지막 업데이트 표시
+    this.updateVisitorCount();
+    this.updatePostCount();
     this.updateLastUpdateDate();
+    this.setupEventListeners();
   }
   
   loadStats() {
@@ -76,25 +76,22 @@ class StatsManager {
   }
   
   updatePostCount() {
-    // 실제 포스트 수를 계산하는 로직
-    // 로컬 스토리지에서 저장된 포스트 수 가져오기
-    const savedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
-    let postCount = savedPosts.length;
+    // 서버에서 계산된 포스트 수를 가져오기
+    const postCountElement = document.getElementById('post-count');
+    let postCount = 0;
     
-    // posts.json 파일의 포스트 수도 확인 (서버에서 로드된 경우)
-    try {
-      // posts.json 데이터가 있다면 추가로 카운트
-      const postsData = JSON.parse(localStorage.getItem('posts_json_data') || '{"posts": []}');
-      if (postsData.posts && Array.isArray(postsData.posts)) {
-        postCount += postsData.posts.length;
-      }
-    } catch (e) {
-      console.log('posts.json 데이터 로드 실패:', e);
+    if (postCountElement) {
+      // 서버에서 계산된 포스트 수 사용
+      postCount = parseInt(postCountElement.textContent) || 0;
+    } else {
+      // 폴백: 로컬 스토리지에서 계산
+      const savedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+      postCount = savedPosts.length;
+      
+      // 기본 페이지들 추가
+      const basicPages = ['txt', 'gallery', 'archive', 'links', 'search', 'write', 'login'];
+      postCount += basicPages.length;
     }
-    
-    // 기본 포스트들 (txt, gallery, archive, links)도 카운트
-    const defaultPosts = 4; // txt, gallery, archive, links
-    postCount += defaultPosts;
     
     this.stats.posts = postCount;
     localStorage.setItem(this.postCountKey, postCount.toString());
@@ -105,7 +102,35 @@ class StatsManager {
   
   updateSiteStats() {
     const siteStatsElement = document.getElementById('site-stats');
-    if (siteStatsElement) {
+    const searchStatsElement = document.getElementById('search-stats');
+    const postCountElement = document.getElementById('post-count');
+    const visitorCountElement = document.getElementById('visitor-count');
+    const lastUpdateElement = document.getElementById('last-update');
+    
+    // 개별 요소 업데이트
+    if (postCountElement) {
+      postCountElement.textContent = this.stats.posts;
+    }
+    
+    if (visitorCountElement) {
+      visitorCountElement.textContent = this.stats.visitors.toLocaleString();
+    }
+    
+    if (lastUpdateElement) {
+      const now = new Date();
+      const options = { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+      const formattedDate = now.toLocaleDateString('ko-KR', options);
+      lastUpdateElement.textContent = formattedDate;
+    }
+    
+    // 전체 통계 요소가 있는 경우 (하위 호환성)
+    if (siteStatsElement && !postCountElement) {
       const now = new Date();
       const options = { 
         year: 'numeric', 
@@ -117,6 +142,17 @@ class StatsManager {
       const formattedDate = now.toLocaleDateString('ko-KR', options);
       
       siteStatsElement.innerHTML = `포스트: ${this.stats.posts}, 방문자: ${this.stats.visitors.toLocaleString()}, 마지막 업데이트: <span id="last-update">${formattedDate}</span>`;
+    }
+    
+    // 구글 서치콘솔 통계 업데이트 (서버에서 전달된 데이터가 있는 경우)
+    if (searchStatsElement) {
+      if (window.searchConsoleStats && window.searchConsoleStats.totalClicks > 0) {
+        const stats = window.searchConsoleStats;
+        searchStatsElement.innerHTML = `검색 클릭: ${stats.totalClicks.toLocaleString()}, 노출: ${stats.totalImpressions.toLocaleString()}, CTR: ${stats.averageCtr}%`;
+        searchStatsElement.style.display = 'block';
+      } else {
+        searchStatsElement.style.display = 'none';
+      }
     }
   }
 
@@ -162,18 +198,27 @@ class StatsManager {
     // 페이지 가시성 변경 시 통계 업데이트
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.updateStats();
+        this.updateLastUpdateDate();
+        this.updatePostCount();
       }
     });
     
-    // 주기적으로 통계 업데이트 (5분마다)
+    // 주기적으로 마지막 업데이트만 갱신 (1분마다)
     setInterval(() => {
-      this.updateStats();
-    }, 5 * 60 * 1000);
+      this.updateLastUpdateDate();
+    }, 60 * 1000);
+    
+    // 포스트 수는 페이지 로드 시에만 업데이트
+    // 방문자 수는 하루에 한 번만 증가
     
     // 페이지 언로드 시 통계 저장
     window.addEventListener('beforeunload', () => {
       this.saveStats();
+    });
+    
+    // 포스트가 추가/삭제될 때를 감지하는 이벤트 리스너
+    window.addEventListener('postUpdated', () => {
+      this.updatePostCount();
     });
   }
   
