@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages, Neocities and Nekoweb
 on:
   push:
     branches: [ main ]
+  repository_dispatch:
+    types: [ deploy ]
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
