@@ -116,6 +116,7 @@ async function loadDynamicPosts() {
 function createPostElement(post) {
   const postDiv = document.createElement('div');
   postDiv.className = 'post-item';
+  postDiv.setAttribute('data-post-id', post.id || post.date);
   
   // Quill 콘텐츠를 HTML로 변환
   const contentHtml = convertQuillToHtml(post.description);
@@ -125,12 +126,21 @@ function createPostElement(post) {
     `<button class="tag-button" onclick="searchByTag('${tag}')">#${tag}</button>`
   ).join('') : '';
   
+  // Admin 모드 확인
+  const isAdminMode = checkAdminMode();
+  const adminButtons = isAdminMode ? `
+    <div class="admin-buttons">
+      <button class="delete-btn" onclick="deletePost('${post.id || post.date}')" title="글 삭제">✕</button>
+    </div>
+  ` : '';
+  
   postDiv.innerHTML = `
     <div class="post-content">
       <div class="post-text">${contentHtml}</div>
       <div class="post-footer">
         <div class="post-meta">${post.date}</div>
         ${post.tags ? `<div class="post-tags">${tagButtons}</div>` : ''}
+        ${adminButtons}
       </div>
     </div>
   `;
@@ -237,6 +247,317 @@ function searchByTag(tag) {
   window.location.href = `${CONFIG.searchPageUrl}${encodeURIComponent(tag)}`;
 }
 
+// Admin 모드 확인
+function checkAdminMode() {
+  if (typeof AdminAuth !== 'undefined') {
+    const adminAuth = new AdminAuth();
+    return adminAuth.isAdminLoggedIn();
+  }
+  return false;
+}
+
+// 포스트 삭제 함수
+async function deletePost(postId) {
+  if (!checkAdminMode()) {
+    alert('관리자 권한이 필요합니다.');
+    return;
+  }
+  
+  // 삭제 확인
+  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.')) {
+    return;
+  }
+  
+  try {
+    // 1. 로컬 posts.json에서 삭제
+    await deletePostFromLocal(postId);
+    
+    // 2. Neocities에서 삭제
+    await deletePostFromNeocities(postId);
+    
+    // 3. 관련 이미지 삭제
+    await deletePostImages(postId);
+    
+    // 4. UI에서 제거
+    removePostFromUI(postId);
+    
+    alert('글이 성공적으로 삭제되었습니다.');
+  } catch (error) {
+    console.error('포스트 삭제 중 오류 발생:', error);
+    alert('포스트 삭제 중 오류가 발생했습니다: ' + error.message);
+  }
+}
+
+// GitHub API를 사용하여 posts.json에서 포스트 삭제
+async function deletePostFromLocal(postId) {
+  try {
+    // GitHub Personal Access Token 확인
+    const token = getGitHubToken();
+    if (!token) {
+      throw new Error('GitHub token이 필요합니다.');
+    }
+
+    // 현재 파일 내용 가져오기
+    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('파일 정보 가져오기 실패: ' + response.statusText);
+    }
+    
+    const fileData = await response.json();
+    
+    // 기존 포스트들 가져오기 (UTF-8 디코딩 처리)
+    const base64Content = fileData.content;
+    const binaryString = atob(base64Content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decoder = new TextDecoder('utf-8');
+    const jsonString = decoder.decode(bytes);
+    const existingContent = JSON.parse(jsonString);
+    const existingPosts = existingContent.posts || [];
+    
+    // 포스트 찾기 및 삭제
+    console.log('현재 포스트들:', existingPosts.map(p => ({ id: p.id, date: p.date })));
+    console.log('삭제할 포스트 ID:', postId);
+    
+    const filteredPosts = existingPosts.filter(post => {
+      const postIdentifier = post.id || post.date;
+      // 문자열과 숫자 비교를 위해 둘 다 문자열로 변환
+      const postIdStr = String(postIdentifier);
+      const targetIdStr = String(postId);
+      console.log(`포스트 비교: "${postIdStr}" !== "${targetIdStr}" = ${postIdStr !== targetIdStr}`);
+      return postIdStr !== targetIdStr;
+    });
+    
+    console.log(`원본 포스트 수: ${existingPosts.length}, 필터링 후: ${filteredPosts.length}`);
+    
+    if (filteredPosts.length === existingPosts.length) {
+      throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
+    }
+    
+    // 새 파일 내용 생성 (UTF-8 인코딩 처리)
+    const newContent = JSON.stringify({ posts: filteredPosts }, null, 2);
+    
+    // UTF-8 인코딩을 위한 TextEncoder 사용
+    const encoder = new TextEncoder();
+    const utf8Bytes = encoder.encode(newContent);
+    const encodedContent = btoa(String.fromCharCode(...utf8Bytes));
+    
+    // 파일 업데이트
+    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Delete post: ${postId}`,
+        content: encodedContent,
+        sha: fileData.sha
+      })
+    });
+    
+    if (!updateResponse.ok) {
+      const errorData = await updateResponse.text();
+      console.error('GitHub API 오류 상세:', {
+        status: updateResponse.status,
+        statusText: updateResponse.statusText,
+        errorData: errorData
+      });
+      throw new Error('파일 업데이트 실패: ' + updateResponse.statusText + ' ' + errorData);
+    }
+    
+    console.log('GitHub에서 포스트가 삭제되었습니다.');
+    
+    // GitHub Actions 웹훅 트리거
+    await triggerDeployment();
+    
+  } catch (error) {
+    console.error('GitHub 포스트 삭제 오류:', error);
+    throw error;
+  }
+}
+
+// GitHub 토큰 가져오기
+function getGitHubToken() {
+  const tokenElement = document.getElementById('github-token-data');
+  const token = tokenElement ? tokenElement.textContent.trim() : null;
+  console.log('GitHub 토큰 확인:', token ? '토큰 있음' : '토큰 없음');
+  return token;
+}
+
+// GitHub Actions 웹훅 트리거
+async function triggerDeployment() {
+  try {
+    const token = getGitHubToken();
+    if (!token) {
+      console.warn('GitHub token이 없어서 웹훅을 트리거할 수 없습니다.');
+      return;
+    }
+
+    // GitHub Actions 워크플로우 트리거
+    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/dispatches', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        event_type: 'manual_deploy',
+        client_payload: {
+          source: 'post_deletion'
+        }
+      })
+    });
+
+    if (!response.ok) {
+      console.warn('웹훅 트리거 실패:', response.statusText);
+    } else {
+      console.log('배포 워크플로우가 트리거되었습니다.');
+    }
+  } catch (error) {
+    console.warn('웹훅 트리거 오류:', error);
+  }
+}
+
+// Neocities에서 포스트 삭제 (GitHub에서 이미 처리되므로 스킵)
+async function deletePostFromNeocities(postId) {
+  // GitHub에서 이미 posts.json을 업데이트했으므로 Neocities는 자동으로 동기화됨
+  console.log('Neocities는 GitHub Actions를 통해 자동으로 동기화됩니다.');
+}
+
+// 포스트 관련 이미지 삭제
+async function deletePostImages(postId) {
+  try {
+    // GitHub에서 포스트 데이터 가져오기
+    const token = getGitHubToken();
+    if (!token) {
+      console.warn('GitHub token이 없어서 이미지 삭제를 건너뜁니다.');
+      return;
+    }
+
+    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+      }
+    });
+    
+    if (!response.ok) return;
+    
+    const fileData = await response.json();
+    const base64Content = fileData.content;
+    const binaryString = atob(base64Content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decoder = new TextDecoder('utf-8');
+    const jsonString = decoder.decode(bytes);
+    const data = JSON.parse(jsonString);
+    const posts = data.posts || [];
+    const post = posts.find(p => (p.id || p.date) === postId);
+    
+    if (!post || !post.description) return;
+    
+    // Quill 콘텐츠에서 이미지 경로 추출
+    const imagePaths = extractImagePaths(post.description);
+    
+    // 각 이미지 삭제
+    for (const imagePath of imagePaths) {
+      try {
+        await deleteImageFromNeocities(imagePath);
+        console.log(`이미지 삭제됨: ${imagePath}`);
+      } catch (error) {
+        console.warn(`이미지 삭제 실패: ${imagePath}`, error);
+      }
+    }
+  } catch (error) {
+    console.error('이미지 삭제 오류:', error);
+  }
+}
+
+// Neocities에서 이미지 삭제
+async function deleteImageFromNeocities(imagePath) {
+  const neocitiesApiToken = getNeocitiesApiToken();
+  if (!neocitiesApiToken) {
+    throw new Error('Neocities API token이 필요합니다.');
+  }
+
+  // 이미지 경로에서 파일명 추출
+  let fileName = imagePath;
+  if (imagePath.includes('/')) {
+    fileName = imagePath.split('/').pop();
+  }
+  
+  // Neocities API로 파일 삭제
+  const formData = new FormData();
+  formData.append('filenames[]', fileName);
+  
+  const response = await fetch(`https://neocities.org/api/delete`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${neocitiesApiToken}`,
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    throw new Error(`이미지 삭제 실패: ${response.status} ${errorData}`);
+  }
+
+  console.log(`Neocities에서 이미지 삭제됨: ${fileName}`);
+}
+
+// Neocities API 토큰 가져오기
+function getNeocitiesApiToken() {
+  const tokenElement = document.getElementById('neocities-api-token-data');
+  return tokenElement ? tokenElement.textContent.trim() : null;
+}
+
+// Quill 콘텐츠에서 이미지 경로 추출
+function extractImagePaths(quillContent) {
+  const imagePaths = [];
+  
+  if (!quillContent || typeof quillContent !== 'object' || !quillContent.ops) {
+    return imagePaths;
+  }
+  
+  quillContent.ops.forEach(op => {
+    if (op && op.insert && typeof op.insert === 'object' && op.insert.image) {
+      imagePaths.push(op.insert.image);
+    }
+  });
+  
+  return imagePaths;
+}
+
+// UI에서 포스트 제거
+function removePostFromUI(postId) {
+  // 동적 포스트에서 제거
+  const dynamicPosts = document.querySelectorAll('#dynamic-posts .post-item[data-post-id="' + postId + '"]');
+  dynamicPosts.forEach(post => post.remove());
+  
+  // 정적 포스트에서 제거 (페이지 새로고침 필요)
+  const staticPosts = document.querySelectorAll('.post-item[data-post-id="' + postId + '"]');
+  if (staticPosts.length > 0) {
+    // 정적 포스트가 있는 경우 페이지 새로고침
+    window.location.reload();
+  }
+}
+
 // 정적 포스트의 Quill 콘텐츠 변환
 function convertStaticPosts() {
   const staticPosts = document.querySelectorAll('.post-text[data-quill-content]');
@@ -284,6 +605,36 @@ function convertStaticPosts() {
         postElement.innerHTML = '<p></p>';
         postElement.removeAttribute('data-quill-content');
       }
+    }
+  });
+  
+  // 정적 포스트에 admin 버튼 추가
+  addAdminButtonsToStaticPosts();
+}
+
+// 정적 포스트에 admin 버튼 추가
+function addAdminButtonsToStaticPosts() {
+  if (!checkAdminMode()) return;
+  
+  const staticPostItems = document.querySelectorAll('.post-item:not([data-post-id])');
+  staticPostItems.forEach((postItem, index) => {
+    // 이미 admin 버튼이 있는지 확인
+    if (postItem.querySelector('.admin-buttons')) return;
+    
+    // 포스트 ID 생성 (날짜 기반)
+    const postMeta = postItem.querySelector('.post-meta');
+    const postDate = postMeta ? postMeta.textContent.trim() : `static-${index}`;
+    postItem.setAttribute('data-post-id', postDate);
+    
+    console.log(`정적 포스트 ID 생성: ${postDate}`);
+    
+    // Admin 버튼 추가
+    const postFooter = postItem.querySelector('.post-footer');
+    if (postFooter) {
+      const adminButtons = document.createElement('div');
+      adminButtons.className = 'admin-buttons';
+      adminButtons.innerHTML = `<button class="delete-btn" onclick="deletePost('${postDate}')" title="글 삭제">✕</button>`;
+      postFooter.appendChild(adminButtons);
     }
   });
 }
