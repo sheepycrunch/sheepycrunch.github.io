@@ -27,11 +27,11 @@ dist/
 Thumbs.db
 
 # Images (uploaded to Neocities only)
-src/images/
-images/
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
-*.svg
+# src/images/ - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# images/ - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.jpg - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.jpeg - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.png - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.gif - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.webp - 이제 GitHub Pages에서 호스팅하므로 주석 처리
+# *.svg - 이제 GitHub Pages에서 호스팅하므로 주석 처리
