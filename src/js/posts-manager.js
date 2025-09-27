@@ -414,86 +414,56 @@ function getGitHubToken() {
   return token;
 }
 
-// GitHub에 자동으로 posts.json 업데이트 및 푸시
+// Neocities API를 사용하여 posts.json 업데이트
 async function triggerDeployment() {
   try {
-    console.log('GitHub에 자동으로 posts.json 업데이트 중...');
+    console.log('Neocities API를 사용하여 posts.json 업데이트 시도 중...');
     
-    const token = getGitHubToken();
-    if (!token) {
-      console.warn('GitHub 토큰이 없어서 자동 푸시를 건너뜁니다.');
+    // 로컬 posts.json 파일 업데이트
+    const localPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    
+    // Neocities API 토큰 확인
+    const neocitiesApiToken = getNeocitiesApiToken();
+    if (!neocitiesApiToken) {
+      console.warn('Neocities API 토큰이 없어서 로컬에서만 업데이트합니다.');
+      
+      // 로컬 스토리지에 삭제 요청 저장 (수동 푸시용)
+      const deletionRequest = {
+        action: 'delete_post',
+        timestamp: new Date().toISOString(),
+        posts: localPosts
+      };
+      localStorage.setItem('pending_deletion', JSON.stringify(deletionRequest));
+      
+      alert('Neocities API 토큰이 없어서 로컬에서만 삭제되었습니다.\n수동으로 GitHub에 푸시해야 합니다.');
       return;
     }
-
-    // 1. 현재 posts.json 내용 가져오기
-    const getResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-      }
-    });
-
-    if (!getResponse.ok) {
-      throw new Error(`posts.json을 가져올 수 없습니다: ${getResponse.status}`);
-    }
-
-    const fileData = await getResponse.json();
     
-    // 2. 로컬 스토리지에서 업데이트된 포스트 가져오기
-    const updatedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
-    const updatedContent = { posts: updatedPosts };
-    const newContent = JSON.stringify(updatedContent, null, 2);
-    const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
-
-    // 3. GitHub에 업데이트된 posts.json 업로드
-    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Delete post - Auto update`,
-        content: encodedContent,
-        sha: fileData.sha
-      })
-    });
-
-    if (!updateResponse.ok) {
-      const errorData = await updateResponse.text();
-      throw new Error(`posts.json 업데이트 실패: ${updateResponse.status} ${errorData}`);
-    }
-
-    const updateResult = await updateResponse.json();
-    console.log('GitHub에 posts.json이 성공적으로 업데이트되었습니다:', updateResult.commit.sha);
-    
-    // 4. GitHub Actions 워크플로우 트리거
-    const dispatchResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/dispatches', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        event_type: 'manual_deploy',
-        client_payload: {
-          source: 'post_deletion',
-          timestamp: new Date().toISOString()
-        }
-      })
-    });
-
-    if (dispatchResponse.ok) {
-      console.log('GitHub Actions 워크플로우가 트리거되었습니다.');
-    } else {
-      console.warn('GitHub Actions 트리거 실패, 하지만 posts.json은 업데이트됨');
+    try {
+      // Neocities에 posts.json 업데이트
+      await updateNeocitiesPostsJson(localPosts);
+      console.log('Neocities에 posts.json이 성공적으로 업데이트되었습니다.');
+      
+      // 성공 메시지
+      alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 수동으로 푸시하면 완전 동기화됩니다');
+      
+    } catch (neocitiesError) {
+      console.warn('Neocities 업데이트 실패:', neocitiesError);
+      
+      // 로컬 스토리지에 삭제 요청 저장 (수동 푸시용)
+      const deletionRequest = {
+        action: 'delete_post',
+        timestamp: new Date().toISOString(),
+        posts: localPosts
+      };
+      localStorage.setItem('pending_deletion', JSON.stringify(deletionRequest));
+      
+      alert('Neocities 업데이트 실패로 로컬에서만 삭제되었습니다.\n수동으로 GitHub에 푸시해야 합니다.');
     }
     
   } catch (error) {
-    console.error('자동 푸시 오류:', error);
-    // 에러가 발생해도 삭제는 계속 진행
+    console.error('업데이트 실패:', error);
+    alert('업데이트 중 오류가 발생했습니다.');
   }
 }
 
