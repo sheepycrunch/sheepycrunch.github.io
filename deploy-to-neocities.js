@@ -50,6 +50,12 @@ try {
         if (resp.result === 'success') {
             console.log('✅ 배포가 완료되었습니다!');
             console.log(`업로드된 파일 수: ${resp.files_uploaded || files.length}`);
+            console.log('');
+            console.log('========================================');
+            console.log('   배포가 완료되었습니다!');
+            console.log('   - Neocities: 업데이트됨');
+            console.log('   - 로컬에서만 처리됨 (GitHub 푸시 없음)');
+            console.log('========================================');
         } else {
             console.error('❌ 배포 실패:', resp.message);
             process.exit(1);
