@@ -85,6 +85,7 @@ async function loadDynamicPosts() {
       }
     }
     
+    
     if (response.ok) {
       const data = await response.json();
       const posts = data.posts || [];
@@ -128,7 +129,10 @@ function createPostElement(post) {
   
   // Admin 모드 확인
   const isAdminMode = checkAdminMode();
-  const adminButtons = isAdminMode ? `
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  // 로컬 환경에서는 삭제 버튼 숨김
+  const adminButtons = (isAdminMode && !isLocal) ? `
     <div class="admin-buttons">
       <button class="delete-btn" onclick="deletePost('${post.id || post.date}')" title="글 삭제">✕</button>
     </div>
@@ -258,6 +262,13 @@ function checkAdminMode() {
 
 // 포스트 삭제 함수
 async function deletePost(postId) {
+  // 로컬 환경에서 삭제 기능 비활성화
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocal) {
+    alert('로컬 환경에서는 삭제 기능을 사용할 수 없습니다.\n\n프로덕션 환경에서 삭제해주세요.');
+    return;
+  }
+  
   if (!checkAdminMode()) {
     alert('관리자 권한이 필요합니다.');
     return;
@@ -717,6 +728,10 @@ function convertStaticPosts() {
 // 정적 포스트에 admin 버튼 추가
 function addAdminButtonsToStaticPosts() {
   if (!checkAdminMode()) return;
+  
+  // 로컬 환경에서는 삭제 버튼 추가하지 않음
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isLocal) return;
   
   const staticPostItems = document.querySelectorAll('.post-item:not([data-post-id])');
   staticPostItems.forEach((postItem, index) => {
