@@ -25,6 +25,7 @@ jobs:
     - name: Build with 11ty
       run: npx @11ty/eleventy
       env:
+        ELEVENTY_ENV: production
         NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
         NEKOWEB_URL: https://${{ secrets.NEKOWEB_SITE_NAME }}.nekoweb.org
       
