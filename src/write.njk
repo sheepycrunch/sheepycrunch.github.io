@@ -462,6 +462,9 @@ async function savePost() {
     // Base64 이미지 처리 (GitHub Actions에서 Neocities로 업로드)
     const processedContent = await processBase64Images(content);
     
+    // 기존 포스트들 가져오기
+    const existingPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    
     // 새 포스트 생성
     const newPost = {
       id: Date.now(),
@@ -472,7 +475,13 @@ async function savePost() {
       title: extractTitleFromContent(processedContent) || '제목 없음'
     };
     
-    // GitHub API를 사용하여 posts.json 파일 업데이트
+    // 새 포스트를 기존 포스트 목록에 추가
+    existingPosts.push(newPost);
+    
+    // 로컬에 포스트 저장 (GitHub Actions가 처리)
+    localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
+    
+    // GitHub API를 사용하여 posts.json 파일 업데이트 (실제 토큰이 있을 때만)
     try {
       await updatePostsJsonFile(newPost);
       
@@ -482,8 +491,7 @@ async function savePost() {
       }
     } catch (error) {
       console.warn('GitHub 저장 실패:', error);
-      showTopMessage('저장에 실패했습니다. 다시 시도해주세요.');
-      return;
+      showTopMessage('로컬에 저장되었습니다. GitHub 푸시 시 자동으로 처리됩니다.');
     }
     
     // 오늘 날짜 기록 (하루 제한)
@@ -533,7 +541,10 @@ async function updatePostsJsonFile(newPost) {
     // GitHub Personal Access Token 확인
     const token = getGitHubToken();
     if (!token) {
-      throw new Error('GitHub 토큰이 필요합니다.');
+      // 토큰이 없으면 로컬에만 저장
+      console.warn('GitHub 토큰이 없습니다. 로컬에만 저장됩니다.');
+      showTopMessage('GitHub 토큰이 필요합니다. 로컬에만 저장되었습니다.');
+      return;
     }
 
     // 현재 파일 내용 가져오기
