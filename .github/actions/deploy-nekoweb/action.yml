@@ -55,6 +55,9 @@ runs:
           exit 1
         fi
         
+        # Set site name for uploads
+        SITE_NAME="$CLEAN_SITE_NAME"
+        
         # Upload files
         upload_count=0
         error_count=0
@@ -77,7 +80,7 @@ runs:
             response=$(curl -X POST \
               -H "$AUTH_HEADER" \
               -F "pathname=$dir_path" \
-              -F "file=@$file" \
+              -F "files=@$file" \
               "https://nekoweb.org/api/files/upload" \
               --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
             
@@ -94,6 +97,12 @@ runs:
               echo "📁 Directory: $dir_path"
               echo "📄 File size: $(stat -c%s "$file") bytes"
               echo "Response: $body"
+              echo "Debug info:"
+              echo "  - File exists: $([ -f "$file" ] && echo "Yes" || echo "No")"
+              echo "  - File readable: $([ -r "$file" ] && echo "Yes" || echo "No")"
+              echo "  - File size: $(stat -c%s "$file") bytes"
+              echo "  - Relative path: $relative_path"
+              echo "  - Directory path: $dir_path"
               ((error_count++))
             fi
           fi
