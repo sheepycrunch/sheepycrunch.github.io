@@ -87,34 +87,50 @@ function handleImageFile(file) {
     return;
   }
   
+  // 로컬 파일 경로 생성
+  const timestamp = Date.now();
+  const randomString = Math.random().toString(36).substring(2, 15);
+  const extension = file.name.split('.').pop();
+  const localPath = `images/uploaded/${timestamp}_${randomString}.${extension}`;
+  
+  // 파일을 실제로 저장
   const reader = new FileReader();
   reader.onload = (e) => {
-    // 로컬 파일 경로 생성 (실제로는 Base64 사용)
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop();
-    const localPath = `images/uploaded/${timestamp}_${randomString}.${extension}`;
+    // Base64 데이터를 Blob으로 변환
+    const base64Data = e.target.result.split(',')[1];
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: file.type });
     
-    // 에디터에 이미지 삽입 (Base64로 임시 저장)
-    insertImageToEditor(e.target.result, localPath);
-    showTopMessage('이미지가 추가되었습니다. 저장 후 upload-images.bat를 실행하세요.');
+    // 파일 저장 (브라우저에서 다운로드)
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = localPath.split('/').pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // 에디터에 이미지 삽입 (상대 경로로)
+    insertImageToEditor(localPath, localPath);
+    showTopMessage('이미지가 저장되었습니다. 배포 시 자동으로 업로드됩니다.');
   };
   reader.readAsDataURL(file);
 }
 
 // 에디터에 이미지 삽입
-function insertImageToEditor(imageData, localPath) {
+function insertImageToEditor(imagePath, localPath) {
   try {
     const range = editor.getSelection();
     const index = range ? range.index : editor.getLength();
     
-    // Base64 데이터와 로컬 경로를 함께 저장
-    const imageDataWithPath = {
-      base64: imageData,
-      localPath: localPath
-    };
-    
-    editor.insertEmbed(index, 'image', imageDataWithPath);
+    // 상대 경로로 이미지 삽입
+    editor.insertEmbed(index, 'image', imagePath);
     editor.setSelection(index + 1);
     
     console.log('이미지가 에디터에 삽입되었습니다.');
