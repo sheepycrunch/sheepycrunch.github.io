@@ -261,7 +261,7 @@ async function deletePost(postId) {
   console.log('관리자 권한 확인됨, 삭제 진행');
   
   // 삭제 확인
-  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.\n\nGitHub에 직접 수정사항이 반영됩니다.')) {
+  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.\n\nNeocities에 직접 수정사항이 반영됩니다.')) {
     return;
   }
   
@@ -272,8 +272,8 @@ async function deletePost(postId) {
   deleteBtn.disabled = true;
   
   try {
-    // 1. GitHub에서 posts.json 직접 수정 및 배포 트리거
-    console.log('GitHub에서 포스트 삭제 시작...');
+    // 1. Neocities에서 posts.json 직접 수정
+    console.log('Neocities에서 포스트 삭제 시작...');
     await deletePostFromLocal(postId);
     
      // 2. 관련 이미지 삭제 (토큰이 있을 때만)
@@ -300,8 +300,8 @@ async function deletePost(postId) {
      setTimeout(() => {
        const neocitiesApiToken = getNeocitiesApiToken();
        const message = neocitiesApiToken 
-         ? '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 자동으로 푸시되었습니다'
-         : '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ GitHub에 자동으로 푸시되었습니다\n✓ Neocities에 자동 동기화됩니다';
+         ? '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다'
+         : '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities API 토큰이 필요합니다';
        alert(message);
      }, 100);
     
@@ -310,12 +310,12 @@ async function deletePost(postId) {
     
     // 에러 타입별 메시지
     let errorMessage = '포스트 삭제 중 오류가 발생했습니다.';
-    if (error.message.includes('GitHub 토큰')) {
-      errorMessage = 'GitHub 토큰이 필요합니다. 관리자에게 문의하세요.';
+    if (error.message.includes('Neocities API 토큰')) {
+      errorMessage = 'Neocities API 토큰이 필요합니다. 관리자에게 문의하세요.';
     } else if (error.message.includes('posts.json을 가져올 수 없습니다')) {
-      errorMessage = 'GitHub에서 posts.json을 가져올 수 없습니다. 네트워크를 확인하세요.';
+      errorMessage = '로컬에서 posts.json을 가져올 수 없습니다. 파일을 확인하세요.';
     } else if (error.message.includes('업데이트 실패')) {
-      errorMessage = 'GitHub에 수정사항을 저장할 수 없습니다. 권한을 확인하세요.';
+      errorMessage = 'Neocities에 수정사항을 저장할 수 없습니다. API 토큰을 확인하세요.';
     } else if (error.message.includes('삭제할 포스트를 찾을 수 없습니다')) {
       errorMessage = '삭제할 포스트를 찾을 수 없습니다. 이미 삭제되었을 수 있습니다.';
     } else {
@@ -381,7 +381,7 @@ async function deletePostFromLocal(postId) {
        console.log('로컬에서만 삭제되고, GitHub 푸시 시 Neocities에 자동 동기화됩니다.');
      }
      
-     // 4. GitHub Actions 웹훅 트리거 (CSP 우회)
+     // 4. Neocities API를 통한 직접 업데이트
      await triggerDeployment();
      
      console.log('포스트 삭제가 완료되었습니다.');
@@ -392,12 +392,7 @@ async function deletePostFromLocal(postId) {
   }
 }
 
-// GitHub 토큰 가져오기 (프록시 API 사용)
-function getGitHubToken() {
-  // 프록시 API를 사용하므로 토큰은 서버에서 관리됨
-  console.log('GitHub API 프록시 사용');
-  return 'proxy'; // 프록시 사용을 나타내는 플래그
-}
+// GitHub API는 더 이상 사용하지 않음 (Neocities API만 사용)
 
 // Neocities API를 사용하여 posts.json 업데이트
 async function triggerDeployment() {
@@ -420,7 +415,7 @@ async function triggerDeployment() {
       };
       localStorage.setItem('pending_deletion', JSON.stringify(deletionRequest));
       
-      alert('Neocities API 토큰이 없어서 로컬에서만 삭제되었습니다.\n수동으로 GitHub에 푸시해야 합니다.');
+      alert('Neocities API 토큰이 없어서 로컬에서만 삭제되었습니다.\nNeocities API 토큰을 설정해야 합니다.');
       return;
     }
     
@@ -430,7 +425,7 @@ async function triggerDeployment() {
       console.log('Neocities에 posts.json이 성공적으로 업데이트되었습니다.');
       
       // 성공 메시지
-      alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 수동으로 푸시하면 완전 동기화됩니다');
+      alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다');
       
     } catch (neocitiesError) {
       console.warn('Neocities 업데이트 실패:', neocitiesError);
@@ -443,7 +438,7 @@ async function triggerDeployment() {
       };
       localStorage.setItem('pending_deletion', JSON.stringify(deletionRequest));
       
-      alert('Neocities 업데이트 실패로 로컬에서만 삭제되었습니다.\n수동으로 GitHub에 푸시해야 합니다.');
+      alert('Neocities 업데이트 실패로 로컬에서만 삭제되었습니다.\nNeocities API 토큰을 확인하세요.');
     }
     
   } catch (error) {
@@ -516,25 +511,32 @@ async function deletePostImages(postId) {
   }
 }
 
-// Neocities에서 이미지 삭제 (프록시 API 사용)
+// Neocities에서 이미지 삭제 (직접 API 사용)
 async function deleteImageFromNeocities(imagePath) {
+  const token = getNeocitiesApiToken();
+  if (!token) {
+    throw new Error('Neocities API 토큰이 없습니다.');
+  }
+
   // 이미지 경로에서 파일명 추출
   let fileName = imagePath;
   if (imagePath.includes('/')) {
     fileName = imagePath.split('/').pop();
   }
   
-  console.log(`프록시 API를 통해 이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
+  console.log(`Neocities API를 직접 사용하여 이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
   
-  // 프록시 API로 파일 삭제
-  const response = await fetch('/api/neocities/delete', {
+  // FormData 생성
+  const formData = new FormData();
+  formData.append('filenames[]', fileName);
+  
+  // Neocities API로 직접 파일 삭제
+  const response = await fetch('https://neocities.org/api/delete', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      filenames: [fileName]
-    })
+    body: formData
   });
 
   if (!response.ok) {
@@ -548,33 +550,42 @@ async function deleteImageFromNeocities(imagePath) {
   return result;
 }
 
-// Neocities API 토큰 가져오기 (프록시 API 사용)
+// Neocities API 토큰 가져오기 (직접 API 사용)
 function getNeocitiesApiToken() {
-  // 프록시 API를 사용하므로 토큰은 서버에서 관리됨
-  console.log('Neocities API 프록시 사용');
-  return 'proxy'; // 프록시 사용을 나타내는 플래그
+  // 환경변수에서 토큰 가져오기 (빌드 시 주입됨)
+  const token = window.NEOCITIES_API_KEY;
+  if (!token) {
+    console.error('Neocities API 토큰이 설정되지 않았습니다.');
+    return null;
+  }
+  console.log('Neocities API 직접 사용');
+  return token;
 }
 
-// Neocities에 posts.json 업데이트 (프록시 API 사용)
+// Neocities에 posts.json 업데이트 (직접 API 사용)
 async function updateNeocitiesPostsJson(posts) {
+  const token = getNeocitiesApiToken();
+  if (!token) {
+    throw new Error('Neocities API 토큰이 없습니다.');
+  }
+
   // posts.json 내용 생성
   const postsJsonContent = JSON.stringify({ posts }, null, 2);
   
-  // Blob으로 변환
+  // FormData 생성
+  const formData = new FormData();
   const blob = new Blob([postsJsonContent], { type: 'application/json' });
+  formData.append('posts.json', blob, 'posts.json');
   
-  console.log('프록시 API를 통해 posts.json 업로드 중...');
+  console.log('Neocities API를 직접 사용하여 posts.json 업로드 중...');
   
-  // 프록시 API로 파일 업로드
-  const response = await fetch('/api/neocities/upload', {
+  // Neocities API로 직접 파일 업로드
+  const response = await fetch('https://neocities.org/api/upload', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      file: postsJsonContent,
-      filename: 'posts.json'
-    })
+    body: formData
   });
 
   if (!response.ok) {
