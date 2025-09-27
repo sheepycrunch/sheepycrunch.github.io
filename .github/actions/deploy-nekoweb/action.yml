@@ -37,7 +37,7 @@ runs:
         
         # Test with correct API endpoint
         if curl -H "Authorization: ${{ inputs.api_key }}" \
-          "https://nekoweb.org/api/site/info" \
+          "https://nekoweb.org/api/files/limits" \
           --silent --show-error --fail; then
           echo "✅ API connection successful"
           AUTH_HEADER="Authorization: ${{ inputs.api_key }}"
@@ -56,20 +56,29 @@ runs:
             relative_path=${file#${{ inputs.dist_dir }}/}
             echo "📤 Uploading: $relative_path"
             
-            # Get directory path for the file
-            dir_path=$(dirname "$relative_path")
-            if [ "$dir_path" = "." ]; then
-              dir_path="/"
+            # Create file first, then edit with content
+            echo "📁 Creating file: $relative_path"
+            create_response=$(curl -X POST \
+              -H "$AUTH_HEADER" \
+              -H "Content-Type: application/x-www-form-urlencoded" \
+              -d "pathname=/$relative_path&isFolder=false" \
+              "https://nekoweb.org/api/files/create" \
+              --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
+            
+            create_http_code=$(echo $create_response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+            
+            if [ $create_http_code -eq 200 ] || [ $create_http_code -eq 201 ]; then
+              echo "📝 File created successfully"
             else
-              dir_path="/$dir_path"
+              echo "⚠️  File creation failed or file already exists (HTTP $create_http_code)"
             fi
             
-            # Upload file using the correct API endpoint
+            # Upload file content using edit endpoint
             response=$(curl -X POST \
               -H "$AUTH_HEADER" \
-              -F "pathname=$dir_path" \
-              -F "file=@$file" \
-              "https://nekoweb.org/api/files/upload" \
+              -F "pathname=/$relative_path" \
+              -F "content=@$file" \
+              "https://nekoweb.org/api/files/edit" \
               --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
             
             http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
