@@ -77,12 +77,31 @@ function watchFile(filePath, fileName) {
   });
 }
 
+// 로컬 스토리지 데이터를 posts.json에 반영하는 함수
+function updatePostsFromLocalStorage() {
+  try {
+    // 브라우저에서 실행된 스크립트가 localStorage에 저장한 데이터를 읽기
+    // 실제로는 브라우저 콘솔에서 실행해야 함
+    console.log('로컬 스토리지 데이터를 posts.json에 반영하려면:');
+    console.log('1. 브라우저에서 http://localhost:8080/write.html 접속');
+    console.log('2. 개발자 도구 콘솔에서 다음 명령어 실행:');
+    console.log('   localStorage.getItem("hamster_posts")');
+    console.log('3. 결과를 복사하여 아래 명령어로 posts.json 업데이트:');
+    console.log('   node -e "const fs=require(\'fs\'); const data=JSON.parse(\'[여기에_복사한_데이터]\'); fs.writeFileSync(\'src/posts.json\', JSON.stringify({posts:data}, null, 2));"');
+  } catch (error) {
+    console.error('Error updating posts from localStorage:', error);
+  }
+}
+
 // 시작
 console.log('Auto-upload script started...');
 console.log('Press Ctrl+C to stop');
 
 // posts.json 감시
 watchFile('src/posts.json', 'posts.json');
+
+// 로컬 스토리지 데이터 반영 안내
+updatePostsFromLocalStorage();
 
 // 이미지 폴더 감시 (선택사항)
 const imagesDir = 'src/images/uploaded';

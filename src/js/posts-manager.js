@@ -32,41 +32,46 @@ async function loadDynamicPosts() {
     console.log('Environment check:', { hostname: window.location.hostname, isLocal });
     
     let response;
-    if (isLocal) {
-      // 로컬 환경: /posts.json 직접 fetch
-      console.log('Local environment detected. Fetching from /posts.json');
+    
+    // 모든 환경에서 Neocities에서 데이터 가져오기 (최신 데이터 보장)
+    try {
+      // 먼저 Neocities에서 시도
+      console.log('Fetching posts from Neocities...');
+      response = await fetch(CONFIG.neocitiesPostsUrl);
+    } catch (error) {
+      console.warn('Failed to fetch from Neocities, trying local fallback...');
       
-      try {
-        response = await fetch('/posts.json');
-        console.log('Local fetch response:', response.status);
-      } catch (error) {
-        console.error('Error fetching from /posts.json:', error);
-        // Eleventy 변수로 폴백 시도
+      // Neocities 실패 시 로컬 파일로 폴백
+      if (isLocal) {
         try {
-          const posts = window.eleventyPosts || [];
-          if (posts && posts.length > 0) {
-            posts.forEach(post => {
-              const postElement = createPostElement(post);
-              dynamicPostsContainer.appendChild(postElement);
-            });
-            console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable (fallback).`);
-            return;
+          response = await fetch('/posts.json');
+          console.log('Local fallback response:', response.status);
+        } catch (localError) {
+          console.error('Local fallback also failed:', localError);
+          // Eleventy 변수로 최종 폴백
+          try {
+            const posts = window.eleventyPosts || [];
+            if (posts && posts.length > 0) {
+              posts.forEach(post => {
+                const postElement = createPostElement(post);
+                dynamicPostsContainer.appendChild(postElement);
+              });
+              console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable (final fallback).`);
+              return;
+            }
+          } catch (fallbackError) {
+            console.error('All fallbacks failed:', fallbackError);
           }
-        } catch (fallbackError) {
-          console.error('Fallback to Eleventy variable also failed:', fallbackError);
+          return;
         }
-        return;
-      }
-    } else {
-      // 프로덕션 환경: Neocities에서 가져오기
-      try {
-        // 먼저 Neocities에서 시도
-        console.log('Fetching posts from Neocities...');
-        response = await fetch(CONFIG.neocitiesPostsUrl);
-      } catch (error) {
-        console.warn('Failed to fetch from Neocities, trying Nekoweb...');
-        // Neocities 실패 시 Nekoweb에서 시도
-        response = await fetch(CONFIG.nekowebPostsUrl);
+      } else {
+        // 프로덕션 환경에서 Neocities 실패 시 Nekoweb 시도
+        try {
+          response = await fetch(CONFIG.nekowebPostsUrl);
+        } catch (nekowebError) {
+          console.error('All data sources failed:', nekowebError);
+          return;
+        }
       }
     }
     
@@ -193,23 +198,27 @@ function convertQuillToHtml(quillContent) {
           
           html += text;
         } else if (op.insert && typeof op.insert === 'object' && op.insert.image) {
-          // 이미지 처리 (dualImage 필터 로직 적용)
+          // 이미지 처리
           const imagePath = op.insert.image;
-          if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+          
+          if (imagePath.startsWith('data:image/')) {
+            // Base64 이미지인 경우 그대로 사용
+            html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
+          } else if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
             // 이미 절대 URL인 경우 그대로 사용
             html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
           } else {
-            // 환경에 따라 이미지 URL 결정
+            // 상대 경로인 경우 환경에 따라 URL 결정
             const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
             
             if (isLocal) {
-              // 로컬 환경: Neocities URL 사용 (dualImage 필터와 동일)
+              // 로컬 환경: Neocities URL 사용
               html += `<img src="${CONFIG.neocitiesBaseUrl}/${cleanPath}" 
                            onerror="this.onerror=null; this.src='${CONFIG.nekowebBaseUrl}/${cleanPath}'" 
                            alt="이미지" style="max-width: 100%; height: auto;">`;
             } else {
-              // 프로덕션 환경: 상대 경로 사용 (dualImage 필터와 동일)
+              // 프로덕션 환경: 상대 경로 사용
               html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
             }
           }
@@ -239,21 +248,34 @@ function searchByTag(tag) {
 function checkAdminMode() {
   console.log('Admin 모드 확인 중...');
   
-  // 로컬 서버 접속 시 자동으로 admin 모드 활성화
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (isLocal) {
-    console.log('로컬 서버 접속 감지 - 자동 admin 모드 활성화');
+  // 로컬 서버 접속 시에만 자동으로 admin 모드 활성화
+  const isLocal = window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname === '::1';
+  
+  // 추가 보안: 포트도 확인 (8080, 3000 등 개발 포트만 허용)
+  const isDevPort = window.location.port === '8080' || 
+                    window.location.port === '3000' || 
+                    window.location.port === '8081' ||
+                    window.location.port === '';
+  
+  if (isLocal && isDevPort) {
+    console.log('로컬 개발 환경 감지 - 자동 admin 모드 활성화');
     return true;
   }
   
-  // 기존 AdminAuth 방식 (프로덕션 환경용)
+  // 프로덕션 환경에서는 절대 자동 admin 모드 활성화하지 않음
+  console.log('프로덕션 환경 - AdminAuth 로그인 필요');
+  
+  // AdminAuth를 통한 로그인 확인만 허용
   if (typeof AdminAuth !== 'undefined') {
     const adminAuth = new AdminAuth();
     const isLoggedIn = adminAuth.isAdminLoggedIn();
     console.log('AdminAuth 클래스 존재, 로그인 상태:', isLoggedIn);
     return isLoggedIn;
   }
-  console.log('AdminAuth 클래스가 정의되지 않음');
+  
+  console.log('AdminAuth 클래스가 정의되지 않음 - admin 모드 비활성화');
   return false;
 }
 

@@ -512,15 +512,29 @@ function addTag(tag) {
 
 async function savePost() {
   try {
-    // editor가 초기화되었는지 확인
-    if (!editor) {
-      console.log('Editor not initialized yet.');
-      alert('Editor not ready. Please try again in a moment.');
+    console.log('savePost 함수 시작');
+    
+    // 관리자 권한 체크
+    if (!checkAdminPermission()) {
+      console.log('관리자 권한 없음');
+      showTopMessage('관리자 권한이 필요합니다.');
       return;
     }
     
+    // editor가 초기화되었는지 확인
+    if (!editor) {
+      console.log('Editor not initialized yet.');
+      showTopMessage('에디터가 준비되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+    
+    console.log('에디터 초기화 확인됨');
+    
     const content = editor.getContents();
     const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    
+    console.log('콘텐츠 확인:', content);
+    console.log('태그 확인:', tags);
     
     if (!content || !content.ops || content.ops.length === 0) {
       showTopMessage(i18nData?.write?.messages?.noContent || '내용을 입력해주세요.');
@@ -528,10 +542,13 @@ async function savePost() {
     }
     
     // Base64 이미지 처리 (네오시티에 직접 업로드)
+    console.log('Base64 이미지 처리 시작');
     const processedContent = await processBase64Images(content);
+    console.log('Base64 이미지 처리 완료');
     
     // 기존 포스트들 가져오기
     const existingPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    console.log('기존 포스트 수:', existingPosts.length);
     
     // 새 포스트 생성
     const newPost = {
@@ -543,14 +560,29 @@ async function savePost() {
       title: extractTitleFromContent(processedContent) || '제목 없음'
     };
     
+    console.log('새 포스트 생성됨:', newPost);
+    
     // 새 포스트를 기존 포스트 목록에 추가
     existingPosts.push(newPost);
     
-    // 로컬에 포스트 저장 (GitHub Actions가 처리)
+    // 로컬에 포스트 저장
     localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
+    console.log('로컬 스토리지에 저장됨');
     
-    // 로컬 파일에 저장 후 자동 업로드 안내
-    showTopMessage('포스트가 로컬에 저장되었습니다. 터미널에서 "npm run upload:posts"를 실행하세요.');
+    // posts.json 파일 업데이트를 위한 요청 저장
+    const postsData = { posts: existingPosts };
+    localStorage.setItem('pending_posts_update', JSON.stringify(postsData));
+    console.log('posts.json 업데이트 요청이 저장되었습니다.');
+    
+    // 브라우저에서 직접 posts.json 업데이트할 수 있는 명령어 제공
+    console.log('📝 posts.json을 업데이트하려면:');
+    console.log('1. 터미널에서 다음 명령어 실행:');
+    console.log('   node update-posts.js');
+    console.log('2. 또는 브라우저 콘솔에서 다음 명령어 실행:');
+    console.log('   copy(JSON.stringify(' + JSON.stringify(postsData) + ', null, 2))');
+    console.log('3. 복사된 내용을 src/posts.json 파일에 붙여넣기');
+    
+    showTopMessage('포스트가 저장되었습니다. 터미널에서 "node update-posts.js"를 실행하세요.');
     
     // 로컬 스토리지에 업로드 요청 저장
     const uploadRequest = {
@@ -580,7 +612,7 @@ async function savePost() {
     
   } catch (error) {
     console.error('Error saving:', error);
-    showTopMessage('An error occurred while saving: ' + error.message);
+    showTopMessage('저장 중 오류가 발생했습니다: ' + error.message);
   }
 }
 
@@ -668,18 +700,39 @@ function setupAutoSave() {
 
 // 관리자 권한 체크 함수
 function checkAdminPermission() {
-  // 로컬 서버 접속 시 자동으로 admin 모드 활성화
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (isLocal) {
-    console.log('로컬 서버 접속 감지 - 자동 admin 모드 활성화');
+  console.log('관리자 권한 체크 시작');
+  console.log('현재 URL:', window.location.href);
+  
+  // 로컬 서버 접속 시에만 자동으로 admin 모드 활성화
+  const isLocal = window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname === '::1';
+  
+  // 추가 보안: 포트도 확인 (8080, 3000 등 개발 포트만 허용)
+  const isDevPort = window.location.port === '8080' || 
+                    window.location.port === '3000' || 
+                    window.location.port === '8081' ||
+                    window.location.port === '';
+  
+  console.log('로컬 환경 체크:', { isLocal, isDevPort, hostname: window.location.hostname, port: window.location.port });
+  
+  if (isLocal && isDevPort) {
+    console.log('로컬 개발 환경 감지 - 자동 admin 모드 활성화');
     return true;
   }
   
-  // 기존 AdminAuth 방식 (프로덕션 환경용)
+  // 프로덕션 환경에서는 절대 자동 admin 모드 활성화하지 않음
+  console.log('프로덕션 환경 - AdminAuth 로그인 필요');
+  
+  // AdminAuth를 통한 로그인 확인만 허용
   if (typeof AdminAuth !== 'undefined') {
     const adminAuth = new AdminAuth();
-    return adminAuth.isAdminLoggedIn();
+    const isLoggedIn = adminAuth.isAdminLoggedIn();
+    console.log('AdminAuth 로그인 상태:', isLoggedIn);
+    return isLoggedIn;
   }
+  
+  console.log('AdminAuth 클래스가 정의되지 않음 - admin 모드 비활성화');
   return false;
 }
 
@@ -694,35 +747,47 @@ function redirectToLogin() {
 let editor;
 
 function initializeQuillJS() {
+  console.log('Quill.js 초기화 시작');
+  
   // Quill.js가 로드되었는지 확인
   if (typeof Quill === 'undefined') {
     console.error('Quill.js not loaded.');
+    showTopMessage('에디터를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
     return;
   }
 
-  editor = new Quill('#post-content', {
-    theme: 'snow',
-    bounds: '#post-content',
-    modules: {
-      toolbar: [
-        [{ 'font': ['Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 'Arial'] }],
-        [{ 'header': [1, 2, 3, false] }],
-        [{ 'size': ['small', false, 'large', 'huge'] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'align': [] }, { 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['link', 'image']
-      ]
-    }
-  });
+  console.log('Quill.js 로드 확인됨');
 
-  // 에디터 내용이 변경될 때마다 이벤트 발생
-  editor.on('text-change', function() {
-    document.getElementById('post-content').dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  try {
+    editor = new Quill('#post-content', {
+      theme: 'snow',
+      bounds: '#post-content',
+      modules: {
+        toolbar: [
+          [{ 'font': ['Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', '맑은 고딕', 'Arial'] }],
+          [{ 'header': [1, 2, 3, false] }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'align': [] }, { 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link', 'image']
+        ]
+      }
+    });
 
+    console.log('Quill 에디터 인스턴스 생성됨');
 
-  console.log('Quill.js successfully initialized.');
+    // 에디터 내용이 변경될 때마다 이벤트 발생
+    editor.on('text-change', function() {
+      document.getElementById('post-content').dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    console.log('Quill.js successfully initialized.');
+    showTopMessage('에디터가 준비되었습니다.');
+  } catch (error) {
+    console.error('Quill 초기화 오류:', error);
+    showTopMessage('에디터 초기화 중 오류가 발생했습니다: ' + error.message);
+  }
 }
 
 

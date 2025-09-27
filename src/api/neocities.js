@@ -95,6 +95,61 @@ router.post('/github', async (req, res) => {
   }
 });
 
+// posts.json 업데이트 엔드포인트
+router.post('/update-posts', async (req, res) => {
+  try {
+    const fs = require('fs').promises;
+    const path = require('path');
+    
+    const { posts } = req.body;
+    
+    if (!posts || !Array.isArray(posts)) {
+      return res.status(400).json({ error: 'Invalid posts data' });
+    }
+    
+    // 로컬 posts.json 파일 업데이트
+    const postsData = { posts };
+    const postsPath = path.join(__dirname, '..', 'posts.json');
+    
+    await fs.writeFile(postsPath, JSON.stringify(postsData, null, 2), 'utf8');
+    console.log('posts.json 파일이 업데이트되었습니다.');
+    
+    // Neocities에 posts.json 업로드
+    if (neocitiesApiToken) {
+      try {
+        const formData = new FormData();
+        const blob = new Blob([JSON.stringify(postsData, null, 2)], { type: 'application/json' });
+        formData.append('posts.json', blob, 'posts.json');
+        
+        const response = await fetch('https://neocities.org/api/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${neocitiesApiToken}`,
+          },
+          body: formData
+        });
+        
+        if (response.ok) {
+          console.log('Neocities에 posts.json이 업로드되었습니다.');
+          res.json({ success: true, message: 'Posts updated and uploaded to Neocities' });
+        } else {
+          console.warn('Neocities 업로드 실패, 로컬에만 저장됨');
+          res.json({ success: true, message: 'Posts updated locally, Neocities upload failed' });
+        }
+      } catch (uploadError) {
+        console.error('Neocities 업로드 오류:', uploadError);
+        res.json({ success: true, message: 'Posts updated locally, Neocities upload failed' });
+      }
+    } else {
+      console.warn('Neocities API 토큰이 없어서 로컬에만 저장됨');
+      res.json({ success: true, message: 'Posts updated locally, Neocities API token not configured' });
+    }
+  } catch (error) {
+    console.error('Posts update error:', error);
+    res.status(500).json({ error: 'Failed to update posts' });
+  }
+});
+
 // 관리자 인증 프록시 엔드포인트
 router.post('/admin/verify', (req, res) => {
   try {
