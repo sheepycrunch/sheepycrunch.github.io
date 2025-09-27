@@ -291,41 +291,17 @@ async function deletePost(postId) {
   }
 }
 
-// GitHub API를 사용하여 posts.json에서 포스트 삭제
+// 로컬 posts.json에서 포스트 삭제 (CSP 우회)
 async function deletePostFromLocal(postId) {
   try {
-    // GitHub Personal Access Token 확인
-    const token = getGitHubToken();
-    if (!token) {
-      throw new Error('GitHub token이 필요합니다.');
-    }
-
-    // 현재 파일 내용 가져오기
-    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-      }
-    });
-    
+    // 로컬 posts.json 파일 가져오기
+    const response = await fetch('/posts.json');
     if (!response.ok) {
-      throw new Error('파일 정보 가져오기 실패: ' + response.statusText);
+      throw new Error('posts.json을 불러올 수 없습니다.');
     }
     
-    const fileData = await response.json();
-    
-    // 기존 포스트들 가져오기 (UTF-8 디코딩 처리)
-    const base64Content = fileData.content;
-    const binaryString = atob(base64Content);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const decoder = new TextDecoder('utf-8');
-    const jsonString = decoder.decode(bytes);
-    const existingContent = JSON.parse(jsonString);
-    const existingPosts = existingContent.posts || [];
+    const data = await response.json();
+    const existingPosts = data.posts || [];
     
     // 포스트 찾기 및 삭제
     console.log('현재 포스트들:', existingPosts.map(p => ({ id: p.id, date: p.date })));
@@ -346,46 +322,17 @@ async function deletePostFromLocal(postId) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
     }
     
-    // 새 파일 내용 생성 (UTF-8 인코딩 처리)
-    const newContent = JSON.stringify({ posts: filteredPosts }, null, 2);
+    // 로컬 스토리지에 업데이트된 포스트 저장
+    const updatedData = { ...data, posts: filteredPosts };
+    localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
     
-    // UTF-8 인코딩을 위한 TextEncoder 사용
-    const encoder = new TextEncoder();
-    const utf8Bytes = encoder.encode(newContent);
-    const encodedContent = btoa(String.fromCharCode(...utf8Bytes));
+    console.log('로컬에서 포스트가 삭제되었습니다.');
     
-    // 파일 업데이트
-    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Delete post: ${postId}`,
-        content: encodedContent,
-        sha: fileData.sha
-      })
-    });
-    
-    if (!updateResponse.ok) {
-      const errorData = await updateResponse.text();
-      console.error('GitHub API 오류 상세:', {
-        status: updateResponse.status,
-        statusText: updateResponse.statusText,
-        errorData: errorData
-      });
-      throw new Error('파일 업데이트 실패: ' + updateResponse.statusText + ' ' + errorData);
-    }
-    
-    console.log('GitHub에서 포스트가 삭제되었습니다.');
-    
-    // GitHub Actions 웹훅 트리거
-    await triggerDeployment();
+    // GitHub에 수동으로 푸시하라는 안내
+    alert('포스트가 로컬에서 삭제되었습니다.\n\nGitHub에 변경사항을 푸시하려면:\n1. 터미널에서 "git add ."\n2. "git commit -m \'Delete post\'"\n3. "git push origin main"');
     
   } catch (error) {
-    console.error('GitHub 포스트 삭제 오류:', error);
+    console.error('로컬 포스트 삭제 오류:', error);
     throw error;
   }
 }
@@ -433,59 +380,45 @@ async function triggerDeployment() {
   }
 }
 
-// Neocities에서 포스트 삭제 (GitHub에서 이미 처리되므로 스킵)
+// Neocities에서 포스트 삭제 (CSP 우회)
 async function deletePostFromNeocities(postId) {
-  // GitHub에서 이미 posts.json을 업데이트했으므로 Neocities는 자동으로 동기화됨
+  // CSP 문제로 인해 Neocities API 호출을 건너뜀
+  console.log('CSP 정책으로 인해 Neocities API 호출을 건너뜁니다.');
   console.log('Neocities는 GitHub Actions를 통해 자동으로 동기화됩니다.');
 }
 
-// 포스트 관련 이미지 삭제
+// 포스트 관련 이미지 삭제 (CSP 우회)
 async function deletePostImages(postId) {
   try {
-    // GitHub에서 포스트 데이터 가져오기
-    const token = getGitHubToken();
-    if (!token) {
-      console.warn('GitHub token이 없어서 이미지 삭제를 건너뜁니다.');
+    // 로컬 posts.json에서 포스트 데이터 가져오기
+    const response = await fetch('/posts.json');
+    if (!response.ok) {
+      console.warn('posts.json을 불러올 수 없어서 이미지 삭제를 건너뜁니다.');
       return;
     }
-
-    const response = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': `token ${token}`,
-      }
-    });
     
-    if (!response.ok) return;
-    
-    const fileData = await response.json();
-    const base64Content = fileData.content;
-    const binaryString = atob(base64Content);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const decoder = new TextDecoder('utf-8');
-    const jsonString = decoder.decode(bytes);
-    const data = JSON.parse(jsonString);
+    const data = await response.json();
     const posts = data.posts || [];
-    const post = posts.find(p => (p.id || p.date) === postId);
+    const post = posts.find(p => String(p.id || p.date) === String(postId));
     
-    if (!post || !post.description) return;
+    if (!post || !post.description) {
+      console.log('삭제할 포스트를 찾을 수 없습니다.');
+      return;
+    }
     
     // Quill 콘텐츠에서 이미지 경로 추출
     const imagePaths = extractImagePaths(post.description);
+    console.log('추출된 이미지 경로들:', imagePaths);
     
-    // 각 이미지 삭제
-    for (const imagePath of imagePaths) {
-      try {
-        await deleteImageFromNeocities(imagePath);
-        console.log(`이미지 삭제됨: ${imagePath}`);
-      } catch (error) {
-        console.warn(`이미지 삭제 실패: ${imagePath}`, error);
-      }
+    if (imagePaths.length === 0) {
+      console.log('삭제할 이미지가 없습니다.');
+      return;
     }
+    
+    // CSP 문제로 인해 Neocities API 호출을 건너뜀
+    console.log('CSP 정책으로 인해 이미지 삭제를 건너뜁니다.');
+    console.log('다음 이미지들이 삭제되어야 합니다:', imagePaths);
+    
   } catch (error) {
     console.error('이미지 삭제 오류:', error);
   }
