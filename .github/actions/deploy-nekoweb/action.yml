@@ -23,7 +23,14 @@ runs:
       shell: bash
       run: |
         echo "🚀 Deploying to Nekoweb..."
-        echo "📋 Site name: ${{ inputs.site_name }}"
+        
+        # Clean site name - remove https:// if present
+        CLEAN_SITE_NAME="${{ inputs.site_name }}"
+        if [[ "$CLEAN_SITE_NAME" == https://* ]]; then
+          CLEAN_SITE_NAME=$(echo "$CLEAN_SITE_NAME" | sed 's|https://||' | sed 's|\.nekoweb\.org||')
+        fi
+        
+        echo "📋 Site name: $CLEAN_SITE_NAME"
         echo "📁 Dist directory: ${{ inputs.dist_dir }}"
         
         # Check if dist directory exists
@@ -44,6 +51,7 @@ runs:
         else
           echo "❌ API connection failed"
           echo "Please check your API key and site name"
+          echo "Site name being used: $CLEAN_SITE_NAME"
           exit 1
         fi
         
