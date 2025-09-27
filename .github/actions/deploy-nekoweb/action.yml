@@ -116,6 +116,8 @@ runs:
           file_path="/$relative_path"
           
           echo "📤 Uploading file: $relative_path to directory: $dir_path"
+          echo "🔍 Debug: relative_path=$relative_path, dir_path=$dir_path, file_path=$file_path"
+          
           response=$(curl -X POST \
             -H "$AUTH_HEADER" \
             -F "pathname=$dir_path" \
