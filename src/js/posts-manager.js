@@ -380,10 +380,9 @@ async function triggerDeployment() {
   }
 }
 
-// Neocities에서 포스트 삭제 (CSP 우회)
+// Neocities에서 포스트 삭제
 async function deletePostFromNeocities(postId) {
-  // CSP 문제로 인해 Neocities API 호출을 건너뜀
-  console.log('CSP 정책으로 인해 Neocities API 호출을 건너뜁니다.');
+  // GitHub에서 이미 posts.json을 업데이트했으므로 Neocities는 자동으로 동기화됨
   console.log('Neocities는 GitHub Actions를 통해 자동으로 동기화됩니다.');
 }
 
@@ -415,9 +414,15 @@ async function deletePostImages(postId) {
       return;
     }
     
-    // CSP 문제로 인해 Neocities API 호출을 건너뜀
-    console.log('CSP 정책으로 인해 이미지 삭제를 건너뜁니다.');
-    console.log('다음 이미지들이 삭제되어야 합니다:', imagePaths);
+    // 각 이미지 삭제
+    for (const imagePath of imagePaths) {
+      try {
+        await deleteImageFromNeocities(imagePath);
+        console.log(`이미지 삭제됨: ${imagePath}`);
+      } catch (error) {
+        console.warn(`이미지 삭제 실패: ${imagePath}`, error);
+      }
+    }
     
   } catch (error) {
     console.error('이미지 삭제 오류:', error);
