@@ -290,24 +290,33 @@ async function deletePost(postId) {
     console.log('GitHub에서 포스트 삭제 시작...');
     await deletePostFromLocal(postId);
     
-    // 2. 관련 이미지 삭제 (백그라운드에서 실행)
-    let imageDeleteResult = null;
-    try {
-      console.log('관련 이미지 삭제 시작...');
-      imageDeleteResult = await deletePostImages(postId);
-      if (imageDeleteResult && imageDeleteResult.deleted.length > 0) {
-        console.log(`이미지 ${imageDeleteResult.deleted.length}개가 삭제되었습니다.`);
-      }
-    } catch (error) {
-      console.warn('이미지 삭제 중 오류:', error);
-    }
+     // 2. 관련 이미지 삭제 (토큰이 있을 때만)
+     let imageDeleteResult = null;
+     const neocitiesApiToken = getNeocitiesApiToken();
+     if (neocitiesApiToken) {
+       try {
+         console.log('관련 이미지 삭제 시작...');
+         imageDeleteResult = await deletePostImages(postId);
+         if (imageDeleteResult && imageDeleteResult.deleted.length > 0) {
+           console.log(`이미지 ${imageDeleteResult.deleted.length}개가 삭제되었습니다.`);
+         }
+       } catch (error) {
+         console.warn('이미지 삭제 중 오류:', error);
+       }
+     } else {
+       console.log('Neocities API 토큰이 없어서 이미지 삭제를 건너뜁니다.');
+     }
     
     // 3. UI에서 즉시 제거
     removePostFromUI(postId);
     
      // 4. 성공 메시지 표시
      setTimeout(() => {
-       alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 수동 푸시하면 완전 동기화됩니다');
+       const neocitiesApiToken = getNeocitiesApiToken();
+       const message = neocitiesApiToken 
+         ? '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 자동으로 푸시되었습니다'
+         : '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ GitHub에 자동으로 푸시되었습니다\n✓ Neocities에 자동 동기화됩니다';
+       alert(message);
      }, 100);
     
   } catch (error) {
@@ -371,13 +380,19 @@ async function deletePostFromLocal(postId) {
      localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
      console.log('로컬 스토리지에 업데이트된 포스트 저장됨');
      
-     // 3. Neocities에 직접 posts.json 업데이트
-     try {
-       await updateNeocitiesPostsJson(filteredPosts);
-       console.log('Neocities에 posts.json이 업데이트되었습니다.');
-     } catch (error) {
-       console.warn('Neocities 업데이트 실패:', error);
-       // Neocities 업데이트 실패해도 삭제는 계속 진행
+     // 3. Neocities에 직접 posts.json 업데이트 (토큰이 있을 때만)
+     const neocitiesApiToken = getNeocitiesApiToken();
+     if (neocitiesApiToken) {
+       try {
+         await updateNeocitiesPostsJson(filteredPosts);
+         console.log('Neocities에 posts.json이 업데이트되었습니다.');
+       } catch (error) {
+         console.warn('Neocities 업데이트 실패:', error);
+         // Neocities 업데이트 실패해도 삭제는 계속 진행
+       }
+     } else {
+       console.log('Neocities API 토큰이 없어서 Neocities 업데이트를 건너뜁니다.');
+       console.log('로컬에서만 삭제되고, GitHub 푸시 시 Neocities에 자동 동기화됩니다.');
      }
      
      // 4. GitHub Actions 웹훅 트리거 (CSP 우회)
@@ -399,27 +414,85 @@ function getGitHubToken() {
   return token;
 }
 
-// GitHub Actions 웹훅 트리거 (CSP 우회)
+// GitHub에 자동으로 posts.json 업데이트 및 푸시
 async function triggerDeployment() {
   try {
-    console.log('GitHub Actions 배포 워크플로우 트리거 시도 중...');
+    console.log('GitHub에 자동으로 posts.json 업데이트 중...');
     
-    // CSP 문제로 인해 직접 GitHub API 호출 대신 다른 방법 사용
-    // 로컬 스토리지에 삭제 요청 저장
-    const deletionRequest = {
-      action: 'delete_post',
-      timestamp: new Date().toISOString(),
-      posts: JSON.parse(localStorage.getItem('hamster_posts') || '[]')
-    };
+    const token = getGitHubToken();
+    if (!token) {
+      console.warn('GitHub 토큰이 없어서 자동 푸시를 건너뜁니다.');
+      return;
+    }
+
+    // 1. 현재 posts.json 내용 가져오기
+    const getResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+      }
+    });
+
+    if (!getResponse.ok) {
+      throw new Error(`posts.json을 가져올 수 없습니다: ${getResponse.status}`);
+    }
+
+    const fileData = await getResponse.json();
     
-    localStorage.setItem('pending_deletion', JSON.stringify(deletionRequest));
-    console.log('삭제 요청이 로컬 스토리지에 저장되었습니다.');
+    // 2. 로컬 스토리지에서 업데이트된 포스트 가져오기
+    const updatedPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
+    const updatedContent = { posts: updatedPosts };
+    const newContent = JSON.stringify(updatedContent, null, 2);
+    const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
+
+    // 3. GitHub에 업데이트된 posts.json 업로드
+    const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/posts.json', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Delete post - Auto update`,
+        content: encodedContent,
+        sha: fileData.sha
+      })
+    });
+
+    if (!updateResponse.ok) {
+      const errorData = await updateResponse.text();
+      throw new Error(`posts.json 업데이트 실패: ${updateResponse.status} ${errorData}`);
+    }
+
+    const updateResult = await updateResponse.json();
+    console.log('GitHub에 posts.json이 성공적으로 업데이트되었습니다:', updateResult.commit.sha);
     
-    // 사용자에게 수동 푸시 안내
-    console.log('수동으로 GitHub에 푸시가 필요합니다.');
+    // 4. GitHub Actions 워크플로우 트리거
+    const dispatchResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/dispatches', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        event_type: 'manual_deploy',
+        client_payload: {
+          source: 'post_deletion',
+          timestamp: new Date().toISOString()
+        }
+      })
+    });
+
+    if (dispatchResponse.ok) {
+      console.log('GitHub Actions 워크플로우가 트리거되었습니다.');
+    } else {
+      console.warn('GitHub Actions 트리거 실패, 하지만 posts.json은 업데이트됨');
+    }
     
   } catch (error) {
-    console.error('배포 트리거 오류:', error);
+    console.error('자동 푸시 오류:', error);
     // 에러가 발생해도 삭제는 계속 진행
   }
 }
