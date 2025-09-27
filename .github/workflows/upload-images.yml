@@ -26,6 +26,6 @@ jobs:
       uses: ./.github/actions/deploy-nekoweb
       with:
         api_key: ${{ secrets.NEKOWEB_API_KEY }}
-        site_name: ${{ secrets.NEKOWEB_SITE_NAME }}
+        site_name: ${{ secrets.SITE_NAME }}
         dist_dir: src/images # 이미지 폴더만 업로드
         cleanup: false

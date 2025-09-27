@@ -40,12 +40,12 @@ Nekoweb 계정에 로그인한 후 API 키를 수동으로 생성합니다:
 4. **Secret**: 위에서 생성한 API 키 입력
 5. **"Add secret"** 클릭
 
-4. **Name**: `NEKOWEB_SITE_NAME`
+4. **Name**: `SITE_NAME`
 5. **Secret**: Nekoweb 사이트 이름 입력 (예: yoursite)
 6. **"Add secret"** 클릭
 
 **참고**: 
-- `NEKOWEB_SITE_NAME`은 사이트 이름만 입력하면 됩니다 (예: yoursite)
+- `SITE_NAME`은 사이트 이름만 입력하면 됩니다 (예: yoursite)
 - 전체 URL은 자동으로 `https://yoursite.nekoweb.org`로 생성됩니다
 - API 엔드포인트는 자동으로 `https://nekoweb.org/api`를 사용합니다
 
@@ -71,7 +71,7 @@ Nekoweb 계정에 로그인한 후 API 키를 수동으로 생성합니다:
 
 - **GitHub Pages**: `https://sheepycrunch.github.io`
 - **Neocities**: `https://dakimakura.neocities.org/`
-- **Nekoweb**: `https://yoursite.nekoweb.org` (NEKOWEB_SITE_NAME 시크릿에서 설정한 사이트명)
+- **Nekoweb**: `https://yoursite.nekoweb.org` (SITE_NAME 시크릿에서 설정한 사이트명)
 
 ## API 제한사항
 

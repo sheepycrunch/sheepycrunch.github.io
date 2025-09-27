@@ -28,7 +28,7 @@ jobs:
       env:
         ELEVENTY_ENV: production
         NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
-        NEKOWEB_URL: https://${{ secrets.NEKOWEB_SITE_NAME }}.nekoweb.org
+        NEKOWEB_URL: https://${{ secrets.SITE_NAME }}.nekoweb.org
         
     - name: Deploy to Neocities
       uses: bcomnes/deploy-to-neocities@v1
