@@ -24,6 +24,22 @@ module.exports = function(eleventyConfig) {
   
   eleventyConfig.addGlobalData("neocitiesApiToken", neocitiesApiToken);
   
+  // Posts 데이터를 전역 데이터로 추가
+  let postsData = { posts: [] };
+  try {
+    const fs = require('fs');
+    const postsPath = 'src/_data/posts.json';
+    if (fs.existsSync(postsPath)) {
+      const postsContent = fs.readFileSync(postsPath, 'utf8');
+      postsData = JSON.parse(postsContent);
+      console.log('Posts data loaded globally:', postsData.posts.length, 'posts');
+    }
+  } catch (error) {
+    console.warn('Failed to load posts data globally:', error.message);
+  }
+  
+  eleventyConfig.addGlobalData("postsData", postsData);
+  
   // 구글 서치콘솔 통계 초기화
   let searchConsoleStats = {
     totalClicks: 0,

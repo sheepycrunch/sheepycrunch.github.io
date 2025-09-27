@@ -47,18 +47,45 @@ async function loadDynamicPosts() {
   const dynamicPostsContainer = document.getElementById('dynamic-posts');
   
   try {
-    // Neocities에서 posts.json 파일 가져오기
-    const neocitiesUrl = 'https://dakimakura.neocities.org/posts.json';
-    const nekowebUrl = 'https://dakimakura.nekoweb.org/posts.json';
+    // 환경에 따라 posts.json 경로 결정
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    console.log('Environment check:', { hostname: window.location.hostname, isLocal });
     
     let response;
-    try {
-      // 먼저 Neocities에서 시도
-      response = await fetch(neocitiesUrl);
-    } catch (error) {
-      console.warn('Failed to fetch from Neocities, trying Nekoweb...');
-      // Neocities 실패 시 Nekoweb에서 시도
-      response = await fetch(nekowebUrl);
+    if (isLocal) {
+      // 로컬 환경: Eleventy 템플릿에서 직접 데이터 사용
+      console.log('Local environment detected. Using Eleventy template data.');
+      
+      // Eleventy 템플릿에서 직접 posts 데이터 사용
+      const posts = {{ postsData.posts | dump | safe }};
+      
+      if (posts && posts.length > 0) {
+        // 모든 포스트 표시 (카테고리 필터링 제거)
+        // 최신 포스트부터 표시
+        posts.forEach(post => {
+          const postElement = createPostElement(post);
+          dynamicPostsContainer.appendChild(postElement);
+        });
+        
+        console.log(`Loaded ${posts.length} dynamic posts from Eleventy template data.`);
+        return;
+      } else {
+        console.log('No saved posts found in template data.');
+        return;
+      }
+    } else {
+      // 프로덕션 환경: Neocities에서 가져오기
+      const neocitiesUrl = 'https://dakimakura.neocities.org/posts.json';
+      const nekowebUrl = 'https://dakimakura.nekoweb.org/posts.json';
+      
+      try {
+        // 먼저 Neocities에서 시도
+        response = await fetch(neocitiesUrl);
+      } catch (error) {
+        console.warn('Failed to fetch from Neocities, trying Nekoweb...');
+        // Neocities 실패 시 Nekoweb에서 시도
+        response = await fetch(nekowebUrl);
+      }
     }
     
     if (response.ok) {
@@ -77,9 +104,9 @@ async function loadDynamicPosts() {
         dynamicPostsContainer.appendChild(postElement);
       });
       
-      console.log(`Loaded ${posts.length} dynamic posts from Neocities.`);
+      console.log(`Loaded ${posts.length} dynamic posts from ${isLocal ? 'local' : 'Neocities'}.`);
     } else {
-      console.warn('Failed to fetch posts from Neocities.');
+      console.warn(`Failed to fetch posts from ${isLocal ? 'local' : 'Neocities'}.`);
       dynamicPostsContainer.innerHTML = '<p>Failed to load posts.</p>';
     }
   } catch (error) {
@@ -177,14 +204,22 @@ function convertQuillToHtml(quillContent) {
             // 이미 절대 URL인 경우 그대로 사용
             html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
           } else {
-            // 상대 경로인 경우 네오시티 URL로 변환
+            // 환경에 따라 이미지 URL 결정
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
-            const neocitiesUrl = 'https://dakimakura.neocities.org';
-            const nekowebUrl = 'https://dakimakura.nekoweb.org';
             
-            html += `<img src="${neocitiesUrl}/${cleanPath}" 
-                         onerror="this.onerror=null; this.src='${nekowebUrl}/${cleanPath}'" 
-                         alt="이미지" style="max-width: 100%; height: auto;">`;
+            if (isLocal) {
+              // 로컬 환경: Neocities URL 사용 (dualImage 필터와 동일)
+              const neocitiesUrl = 'https://dakimakura.neocities.org';
+              const nekowebUrl = 'https://dakimakura.nekoweb.org';
+              
+              html += `<img src="${neocitiesUrl}/${cleanPath}" 
+                           onerror="this.onerror=null; this.src='${nekowebUrl}/${cleanPath}'" 
+                           alt="이미지" style="max-width: 100%; height: auto;">`;
+            } else {
+              // 프로덕션 환경: 상대 경로 사용 (dualImage 필터와 동일)
+              html += `<img src="${imagePath}" alt="이미지" style="max-width: 100%; height: auto;">`;
+            }
           }
         }
       }
