@@ -28,7 +28,7 @@ module.exports = function(eleventyConfig) {
   let postsData = { posts: [] };
   try {
     const fs = require('fs');
-    const postsPath = 'src/_data/posts.json';
+    const postsPath = 'src/posts.json';
     if (fs.existsSync(postsPath)) {
       const postsContent = fs.readFileSync(postsPath, 'utf8');
       postsData = JSON.parse(postsContent);
@@ -633,6 +633,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/js");
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
+  eleventyConfig.addPassthroughCopy("src/posts.json");
   eleventyConfig.addPassthroughCopy("neocities.png");
 
   // HTML 압축 설정 (프로덕션 빌드 시에만)

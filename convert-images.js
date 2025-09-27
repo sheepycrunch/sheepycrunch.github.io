@@ -54,7 +54,7 @@ async function uploadImageToNeocities(buffer, fileName, mime) {
 // 포스트 데이터 처리
 async function processPosts() {
   try {
-    const postsData = fs.readFileSync('src/_data/posts.json', 'utf8');
+    const postsData = fs.readFileSync('src/posts.json', 'utf8');
     const posts = JSON.parse(postsData).posts || [];
     let updated = false;
     
@@ -107,7 +107,7 @@ async function processPosts() {
     
     if (updated) {
       // 업데이트된 포스트를 파일에 저장
-      fs.writeFileSync('src/_data/posts.json', JSON.stringify({ posts }, null, 2));
+      fs.writeFileSync('src/posts.json', JSON.stringify({ posts }, null, 2));
       console.log('Posts updated with Neocities URLs');
     } else {
       console.log('No base64 images found to convert');

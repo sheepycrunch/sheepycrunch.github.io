@@ -94,7 +94,7 @@ jobs:
         // 포스트 데이터 처리
         async function processPosts() {
           try {
-            const postsPath = 'src/_data/posts.json';
+            const postsPath = 'src/posts.json';
             
             if (!fs.existsSync(postsPath)) {
               console.log('No posts.json file found, skipping image processing');
@@ -160,7 +160,7 @@ jobs:
               try {
                 execSync('git config --local user.email "action@github.com"');
                 execSync('git config --local user.name "GitHub Action"');
-                execSync('git add src/_data/posts.json');
+                execSync('git add src/posts.json');
                 execSync('git commit -m "Auto-update: Convert Base64 images to Neocities URLs"');
                 execSync('git push');
                 console.log('Changes committed and pushed to GitHub');
