@@ -1,4 +1,4 @@
-name: Deploy to Neocities
+name: Deploy to Nekoweb
 
 on:
   push:
@@ -29,9 +29,10 @@ jobs:
         NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
         NEKOWEB_URL: https://${{ secrets.NEKOWEB_SITE_NAME }}.nekoweb.org
         
-    - name: Deploy to Neocities
-      uses: bcomnes/deploy-to-neocities@v1
+    - name: Deploy to Nekoweb
+      uses: ./.github/actions/deploy-nekoweb
       with:
-        api_token: ${{ secrets.NEOCITIES_API_KEY }}
-        cleanup: false
+        api_key: ${{ secrets.NEKOWEB_API_KEY }}
+        site_name: ${{ secrets.NEKOWEB_SITE_NAME }}
         dist_dir: _site
+        cleanup: false

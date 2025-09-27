@@ -1,0 +1,60 @@
+name: 'Deploy to Nekoweb'
+description: 'Deploy files to Nekoweb using their API'
+inputs:
+  api_key:
+    description: 'Nekoweb API key'
+    required: true
+  site_name:
+    description: 'Nekoweb site name'
+    required: true
+  dist_dir:
+    description: 'Directory to deploy'
+    required: true
+    default: '_site'
+  cleanup:
+    description: 'Cleanup existing files before upload'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy to Nekoweb
+      shell: bash
+      run: |
+        echo "🚀 Deploying to Nekoweb..."
+        
+        # Check if dist directory exists
+        if [ ! -d "${{ inputs.dist_dir }}" ]; then
+          echo "❌ Directory ${{ inputs.dist_dir }} not found!"
+          exit 1
+        fi
+        
+        # Upload files
+        upload_count=0
+        error_count=0
+        
+        for file in ${{ inputs.dist_dir }}/**/*; do
+          if [ -f "$file" ]; then
+            relative_path=${file#${{ inputs.dist_dir }}/}
+            echo "📤 Uploading: $relative_path"
+            
+            if curl -X POST \
+              -H "Authorization: Bearer ${{ inputs.api_key }}" \
+              -F "file=@$file" \
+              -F "path=$relative_path" \
+              "https://nekoweb.org/api/upload" \
+              --silent --show-error --fail; then
+              ((upload_count++))
+            else
+              echo "❌ Failed to upload: $relative_path"
+              ((error_count++))
+            fi
+          fi
+        done
+        
+        echo "✅ Upload complete: $upload_count files uploaded"
+        if [ $error_count -gt 0 ]; then
+          echo "⚠️  $error_count files failed to upload"
+          exit 1
+        fi

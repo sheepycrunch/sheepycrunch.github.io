@@ -10,13 +10,13 @@ lang: "en"
 <!-- 아이콘 쇼케이스 섹션 -->
 <section id="icon-showcase">
   <ol>
-    <li><img src="{{ '/images/icons/icon1.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="{{ '/images/icons/icon2.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="{{ '/images/icons/icon3.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="{{ '/images/icons/icon4.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
-    <li class="hidden"><img src="{{ '/images/icons/icon5.png' | neocitiesImage }}" alt="icon" onerror="this.style.display='none'"></li>
+    <li>{{ '/images/icons/icon1.png' | dualImage | safe }}</li>
+    <li class="hidden">{{ '/images/icons/icon2.png' | dualImage | safe }}</li>
+    <li class="hidden">{{ '/images/icons/icon3.png' | dualImage | safe }}</li>
+    <li class="hidden">{{ '/images/icons/icon4.png' | dualImage | safe }}</li>
+    <li class="hidden">{{ '/images/icons/icon5.png' | dualImage | safe }}</li>
   </ol>
-  <img id="misuzu-button" class="clickable" src="{{ '/images/button.png' | neocitiesImage }}" alt="click to change icon" onerror="this.style.display='none'">
+  <div id="misuzu-button" class="clickable">{{ '/images/button.png' | dualImage | safe }}</div>
 </section>
 
 <!-- 자기소개 섹션 -->
@@ -68,7 +68,7 @@ lang: "en"
   <h2>{{ i18n.banners.title | autoTranslate("en") }}</h2>
   <div class="banner-section">
     <div class="banner-item">
-      <img src="{{ '/neocities.png' | neocitiesImage }}" alt="Neocities Banner" class="banner-image">
+      <div class="banner-image">{{ '/neocities.png' | dualImage | safe }}</div>
       <p class="banner-description">{{ i18n.banners.description | autoTranslate("en") }}</p>
     </div>
   </div>

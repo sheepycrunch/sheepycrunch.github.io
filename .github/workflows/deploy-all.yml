@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages and Neocities
+name: Deploy to GitHub Pages, Neocities and Nekoweb
 
 on:
   push:
@@ -24,6 +24,9 @@ jobs:
       
     - name: Build with 11ty
       run: npx @11ty/eleventy
+      env:
+        NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
+        NEKOWEB_URL: https://${{ secrets.NEKOWEB_SITE_NAME }}.nekoweb.org
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
@@ -40,3 +43,12 @@ jobs:
         api_token: ${{ secrets.NEOCITIES_API_KEY }}
         cleanup: false
         dist_dir: _site
+        
+    - name: Deploy to Nekoweb
+      if: github.ref == 'refs/heads/main'
+      uses: ./.github/actions/deploy-nekoweb
+      with:
+        api_key: ${{ secrets.NEKOWEB_API_KEY }}
+        site_name: ${{ secrets.NEKOWEB_SITE_NAME }}
+        dist_dir: _site
+        cleanup: false
