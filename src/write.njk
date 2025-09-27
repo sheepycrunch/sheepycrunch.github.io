@@ -290,8 +290,9 @@ permalink: "/write.html"
           </div>
         </div>
         
-        <div id="summernote-editor" class="drag-drop-editor"></div>
-        <textarea id="post-content" class="form-textarea" placeholder="{{ "내용을 입력하세요..." | t(lang) }}" rows="10" style="display: none;"></textarea>
+        <div class="editor-container">
+          <div id="post-content" class="form-textarea" contenteditable="true" placeholder="{{ "내용을 입력하세요..." | t(lang) }}" rows="10"></div>
+        </div>
         <input type="file" id="image-file-input" accept="image/*" style="display: none;" />
       </div>
       
@@ -320,12 +321,292 @@ permalink: "/write.html"
   </div>
 </section>
 
-<!-- Summernote CSS -->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.css" rel="stylesheet" type="text/css" media="all">
+<!-- 에디터 CSS는 인라인으로 처리 -->
 
-<!-- jQuery and Summernote JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs4.min.js"></script>
+<style>
+/* 커스텀 툴바 스타일 */
+.note-toolbar {
+  border: none;
+  border-radius: 4px;
+  padding: 8px;
+  background: #f8f9fa;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.note-btn-group {
+  position: relative;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.note-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  text-decoration: none;
+  user-select: none;
+}
+
+.note-btn:hover {
+  background: #e6e6e6;
+  border-color: #adadad;
+}
+
+.note-btn.active {
+  background: #337ab7;
+  color: #fff;
+  border-color: #2e6da4;
+}
+
+.note-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.note-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 0; /* 갭 제거 */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.note-dropdown-item {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.note-dropdown-item:hover {
+  background: #f5f5f5;
+  color: #262626;
+  text-decoration: none;
+}
+
+.note-dropdown-item.checked {
+  background: #337ab7;
+  color: #fff;
+}
+
+.note-icon-menu-check {
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.note-color-palette {
+  padding: 10px;
+}
+
+.note-color-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.note-color-btn {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.note-color-btn:hover {
+  border-color: #333;
+  transform: scale(1.1);
+}
+
+.note-dimension-picker {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 10px;
+}
+
+.note-dimension-picker-mousecatcher {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 19px,
+    #ddd 19px,
+    #ddd 20px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 19px,
+    #ddd 19px,
+    #ddd 20px
+  );
+}
+
+.note-dimension-display {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.note-break {
+  width: 1px;
+  height: 20px;
+  background: #ddd;
+  margin: 0 5px;
+}
+
+/* 드래그 앤 드랍 스타일 */
+.drag-drop-editor.dragover {
+  border: 2px dashed #007bff;
+  background: rgba(0, 123, 255, 0.1);
+}
+
+/* 태그 제안 스타일 */
+.tag-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.tag-button {
+  display: inline-block;
+  padding: 4px 8px;
+  margin: 2px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.tag-button:hover {
+  background: #e0e0e0;
+}
+
+.existing-tags-title,
+.filtered-tags-title {
+  padding: 8px 12px;
+  font-weight: bold;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.no-results {
+  padding: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* 상단 메시지 스타일 */
+#top-message {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #28a745;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#top-message.show {
+  opacity: 1;
+}
+
+/* 하루 제한 메시지 */
+.daily-limit-message {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* 에디터 컨테이너 스타일 */
+.editor-container {
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  min-height: 200px;
+}
+
+#post-content {
+  width: 100%;
+  min-height: 200px;
+  padding: 15px;
+  border: none;
+  outline: none;
+  font-family: '맑은 고딕', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: auto;
+}
+
+#post-content:empty:before {
+  content: attr(placeholder);
+  color: #999;
+  font-style: italic;
+}
+
+#post-content:focus {
+  outline: none;
+}
+
+/* 드래그 앤 드랍 스타일 */
+.editor-container.dragover {
+  border: 2px dashed #007bff;
+  background: rgba(0, 123, 255, 0.1);
+}
+</style>
+
+<!-- 에디터 JavaScript는 인라인으로 처리 -->
 
 <script>
 // AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
@@ -395,24 +676,24 @@ window.AdminAuth = AdminAuth;
 // i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
-// Summernote 에디터에 이미지 드래그 앤 드랍 기능 추가
+// 이미지 드래그 앤 드랍 기능
 function setupImageUpload() {
-  const summernoteEditor = document.getElementById('summernote-editor');
+  const editor = document.getElementById('post-content');
   const fileInput = document.getElementById('image-file-input');
   
-  // Summernote 에디터에 드래그 앤 드랍 이벤트 추가
-  summernoteEditor.addEventListener('dragover', (e) => {
+  // 에디터에 드래그 앤 드랍 이벤트 추가
+  editor.addEventListener('dragover', (e) => {
     e.preventDefault();
-    summernoteEditor.classList.add('dragover');
+    editor.parentElement.classList.add('dragover');
   });
   
-  summernoteEditor.addEventListener('dragleave', () => {
-    summernoteEditor.classList.remove('dragover');
+  editor.addEventListener('dragleave', () => {
+    editor.parentElement.classList.remove('dragover');
   });
   
-  summernoteEditor.addEventListener('drop', (e) => {
+  editor.addEventListener('drop', (e) => {
     e.preventDefault();
-    summernoteEditor.classList.remove('dragover');
+    editor.parentElement.classList.remove('dragover');
     
     const files = e.dataTransfer.files;
     if (files.length > 0 && files[0].type.startsWith('image/')) {
@@ -421,7 +702,7 @@ function setupImageUpload() {
   });
   
   // 클릭으로 파일 선택
-  summernoteEditor.addEventListener('click', () => {
+  editor.addEventListener('click', () => {
     fileInput.click();
   });
   
@@ -439,20 +720,36 @@ function setupImageUpload() {
     
     const reader = new FileReader();
     reader.onload = (e) => {
-      // Summernote 에디터에 이미지 삽입
-      $('#summernote-editor').summernote('insertImage', e.target.result);
+      // 에디터에 이미지 삽입
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.maxWidth = '100%';
+      img.style.height = 'auto';
+      
+      // 현재 커서 위치에 이미지 삽입
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        range.insertNode(img);
+        range.setStartAfter(img);
+        range.setEndAfter(img);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        editor.appendChild(img);
+      }
+      
+      // 변경 이벤트 발생
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
     };
     reader.readAsDataURL(file);
   }
 }
 
 
-// 임시저장 기능 (admin-panel.js 스타일)
+// 임시저장 기능
 function saveDraft() {
-  // Summernote 내용을 textarea에 동기화
-  syncSummernoteToTextarea();
-  
-  const content = document.getElementById('post-content').value;
+  const content = document.getElementById('post-content').innerHTML;
   const tags = document.getElementById('post-tags').value;
   const category = document.getElementById('post-category').value;
   
@@ -467,17 +764,14 @@ function saveDraft() {
   showTopMessage(i18nData.write.messages.draftSaved);
 }
 
-// 임시저장 불러오기 (admin-panel.js 스타일)
+// 임시저장 불러오기
 function loadDraft() {
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
   
   if (draft.content) {
-    document.getElementById('post-content').value = draft.content || '';
+    document.getElementById('post-content').innerHTML = draft.content || '';
     document.getElementById('post-tags').value = draft.tags || '';
     document.getElementById('post-category').value = draft.category || 'txt';
-    
-    // Summernote에 내용 동기화
-    syncTextareaToSummernote();
     
     // 상단 메시지 표시
     showTopMessage(i18nData.write.messages.draftLoaded);
@@ -594,11 +888,8 @@ function addTag(tag) {
 
 
 function savePost() {
-  // Summernote 내용을 textarea에 동기화
-  syncSummernoteToTextarea();
-  
   const category = document.getElementById('post-category').value;
-  const content = document.getElementById('post-content').value;
+  const content = document.getElementById('post-content').innerHTML;
   const tags = document.getElementById('post-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
   
   if (!content.trim()) {
@@ -628,11 +919,8 @@ function savePost() {
 
 function clearForm() {
   document.getElementById('post-category').value = 'txt';
-  document.getElementById('post-content').value = '';
+  document.getElementById('post-content').innerHTML = '';
   document.getElementById('post-tags').value = '';
-  
-  // Summernote 에디터 초기화
-  $('#summernote-editor').summernote('code', '');
   
   // 파일 입력 초기화
   document.getElementById('image-file-input').value = '';
@@ -720,10 +1008,7 @@ function setupAutoSave() {
   
   // 1분마다 자동 저장 (알림 없음)
   autoSaveInterval = setInterval(() => {
-    // Summernote 내용을 textarea에 동기화
-    syncSummernoteToTextarea();
-    
-    const content = document.getElementById('post-content').value;
+    const content = document.getElementById('post-content').innerHTML;
     if (content.trim()) {
       saveDraft();
       // 알림 없이 조용히 저장
@@ -746,74 +1031,57 @@ function redirectTo404() {
   window.location.href = '/404.html';
 }
 
-// 커스텀 툴바 기능 초기화
-function initializeCustomToolbar() {
-  // HTML 보기 토글
-  const htmlToggle = document.getElementById('chk_html');
-  if (htmlToggle) {
-    htmlToggle.addEventListener('change', function() {
-      if (this.checked) {
-        $('#summernote-editor').summernote('codeview.toggle');
+// 간단한 에디터 툴바 기능
+function initializeSimpleEditorToolbar() {
+  // 드롭다운 메뉴 토글 기능
+  function setupDropdownToggle() {
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // 다른 드롭다운 닫기
+        document.querySelectorAll('.note-dropdown-menu').forEach(menu => {
+          if (menu !== this.nextElementSibling) {
+            menu.style.display = 'none';
+          }
+        });
+        
+        // 현재 드롭다운 토글
+        const dropdown = this.nextElementSibling;
+        if (dropdown) {
+          const isVisible = dropdown.style.display === 'block';
+          dropdown.style.display = isVisible ? 'none' : 'block';
+        }
+      });
+    });
+    
+    // 외부 클릭 시 드롭다운 닫기
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.note-btn-group') && !e.target.closest('.note-dropdown-menu')) {
+        document.querySelectorAll('.note-dropdown-menu').forEach(menu => {
+          menu.style.display = 'none';
+        });
+      }
+    });
+    
+    // 드롭다운 메뉴 내부 클릭 시 닫히지 않도록
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.note-dropdown-menu')) {
+        e.stopPropagation();
       }
     });
   }
-
-  // 글꼴 선택
-  const fontDropdown = document.querySelector('.dropdown-fontname');
-  if (fontDropdown) {
-    const fontItems = fontDropdown.querySelectorAll('.note-dropdown-item');
-    fontItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        const fontName = this.getAttribute('data-value');
-        
-        // Summernote에 글꼴 적용
-        $('#summernote-editor').summernote('fontName', fontName);
-        
-        // 현재 선택된 글꼴 업데이트
-        const currentFont = document.querySelector('.note-current-fontname');
-        if (currentFont) {
-          currentFont.textContent = fontName;
-          currentFont.style.fontFamily = `'${fontName}'`;
-        }
-        
-        // 체크 표시 업데이트
-        fontItems.forEach(fontItem => fontItem.classList.remove('checked'));
-        this.classList.add('checked');
-      });
-    });
-  }
-
-  // 글자 크기 선택
-  const sizeDropdown = document.querySelector('.dropdown-fontsize');
-  if (sizeDropdown) {
-    const sizeItems = sizeDropdown.querySelectorAll('.note-dropdown-item');
-    sizeItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        const fontSize = this.getAttribute('data-value');
-        
-        // Summernote에 글자 크기 적용
-        $('#summernote-editor').summernote('fontSize', fontSize);
-        
-        // 현재 선택된 크기 업데이트
-        const currentSize = document.querySelector('.note-current-fontsize');
-        if (currentSize) {
-          currentSize.textContent = fontSize;
-        }
-        
-        // 체크 표시 업데이트
-        sizeItems.forEach(sizeItem => sizeItem.classList.remove('checked'));
-        this.classList.add('checked');
-      });
-    });
-  }
+  
+  // 드롭다운 토글 설정
+  setupDropdownToggle();
 
   // 텍스트 스타일 버튼들
   const boldBtn = document.querySelector('.note-btn-bold');
   if (boldBtn) {
     boldBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('bold');
+      document.execCommand('bold');
       this.classList.toggle('active');
     });
   }
@@ -821,7 +1089,7 @@ function initializeCustomToolbar() {
   const italicBtn = document.querySelector('.note-btn-italic');
   if (italicBtn) {
     italicBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('italic');
+      document.execCommand('italic');
       this.classList.toggle('active');
     });
   }
@@ -829,7 +1097,7 @@ function initializeCustomToolbar() {
   const underlineBtn = document.querySelector('.note-btn-underline');
   if (underlineBtn) {
     underlineBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('underline');
+      document.execCommand('underline');
       this.classList.toggle('active');
     });
   }
@@ -837,7 +1105,7 @@ function initializeCustomToolbar() {
   const strikethroughBtn = document.querySelector('.note-btn-strikethrough');
   if (strikethroughBtn) {
     strikethroughBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('strikethrough');
+      document.execCommand('strikeThrough');
       this.classList.toggle('active');
     });
   }
@@ -845,21 +1113,46 @@ function initializeCustomToolbar() {
   const eraserBtn = document.querySelector('.note-icon-eraser').parentElement;
   if (eraserBtn) {
     eraserBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('removeFormat');
+      document.execCommand('removeFormat');
     });
   }
 
   // 색상 선택
   const colorBtns = document.querySelectorAll('.note-color-btn');
   colorBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
       const color = this.getAttribute('data-value');
       const event = this.getAttribute('data-event');
       
       if (event === 'foreColor') {
-        $('#summernote-editor').summernote('foreColor', color);
+        document.execCommand('foreColor', false, color);
+        // 현재 색상 버튼 업데이트
+        const currentColorBtn = document.querySelector('.note-current-color-button');
+        if (currentColorBtn) {
+          currentColorBtn.setAttribute('data-forecolor', color);
+          const colorIcon = currentColorBtn.querySelector('.note-recent-color');
+          if (colorIcon) {
+            colorIcon.style.color = color;
+          }
+        }
       } else if (event === 'backColor') {
-        $('#summernote-editor').summernote('backColor', color);
+        document.execCommand('backColor', false, color);
+        // 현재 배경색 버튼 업데이트
+        const currentColorBtn = document.querySelector('.note-current-color-button');
+        if (currentColorBtn) {
+          currentColorBtn.setAttribute('data-backcolor', color);
+          const colorIcon = currentColorBtn.querySelector('.note-recent-color');
+          if (colorIcon) {
+            colorIcon.style.backgroundColor = color;
+          }
+        }
+      }
+      
+      // 색상 선택 후 드롭다운 닫기
+      const colorDropdown = this.closest('.note-dropdown-menu');
+      if (colorDropdown) {
+        colorDropdown.style.display = 'none';
       }
     });
   });
@@ -867,10 +1160,11 @@ function initializeCustomToolbar() {
   // 표 삽입
   const tableBtn = document.querySelector('.note-icon-table').parentElement;
   if (tableBtn) {
-    tableBtn.addEventListener('click', function() {
+    tableBtn.addEventListener('click', function(e) {
+      e.preventDefault();
       // 간단한 표 삽입 (3x3)
-      const tableHtml = '<table><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>';
-      $('#summernote-editor').summernote('pasteHTML', tableHtml);
+      const tableHtml = '<table border="1" style="border-collapse: collapse; width: 100%;"><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr><tr><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td><td style="padding: 8px; border: 1px solid #ccc;"></td></tr></table>';
+      document.execCommand('insertHTML', false, tableHtml);
     });
   }
 
@@ -880,13 +1174,13 @@ function initializeCustomToolbar() {
     btn.addEventListener('click', function() {
       const icon = this.querySelector('i');
       if (icon.classList.contains('note-icon-align-left')) {
-        $('#summernote-editor').summernote('justifyLeft');
+        document.execCommand('justifyLeft');
       } else if (icon.classList.contains('note-icon-align-center')) {
-        $('#summernote-editor').summernote('justifyCenter');
+        document.execCommand('justifyCenter');
       } else if (icon.classList.contains('note-icon-align-right')) {
-        $('#summernote-editor').summernote('justifyRight');
+        document.execCommand('justifyRight');
       } else if (icon.classList.contains('note-icon-align-justify')) {
-        $('#summernote-editor').summernote('justifyFull');
+        document.execCommand('justifyFull');
       }
     });
   });
@@ -895,29 +1189,14 @@ function initializeCustomToolbar() {
   const unorderedListBtn = document.querySelector('.note-icon-unorderedlist').parentElement;
   if (unorderedListBtn) {
     unorderedListBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('insertUnorderedList');
+      document.execCommand('insertUnorderedList');
     });
   }
 
   const orderedListBtn = document.querySelector('.note-icon-orderedlist').parentElement;
   if (orderedListBtn) {
     orderedListBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('insertOrderedList');
-    });
-  }
-
-  // 실행 취소/재실행
-  const undoBtn = document.querySelector('.note-icon-undo').parentElement;
-  if (undoBtn) {
-    undoBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('undo');
-    });
-  }
-
-  const redoBtn = document.querySelector('.note-icon-redo').parentElement;
-  if (redoBtn) {
-    redoBtn.addEventListener('click', function() {
-      $('#summernote-editor').summernote('redo');
+      document.execCommand('insertOrderedList');
     });
   }
 
@@ -927,71 +1206,48 @@ function initializeCustomToolbar() {
     linkBtn.addEventListener('click', function() {
       const url = prompt('링크 URL을 입력하세요:');
       if (url) {
-        $('#summernote-editor').summernote('createLink', url);
+        document.execCommand('createLink', false, url);
       }
     });
   }
 }
 
-// Summernote 에디터 초기화
-function initializeSummernote() {
-  $('#summernote-editor').summernote({
-    height: 300,
-    minHeight: 200,
-    maxHeight: 500,
-    focus: false,
-    lang: 'ko-KR',
-    toolbar: false, // 기본 툴바 비활성화
-    fontNames: [
-      '맑은 고딕', '굴림체', '굴림', '바탕체', '바탕', '궁서',
-      '나눔고딕', 'Helvetica', 'Arial', 'Arial Black', 'Comic Sans MS',
-      'Courier New', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'
-    ],
-    fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36', '50', '72', '96'],
-    callbacks: {
-      onChange: function(contents, $editable) {
-        // Summernote 내용이 변경될 때마다 숨겨진 textarea에 동기화
-        $('#post-content').val(contents);
-        // undo/redo 버튼 상태 업데이트
-        updateUndoRedoButtons();
-      },
-      onInit: function() {
-        // 에디터 초기화 완료 후 기존 내용 로드
-        const existingContent = $('#post-content').val();
-        if (existingContent) {
-          $('#summernote-editor').summernote('code', existingContent);
-        }
-        // 초기 버튼 상태 설정
-        updateUndoRedoButtons();
-        
-        // 커스텀 툴바 초기화
-        initializeCustomToolbar();
-      }
-    }
+// 간단한 에디터 초기화
+function initializeSimpleEditor() {
+  const editor = document.getElementById('post-content');
+  
+  // 에디터 포커스 설정
+  editor.addEventListener('focus', function() {
+    this.style.outline = 'none';
   });
-}
-
-// Summernote 내용을 textarea에 동기화하는 함수
-function syncSummernoteToTextarea() {
-  const content = $('#summernote-editor').summernote('code');
-  $('#post-content').val(content);
-}
-
-// textarea 내용을 Summernote에 동기화하는 함수
-function syncTextareaToSummernote() {
-  const content = $('#post-content').val();
-  $('#summernote-editor').summernote('code', content);
+  
+  // 에디터 변경 이벤트
+  editor.addEventListener('input', function() {
+    // 변경 이벤트 발생
+    this.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  
+  // 툴바 초기화
+  initializeSimpleEditorToolbar();
 }
 
 // Undo/Redo 기능 함수들
 function performUndo() {
-  $('#summernote-editor').summernote('undo');
-  updateUndoRedoButtons();
+  try {
+    document.execCommand('undo');
+    updateUndoRedoButtons();
+  } catch (e) {
+    console.error('Undo error:', e);
+  }
 }
 
 function performRedo() {
-  $('#summernote-editor').summernote('redo');
-  updateUndoRedoButtons();
+  try {
+    document.execCommand('redo');
+    updateUndoRedoButtons();
+  } catch (e) {
+    console.error('Redo error:', e);
+  }
 }
 
 // Undo/Redo 버튼 상태 업데이트
@@ -1000,25 +1256,20 @@ function updateUndoRedoButtons() {
   const redoBtn = document.getElementById('redo-btn');
   
   if (undoBtn && redoBtn) {
-    // Summernote의 undo/redo 히스토리 상태 확인
-    const editor = $('#summernote-editor');
-    const undoAvailable = editor.summernote('isUndoable');
-    const redoAvailable = editor.summernote('isRedoable');
+    // 간단한 상태 확인 (실제로는 더 정교한 구현이 필요)
+    const editor = document.getElementById('post-content');
+    const hasContent = editor.innerHTML.trim() !== '';
     
-    // 버튼 활성화/비활성화
-    undoBtn.disabled = !undoAvailable;
-    redoBtn.disabled = !redoAvailable;
+    // 버튼 활성화/비활성화 (간단한 구현)
+    undoBtn.disabled = !hasContent;
+    redoBtn.disabled = !hasContent;
     
     // 시각적 피드백
-    if (undoAvailable) {
+    if (hasContent) {
       undoBtn.classList.remove('disabled');
-    } else {
-      undoBtn.classList.add('disabled');
-    }
-    
-    if (redoAvailable) {
       redoBtn.classList.remove('disabled');
     } else {
+      undoBtn.classList.add('disabled');
       redoBtn.classList.add('disabled');
     }
   }
@@ -1027,6 +1278,12 @@ function updateUndoRedoButtons() {
 // 키보드 단축키 설정
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', function(e) {
+    // 에디터가 포커스되어 있을 때만 단축키 적용
+    const editor = document.getElementById('post-content');
+    if (document.activeElement !== editor) {
+      return;
+    }
+    
     // Ctrl+Z (Undo)
     if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
       e.preventDefault();
@@ -1040,6 +1297,9 @@ function setupKeyboardShortcuts() {
   });
 }
 
+// 전역 변수로 에디터 초기화 상태 관리
+let isEditorInitialized = false;
+
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
   // 관리자 권한 체크
@@ -1048,8 +1308,16 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Summernote 에디터 초기화
-  initializeSummernote();
+  // 이미 초기화되었으면 중복 실행 방지
+  if (isEditorInitialized) {
+    return;
+  }
+  
+  // 간단한 에디터 초기화
+  initializeSimpleEditor();
+  
+  // 초기화 완료 표시
+  isEditorInitialized = true;
   
   // 카테고리 로드
   loadCategories();
@@ -1074,9 +1342,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 키보드 단축키 설정
   setupKeyboardShortcuts();
-  
-  // 카테고리 변경 이벤트 (이제는 특별한 처리가 필요 없음)
-  const categorySelect = document.getElementById('post-category');
   
   // 페이지 로드 시 임시저장 자동 불러오기
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');
