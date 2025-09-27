@@ -95,11 +95,79 @@ router.post('/github', async (req, res) => {
   }
 });
 
-// posts.json 업데이트 엔드포인트
-router.post('/update-posts', async (req, res) => {
+// Base64 이미지 변환 및 Neocities 업로드 엔드포인트
+router.post('/convert-and-upload-image', async (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const FormData = require('form-data');
+    
+    const { base64Data } = req.body;
+    
+    if (!base64Data || !base64Data.startsWith('data:image/')) {
+      return res.status(400).json({ error: 'Invalid base64 image data' });
+    }
+    
+    // 파일명 생성
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const extension = base64Data.split(';')[0].split('/')[1];
+    const filename = `${timestamp}_${randomString}.${extension}`;
+    
+    // Base64를 파일로 변환
+    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      throw new Error('Invalid base64 data');
+    }
+    
+    const base64Content = matches[2];
+    const buffer = Buffer.from(base64Content, 'base64');
+    
+    // 업로드 폴더 생성
+    const uploadDir = path.join(__dirname, '..', 'images', 'uploaded');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, buffer);
+    
+    // Neocities에 업로드
+    if (neocitiesApiToken) {
+      const formData = new FormData();
+      formData.append(`images/uploaded/${filename}`, fs.createReadStream(filePath));
+      
+      const response = await fetch('https://neocities.org/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${neocitiesApiToken}`,
+          ...formData.getHeaders()
+        },
+        body: formData
+      });
+      
+      if (response.ok) {
+        const imageUrl = `https://dakimakura.neocities.org/images/uploaded/${filename}`;
+        console.log('Image uploaded to Neocities:', imageUrl);
+        res.json({ success: true, imageUrl });
+      } else {
+        throw new Error(`Neocities upload failed: ${response.status}`);
+      }
+    } else {
+      throw new Error('Neocities API token not configured');
+    }
+  } catch (error) {
+    console.error('Image conversion/upload error:', error);
+    res.status(500).json({ error: 'Failed to convert and upload image' });
+  }
+});
+
+// posts.json 업데이트 및 Git 커밋 엔드포인트
+router.post('/update-posts-and-commit', async (req, res) => {
   try {
     const fs = require('fs').promises;
     const path = require('path');
+    const { exec } = require('child_process');
     
     const { posts } = req.body;
     
@@ -114,39 +182,35 @@ router.post('/update-posts', async (req, res) => {
     await fs.writeFile(postsPath, JSON.stringify(postsData, null, 2), 'utf8');
     console.log('posts.json 파일이 업데이트되었습니다.');
     
-    // Neocities에 posts.json 업로드
-    if (neocitiesApiToken) {
-      try {
-        const formData = new FormData();
-        const blob = new Blob([JSON.stringify(postsData, null, 2)], { type: 'application/json' });
-        formData.append('posts.json', blob, 'posts.json');
-        
-        const response = await fetch('https://neocities.org/api/upload', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${neocitiesApiToken}`,
-          },
-          body: formData
+    // Git에 커밋 및 푸시
+    const commands = [
+      'git add src/posts.json',
+      'git add src/images/uploaded/',
+      'git commit -m "Add new post with images"',
+      'git push origin main'
+    ];
+    
+    for (const command of commands) {
+      await new Promise((resolve, reject) => {
+        exec(command, (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Command failed: ${command}`, error);
+            reject(error);
+            return;
+          }
+          console.log(stdout);
+          if (stderr) console.error(stderr);
+          resolve();
         });
-        
-        if (response.ok) {
-          console.log('Neocities에 posts.json이 업로드되었습니다.');
-          res.json({ success: true, message: 'Posts updated and uploaded to Neocities' });
-        } else {
-          console.warn('Neocities 업로드 실패, 로컬에만 저장됨');
-          res.json({ success: true, message: 'Posts updated locally, Neocities upload failed' });
-        }
-      } catch (uploadError) {
-        console.error('Neocities 업로드 오류:', uploadError);
-        res.json({ success: true, message: 'Posts updated locally, Neocities upload failed' });
-      }
-    } else {
-      console.warn('Neocities API 토큰이 없어서 로컬에만 저장됨');
-      res.json({ success: true, message: 'Posts updated locally, Neocities API token not configured' });
+      });
     }
+    
+    console.log('Git 커밋 및 푸시 완료');
+    res.json({ success: true, message: 'Posts updated and committed to Git' });
+    
   } catch (error) {
-    console.error('Posts update error:', error);
-    res.status(500).json({ error: 'Failed to update posts' });
+    console.error('Posts update and commit error:', error);
+    res.status(500).json({ error: 'Failed to update posts and commit to Git' });
   }
 });
 

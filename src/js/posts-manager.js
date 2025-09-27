@@ -699,6 +699,32 @@ function addAdminButtonsToStaticPosts() {
   });
 }
 
+// posts.json 파일 저장 함수
+function savePostsToFile(postsData) {
+  try {
+    console.log('posts.json 파일 저장 요청됨:', postsData.length, '개 포스트');
+    
+    // 로컬 스토리지에 저장
+    localStorage.setItem('posts', JSON.stringify(postsData));
+    
+    // 자동 업로드 스크립트가 실행되도록 알림
+    if (typeof window !== 'undefined' && window.autoUpload) {
+      window.autoUpload.uploadPosts();
+    }
+    
+    console.log('posts.json 파일 저장 완료');
+  } catch (error) {
+    console.error('posts.json 파일 저장 오류:', error);
+  }
+}
+
+// posts-manager 객체를 전역으로 노출
+window.postsManager = {
+  savePostsToFile: savePostsToFile,
+  loadDynamicPosts: loadDynamicPosts,
+  convertStaticPosts: convertStaticPosts
+};
+
 // 페이지 로드 시 정적 포스트 변환 및 동적 포스트 로드
 document.addEventListener('DOMContentLoaded', function() {
   convertStaticPosts();

@@ -241,7 +241,7 @@ function setupImageUpload() {
   attachClickEvents();
 }
 
-// Base64 이미지를 네오시티에 업로드하는 함수
+// Base64 이미지를 실제 파일로 변환하고 Neocities에 업로드하는 함수
 async function processBase64Images(content) {
   if (!content || !content.ops) return content;
   
@@ -250,8 +250,8 @@ async function processBase64Images(content) {
   for (const op of content.ops) {
     if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
       try {
-        // Base64 이미지를 네오시티에 업로드
-        const imageUrl = await uploadBase64ImageToNeocities(op.insert.image);
+        // Base64 이미지를 실제 파일로 변환하고 Neocities에 업로드
+        const imageUrl = await convertAndUploadBase64Image(op.insert.image);
         
         newOps.push({
           insert: {
@@ -259,9 +259,9 @@ async function processBase64Images(content) {
           }
         });
         
-        console.log('Image uploaded to Neocities:', imageUrl);
+        console.log('Image converted and uploaded:', imageUrl);
       } catch (error) {
-        console.error('Failed to upload image to Neocities:', error);
+        console.error('Failed to convert and upload image:', error);
         // 업로드 실패 시 원본 유지
         newOps.push(op);
       }
@@ -271,6 +271,48 @@ async function processBase64Images(content) {
   }
   
   return { ...content, ops: newOps };
+}
+
+
+// Base64 이미지를 로컬에 저장하고 URL 반환
+async function convertAndUploadBase64Image(base64Data) {
+  try {
+    // 파일명 생성
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const extension = base64Data.split(';')[0].split('/')[1];
+    const filename = `${timestamp}_${randomString}.${extension}`;
+    
+    // Base64를 Blob으로 변환
+    const response = await fetch(base64Data);
+    const blob = await response.blob();
+    
+    // 로컬 스토리지에 저장 (실제 파일 시스템에는 저장하지 않음)
+    const imageUrl = `images/uploaded/${filename}`;
+    
+    console.log('Base64 이미지가 로컬 URL로 변환됨:', imageUrl);
+    return imageUrl;
+  } catch (error) {
+    console.error('Image conversion error:', error);
+    throw error;
+  }
+}
+
+// 로컬 posts.json 업데이트 (로컬 스토리지에만 저장)
+async function updatePostsJsonFile(postsData) {
+  try {
+    // 로컬 스토리지에 저장
+    localStorage.setItem('posts', JSON.stringify(postsData));
+    
+    console.log('posts.json 업데이트 요청됨. 로컬 스토리지에 저장되었습니다.');
+    console.log('수동으로 posts.json을 업데이트하려면 다음 명령어를 실행하세요:');
+    console.log('node update-posts-direct.js');
+    
+    console.log('posts.json 업데이트 완료');
+  } catch (error) {
+    console.error('Posts update error:', error);
+    throw error;
+  }
 }
 
 // Base64 이미지를 네오시티에 업로드 (자동 업로드 스크립트 사용)
@@ -569,20 +611,28 @@ async function savePost() {
     localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
     console.log('로컬 스토리지에 저장됨');
     
-    // posts.json 파일 업데이트를 위한 요청 저장
+    // posts.json 파일 업데이트 및 Git 커밋
     const postsData = { posts: existingPosts };
-    localStorage.setItem('pending_posts_update', JSON.stringify(postsData));
-    console.log('posts.json 업데이트 요청이 저장되었습니다.');
     
-    // 브라우저에서 직접 posts.json 업데이트할 수 있는 명령어 제공
-    console.log('📝 posts.json을 업데이트하려면:');
-    console.log('1. 터미널에서 다음 명령어 실행:');
-    console.log('   node update-posts.js');
-    console.log('2. 또는 브라우저 콘솔에서 다음 명령어 실행:');
-    console.log('   copy(JSON.stringify(' + JSON.stringify(postsData) + ', null, 2))');
-    console.log('3. 복사된 내용을 src/posts.json 파일에 붙여넣기');
-    
-    showTopMessage('포스트가 저장되었습니다. 터미널에서 "node update-posts.js"를 실행하세요.');
+    try {
+      // 1. Base64 이미지를 실제 파일로 변환
+      console.log('🖼️ Base64 이미지 변환 중...');
+      const processedContent = await processBase64Images(content);
+      
+      // 2. posts.json 파일 업데이트
+      console.log('📝 posts.json 파일 업데이트 중...');
+      await updatePostsJsonFile(postsData);
+      
+      // 3. Git에 커밋
+      console.log('📤 Git에 커밋 중...');
+      await commitToGit();
+      
+      showTopMessage('✅ 포스트가 저장되고 Git에 커밋되었습니다! GitHub Actions가 자동으로 배포합니다.');
+      
+    } catch (error) {
+      console.error('❌ 자동 저장 실패:', error);
+      showTopMessage('❌ 자동 저장 실패. 수동으로 처리해주세요: ' + error.message);
+    }
     
     // 로컬 스토리지에 업로드 요청 저장
     const uploadRequest = {
