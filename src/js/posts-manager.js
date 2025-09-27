@@ -276,7 +276,7 @@ async function deletePost(postId) {
     await deletePostFromNeocities(postId);
     
     // 3. 관련 이미지 삭제
-    await deletePostImages(postId);
+    const imageDeleteResult = await deletePostImages(postId);
     
     // 4. UI에서 제거
     removePostFromUI(postId);
@@ -322,14 +322,33 @@ async function deletePostFromLocal(postId) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
     }
     
-    // 로컬 스토리지에 업데이트된 포스트 저장
-    const updatedData = { ...data, posts: filteredPosts };
-    localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
+    // Neocities에 업데이트된 posts.json 업로드
+    try {
+      await updateNeocitiesPostsJson(filteredPosts);
+      console.log('Neocities에서 posts.json이 업데이트되었습니다.');
+    } catch (error) {
+      console.warn('Neocities 업데이트 실패:', error);
+      // 실패 시 로컬 스토리지에만 저장
+      localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
+    }
     
     console.log('로컬에서 포스트가 삭제되었습니다.');
     
-    // GitHub에 수동으로 푸시하라는 안내
-    alert('포스트가 로컬에서 삭제되었습니다.\n\nGitHub에 변경사항을 푸시하려면:\n1. 터미널에서 "git add ."\n2. "git commit -m \'Delete post\'"\n3. "git push origin main"');
+    // 이미지 삭제 결과 메시지 생성
+    let imageMessage = '';
+    if (imageDeleteResult && imageDeleteResult.total > 0) {
+      if (imageDeleteResult.deleted.length > 0) {
+        imageMessage += `\n\n이미지 삭제: ${imageDeleteResult.deleted.length}개 성공`;
+      }
+      if (imageDeleteResult.failed.length > 0) {
+        imageMessage += `\n이미지 삭제 실패: ${imageDeleteResult.failed.length}개`;
+      }
+    } else {
+      imageMessage += '\n\n관련 이미지가 없습니다.';
+    }
+    
+    // 사용자에게 삭제 완료 알림
+    alert(`포스트가 삭제되었습니다!${imageMessage}\n\nNeocities에서도 삭제되었으므로 새로고침해도 다시 나타나지 않습니다.`);
     
   } catch (error) {
     console.error('로컬 포스트 삭제 오류:', error);
@@ -415,14 +434,33 @@ async function deletePostImages(postId) {
     }
     
     // 각 이미지 삭제
+    let deletedImages = [];
+    let failedImages = [];
+    
     for (const imagePath of imagePaths) {
       try {
         await deleteImageFromNeocities(imagePath);
-        console.log(`이미지 삭제됨: ${imagePath}`);
+        deletedImages.push(imagePath);
+        console.log(`이미지 삭제 성공: ${imagePath}`);
       } catch (error) {
+        failedImages.push(imagePath);
         console.warn(`이미지 삭제 실패: ${imagePath}`, error);
       }
     }
+    
+    // 삭제 결과 요약
+    if (deletedImages.length > 0) {
+      console.log(`성공적으로 삭제된 이미지: ${deletedImages.length}개`);
+    }
+    if (failedImages.length > 0) {
+      console.warn(`삭제 실패한 이미지: ${failedImages.length}개`);
+    }
+    
+    return {
+      deleted: deletedImages,
+      failed: failedImages,
+      total: imagePaths.length
+    };
     
   } catch (error) {
     console.error('이미지 삭제 오류:', error);
@@ -442,6 +480,8 @@ async function deleteImageFromNeocities(imagePath) {
     fileName = imagePath.split('/').pop();
   }
   
+  console.log(`이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
+  
   // Neocities API로 파일 삭제
   const formData = new FormData();
   formData.append('filenames[]', fileName);
@@ -456,16 +496,57 @@ async function deleteImageFromNeocities(imagePath) {
 
   if (!response.ok) {
     const errorData = await response.text();
+    console.error(`이미지 삭제 실패: ${response.status} ${errorData}`);
     throw new Error(`이미지 삭제 실패: ${response.status} ${errorData}`);
   }
 
-  console.log(`Neocities에서 이미지 삭제됨: ${fileName}`);
+  const result = await response.json();
+  console.log(`Neocities에서 이미지 삭제 성공: ${fileName}`, result);
+  return result;
 }
 
 // Neocities API 토큰 가져오기
 function getNeocitiesApiToken() {
   const tokenElement = document.getElementById('neocities-api-token-data');
   return tokenElement ? tokenElement.textContent.trim() : null;
+}
+
+// Neocities에 posts.json 업데이트
+async function updateNeocitiesPostsJson(posts) {
+  const neocitiesApiToken = getNeocitiesApiToken();
+  if (!neocitiesApiToken) {
+    throw new Error('Neocities API token이 필요합니다.');
+  }
+
+  // posts.json 내용 생성
+  const postsJsonContent = JSON.stringify({ posts }, null, 2);
+  
+  // Blob으로 변환
+  const blob = new Blob([postsJsonContent], { type: 'application/json' });
+  
+  // FormData 생성
+  const formData = new FormData();
+  formData.append('file', blob, 'posts.json');
+  
+  console.log('Neocities에 posts.json 업로드 중...');
+  
+  // Neocities API로 파일 업로드
+  const response = await fetch('https://neocities.org/api/upload', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${neocitiesApiToken}`,
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const errorData = await response.text();
+    throw new Error(`posts.json 업로드 실패: ${response.status} ${errorData}`);
+  }
+
+  const result = await response.json();
+  console.log('Neocities posts.json 업로드 성공:', result);
+  return result;
 }
 
 // Quill 콘텐츠에서 이미지 경로 추출
