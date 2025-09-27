@@ -91,44 +91,43 @@ runs:
           ((current_file++))
           relative_path=${file#${{ inputs.dist_dir }}/}
           echo "📤 Uploading: $relative_path ($current_file/$total_files)"
-            
-            # Get directory path for the file
-            dir_path=$(dirname "$relative_path")
-            if [ "$dir_path" = "." ]; then
-              dir_path="/"
-            else
-              dir_path="/$dir_path"
-            fi
-            
-            # Use the upload endpoint with correct parameters
-            response=$(curl -X POST \
-              -H "$AUTH_HEADER" \
-              -F "pathname=$dir_path" \
-              -F "files=@$file" \
-              "https://nekoweb.org/api/files/upload" \
-              --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
-            
-            http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
-            body=$(echo $response | sed -e 's/HTTPSTATUS:.*//g')
-            
-            if [ $http_code -eq 200 ] || [ $http_code -eq 201 ]; then
-              echo "✅ Uploaded: $relative_path"
-              echo "📁 Directory: $dir_path"
-              echo "📄 File size: $(stat -c%s "$file") bytes"
-              ((upload_count++))
-            else
-              echo "❌ Failed to upload: $relative_path (HTTP $http_code)"
-              echo "📁 Directory: $dir_path"
-              echo "📄 File size: $(stat -c%s "$file") bytes"
-              echo "Response: $body"
-              echo "Debug info:"
-              echo "  - File exists: $([ -f "$file" ] && echo "Yes" || echo "No")"
-              echo "  - File readable: $([ -r "$file" ] && echo "Yes" || echo "No")"
-              echo "  - File size: $(stat -c%s "$file") bytes"
-              echo "  - Relative path: $relative_path"
-              echo "  - Directory path: $dir_path"
-              ((error_count++))
-            fi
+          
+          # Get directory path for the file
+          dir_path=$(dirname "$relative_path")
+          if [ "$dir_path" = "." ]; then
+            dir_path="/"
+          else
+            dir_path="/$dir_path"
+          fi
+          
+          # Use the upload endpoint with correct parameters
+          response=$(curl -X POST \
+            -H "$AUTH_HEADER" \
+            -F "pathname=$dir_path" \
+            -F "files=@$file" \
+            "https://nekoweb.org/api/files/upload" \
+            --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
+          
+          http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          body=$(echo $response | sed -e 's/HTTPSTATUS:.*//g')
+          
+          if [ $http_code -eq 200 ] || [ $http_code -eq 201 ]; then
+            echo "✅ Uploaded: $relative_path"
+            echo "📁 Directory: $dir_path"
+            echo "📄 File size: $(stat -c%s "$file") bytes"
+            ((upload_count++))
+          else
+            echo "❌ Failed to upload: $relative_path (HTTP $http_code)"
+            echo "📁 Directory: $dir_path"
+            echo "📄 File size: $(stat -c%s "$file") bytes"
+            echo "Response: $body"
+            echo "Debug info:"
+            echo "  - File exists: $([ -f "$file" ] && echo "Yes" || echo "No")"
+            echo "  - File readable: $([ -r "$file" ] && echo "Yes" || echo "No")"
+            echo "  - File size: $(stat -c%s "$file") bytes"
+            echo "  - Relative path: $relative_path"
+            echo "  - Directory path: $dir_path"
+            ((error_count++))
           fi
         done
         
