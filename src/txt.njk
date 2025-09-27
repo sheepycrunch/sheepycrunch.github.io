@@ -224,12 +224,24 @@ function convertStaticPosts() {
     const quillData = postElement.getAttribute('data-quill-content');
     if (quillData) {
       try {
-        const quillContent = JSON.parse(quillData);
+        // dump 필터로 생성된 문자열을 정리
+        let cleanData = quillData.trim();
+        
+        // dump 필터는 때때로 불필요한 문자를 포함할 수 있음
+        if (cleanData.startsWith('"') && cleanData.endsWith('"')) {
+          cleanData = cleanData.slice(1, -1);
+        }
+        
+        // 이스케이프된 문자들을 복원
+        cleanData = cleanData.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+        
+        const quillContent = JSON.parse(cleanData);
         const html = convertQuillToHtml(quillContent);
         postElement.innerHTML = html;
         postElement.removeAttribute('data-quill-content');
       } catch (error) {
         console.error('Static post conversion error:', error);
+        console.error('Problematic data:', quillData);
         postElement.innerHTML = '';
       }
     }
