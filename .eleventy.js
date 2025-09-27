@@ -587,6 +587,11 @@ module.exports = function(eleventyConfig) {
     return url;
   });
   
+  // JSON stringify 필터 추가
+  eleventyConfig.addFilter("stringify", function(obj) {
+    return JSON.stringify(obj);
+  });
+  
   // JavaScript 파일에 환경변수 주입
   eleventyConfig.addTransform("inject-admin-key", function(content, outputPath) {
     if (outputPath && outputPath.endsWith('.html')) {

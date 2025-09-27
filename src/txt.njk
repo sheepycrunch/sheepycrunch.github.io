@@ -39,6 +39,11 @@ permalink: "/txt.html"
     <!-- 동적 포스트들 (JavaScript로 로드) -->
     <div id="dynamic-posts"></div>
   </div>
+  
+  <!-- Eleventy posts 데이터를 JavaScript 변수로 주입 -->
+  <script>
+    window.eleventyPosts = {{ postsData.posts | dump | safe }};
+  </script>
 </section>
 
 <script>
@@ -53,24 +58,28 @@ async function loadDynamicPosts() {
     
     let response;
     if (isLocal) {
-      // 로컬 환경: Eleventy 템플릿에서 직접 데이터 사용
-      console.log('Local environment detected. Using Eleventy template data.');
+      // 로컬 환경: Eleventy에서 주입된 JavaScript 변수 사용
+      console.log('Local environment detected. Using Eleventy JavaScript variable.');
       
-      // Eleventy 템플릿에서 직접 posts 데이터 사용
-      const posts = {{ postsData.posts | dump | safe }};
-      
-      if (posts && posts.length > 0) {
-        // 모든 포스트 표시 (카테고리 필터링 제거)
-        // 최신 포스트부터 표시
-        posts.forEach(post => {
-          const postElement = createPostElement(post);
-          dynamicPostsContainer.appendChild(postElement);
-        });
+      try {
+        const posts = window.eleventyPosts || [];
         
-        console.log(`Loaded ${posts.length} dynamic posts from Eleventy template data.`);
-        return;
-      } else {
-        console.log('No saved posts found in template data.');
+        if (posts && posts.length > 0) {
+          // 모든 포스트 표시 (카테고리 필터링 제거)
+          // 최신 포스트부터 표시
+          posts.forEach(post => {
+            const postElement = createPostElement(post);
+            dynamicPostsContainer.appendChild(postElement);
+          });
+          
+          console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable.`);
+          return;
+        } else {
+          console.log('No saved posts found in Eleventy variable.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error accessing posts data:', error);
         return;
       }
     } else {
@@ -252,25 +261,45 @@ function convertStaticPosts() {
     const quillData = postElement.getAttribute('data-quill-content');
     if (quillData) {
       try {
-        // dump 필터로 생성된 문자열을 정리
-        let cleanData = quillData.trim();
-        
-        // dump 필터는 때때로 불필요한 문자를 포함할 수 있음
-        if (cleanData.startsWith('"') && cleanData.endsWith('"')) {
-          cleanData = cleanData.slice(1, -1);
+        // 빈 데이터나 잘못된 데이터 처리
+        if (!quillData || quillData.trim() === '' || quillData === '{' || quillData === '}') {
+          console.log('Empty or invalid quillData, skipping');
+          postElement.innerHTML = '<p></p>';
+          postElement.removeAttribute('data-quill-content');
+          return;
         }
         
-        // 이스케이프된 문자들을 복원
-        cleanData = cleanData.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+        // dump 필터로 생성된 데이터를 안전하게 파싱
+        let quillContent;
         
-        const quillContent = JSON.parse(cleanData);
+        // JSON 형식인지 확인
+        if (quillData.startsWith('{') || quillData.startsWith('[')) {
+          try {
+            quillContent = JSON.parse(quillData);
+          } catch (jsonError) {
+            // JSON 파싱 실패 시 eval 사용
+            try {
+              quillContent = eval('(' + quillData + ')');
+            } catch (evalError) {
+              console.error('Both JSON and eval parsing failed:', evalError);
+              postElement.innerHTML = '<p></p>';
+              postElement.removeAttribute('data-quill-content');
+              return;
+            }
+          }
+        } else {
+          // 문자열인 경우 그대로 사용
+          quillContent = quillData;
+        }
+        
         const html = convertQuillToHtml(quillContent);
         postElement.innerHTML = html;
         postElement.removeAttribute('data-quill-content');
       } catch (error) {
         console.error('Static post conversion error:', error);
         console.error('Problematic data:', quillData);
-        postElement.innerHTML = '';
+        postElement.innerHTML = '<p></p>';
+        postElement.removeAttribute('data-quill-content');
       }
     }
   });
