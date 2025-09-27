@@ -601,9 +601,9 @@ module.exports = function(eleventyConfig) {
     if (outputPath && outputPath.endsWith('.html')) {
       // HTML 파일에서 JavaScript에 환경변수 주입
       const scriptTag = `<script>
-        window.ADMIN_SECRET_KEY = '${adminSecretKey}';
-        window.githubToken = '${githubToken}';
-        window.neocitiesApiToken = '${neocitiesApiToken}';
+        window.ADMIN_SECRET_KEY = '${adminSecretKey || ''}';
+        window.githubToken = '${githubToken || ''}';
+        window.neocitiesApiToken = '${neocitiesApiToken || ''}';
         window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);
