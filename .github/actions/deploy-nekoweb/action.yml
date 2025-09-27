@@ -106,9 +106,9 @@ runs:
           # Get directory path for the file (parent directory)
           dir_path=$(dirname "$relative_path")
           if [ "$dir_path" = "." ]; then
-            dir_path="/"
+            dir_path="/$CLEAN_SITE_NAME.nekoweb.org"
           else
-            dir_path="/$dir_path"
+            dir_path="/$CLEAN_SITE_NAME.nekoweb.org/$dir_path"
           fi
           
           # Use /files/upload with correct parameters
