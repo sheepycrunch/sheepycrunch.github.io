@@ -320,8 +320,8 @@ async function uploadBase64ImageToNeocities(base64Data) {
     throw new Error(`Neocities upload failed: ${errorData.message || response.statusText}`);
   }
   
-  // 네오시티 URL 반환
-  return `https://${siteName}.neocities.org/${fileName}`;
+  // 상대 경로 반환 (dualImage 필터가 처리)
+  return `/${fileName}`;
 }
 
 // Neocities에 이미지 업로드 (기존 함수)

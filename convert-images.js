@@ -43,8 +43,8 @@ async function uploadImageToNeocities(buffer, fileName, mime) {
 
     console.log(`Image uploaded to Neocities: ${fileName}`);
     
-    // 네오시티 URL 반환
-    return `https://dakimakura.neocities.org/images/uploaded/${fileName}`;
+    // 상대 경로 반환 (dualImage 필터가 처리)
+    return `/images/uploaded/${fileName}`;
   } catch (error) {
     throw new Error(`Failed to upload image to Neocities: ${error.message}`);
   }
