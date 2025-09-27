@@ -36,6 +36,9 @@ images/
 *.webp
 *.svg
 
-# Posts data (managed by Neocities API)
+# Posts data (managed locally only - NEVER push to GitHub)
 src/posts.json
 posts.json
+
+# Environment variables (contains sensitive data)
+.env
