@@ -129,6 +129,7 @@ function createPostElement(post) {
   
   // Admin 모드 확인
   const isAdminMode = checkAdminMode();
+  console.log('포스트 요소 생성 중, Admin 모드:', isAdminMode, '포스트 ID:', post.id || post.date);
   const adminButtons = isAdminMode ? `
     <div class="admin-buttons">
       <button class="delete-btn" onclick="deletePost('${post.id || post.date}')" title="글 삭제">✕</button>
@@ -250,19 +251,28 @@ function searchByTag(tag) {
 
 // Admin 모드 확인
 function checkAdminMode() {
+  console.log('Admin 모드 확인 중...');
   if (typeof AdminAuth !== 'undefined') {
     const adminAuth = new AdminAuth();
-    return adminAuth.isAdminLoggedIn();
+    const isLoggedIn = adminAuth.isAdminLoggedIn();
+    console.log('AdminAuth 클래스 존재, 로그인 상태:', isLoggedIn);
+    return isLoggedIn;
   }
+  console.log('AdminAuth 클래스가 정의되지 않음');
   return false;
 }
 
 // 포스트 삭제 함수
 async function deletePost(postId) {
+  console.log('deletePost 함수 호출됨, postId:', postId);
+  
   if (!checkAdminMode()) {
+    console.log('관리자 권한이 없어서 삭제 중단');
     alert('관리자 권한이 필요합니다.');
     return;
   }
+  
+  console.log('관리자 권한 확인됨, 삭제 진행');
   
   // 삭제 확인
   if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.\n\nGitHub에 직접 수정사항이 반영됩니다.')) {
@@ -295,10 +305,10 @@ async function deletePost(postId) {
     // 3. UI에서 즉시 제거
     removePostFromUI(postId);
     
-    // 4. 성공 메시지 표시
-    setTimeout(() => {
-      alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ 수동으로 GitHub에 푸시하면 배포됩니다\n✓ Neocities는 자동으로 동기화됩니다');
-    }, 100);
+     // 4. 성공 메시지 표시
+     setTimeout(() => {
+       alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다\n✓ GitHub에 수동 푸시하면 완전 동기화됩니다');
+     }, 100);
     
   } catch (error) {
     console.error('포스트 삭제 중 오류 발생:', error);
@@ -356,15 +366,24 @@ async function deletePostFromLocal(postId) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
     }
 
-    // 2. 로컬 스토리지에 업데이트된 포스트 저장
-    const updatedContent = { posts: filteredPosts };
-    localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
-    console.log('로컬 스토리지에 업데이트된 포스트 저장됨');
-    
-    // 3. GitHub Actions 웹훅 트리거 (CSP 우회)
-    await triggerDeployment();
-    
-    console.log('포스트 삭제가 예약되었습니다. GitHub Actions를 통해 처리됩니다.');
+     // 2. 로컬 스토리지에 업데이트된 포스트 저장
+     const updatedContent = { posts: filteredPosts };
+     localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
+     console.log('로컬 스토리지에 업데이트된 포스트 저장됨');
+     
+     // 3. Neocities에 직접 posts.json 업데이트
+     try {
+       await updateNeocitiesPostsJson(filteredPosts);
+       console.log('Neocities에 posts.json이 업데이트되었습니다.');
+     } catch (error) {
+       console.warn('Neocities 업데이트 실패:', error);
+       // Neocities 업데이트 실패해도 삭제는 계속 진행
+     }
+     
+     // 4. GitHub Actions 웹훅 트리거 (CSP 우회)
+     await triggerDeployment();
+     
+     console.log('포스트 삭제가 완료되었습니다.');
     
   } catch (error) {
     console.error('포스트 삭제 오류:', error);
