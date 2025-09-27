@@ -570,7 +570,7 @@ module.exports = function(eleventyConfig) {
       // HTML 파일에서 JavaScript에 환경변수 주입
       const scriptTag = `<script>
         window.ADMIN_SECRET_KEY = '${adminSecretKey}';
-        window.GITHUB_TOKEN = '${githubToken}';
+        window.githubToken = '${githubToken}';
         window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);
