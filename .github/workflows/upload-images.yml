@@ -99,7 +99,7 @@ jobs:
         // 포스트 데이터 처리
         async function processPosts() {
           try {
-            const postsData = fs.readFileSync('src/_data/posts.json', 'utf8');
+            const postsData = fs.readFileSync('src/posts.json', 'utf8');
             const posts = JSON.parse(postsData).posts || [];
             let updated = false;
             
@@ -154,7 +154,7 @@ jobs:
               // 업데이트된 포스트를 GitHub에 저장
               const fs = require('fs');
               const updatedPostsData = JSON.stringify({posts: posts}, null, 2);
-              fs.writeFileSync('src/_data/posts.json', updatedPostsData);
+              fs.writeFileSync('src/posts.json', updatedPostsData);
               console.log('Posts updated with Neocities URLs');
               
               // posts.json을 Neocities에도 업로드
@@ -186,6 +186,6 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add src/_data/posts.json
+        git add src/posts.json
         git commit -m "Update posts with Neocities image URLs" || exit 0
         git push
