@@ -170,7 +170,7 @@ jobs:
       run: node upload-images.js
       env:
         NEOCITIES_API_KEY: ${{ secrets.NEOCITIES_API_KEY }}
-        SITE_NAME: ${{ secrets.SITE_NAME }}
+        SITE_NAME: dakimakura
         
     - name: Commit and push changes
       run: |
