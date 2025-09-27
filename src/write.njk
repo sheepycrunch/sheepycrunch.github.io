@@ -637,16 +637,28 @@ async function updatePostsJsonFile(newPost) {
     
     const fileData = await response.json();
     
-    // 기존 포스트들 가져오기
-    const existingContent = JSON.parse(atob(fileData.content));
+    // 기존 포스트들 가져오기 (UTF-8 디코딩 처리)
+    const base64Content = fileData.content;
+    const binaryString = atob(base64Content);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decoder = new TextDecoder('utf-8');
+    const jsonString = decoder.decode(bytes);
+    const existingContent = JSON.parse(jsonString);
     const existingPosts = existingContent.posts || [];
     
     // 새 포스트를 맨 앞에 추가
     const updatedPosts = [newPost, ...existingPosts];
     
-    // 새 파일 내용 생성
+    // 새 파일 내용 생성 (UTF-8 인코딩 처리)
     const newContent = JSON.stringify({ posts: updatedPosts }, null, 2);
-    const encodedContent = btoa(unescape(encodeURIComponent(newContent)));
+    
+    // UTF-8 인코딩을 위한 TextEncoder 사용
+    const encoder = new TextEncoder();
+    const utf8Bytes = encoder.encode(newContent);
+    const encodedContent = btoa(String.fromCharCode(...utf8Bytes));
     
     // 파일 업데이트
     const updateResponse = await fetch('https://api.github.com/repos/sheepycrunch/sheepycrunch.github.io/contents/src/_data/posts.json', {
