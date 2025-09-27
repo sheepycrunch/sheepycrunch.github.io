@@ -41,7 +41,22 @@ jobs:
         echo "ELEVENTY_ENV: $ELEVENTY_ENV"
         echo "NEOCITIES_URL: $NEOCITIES_URL"
         echo "NEKOWEB_URL: $NEKOWEB_URL"
-        npx @11ty/eleventy --verbose
+        echo "Current directory contents:"
+        ls -la
+        echo "Node version:"
+        node --version
+        echo "NPM version:"
+        npm --version
+        echo "Starting Eleventy build..."
+        npx @11ty/eleventy --verbose || {
+          echo "Eleventy build failed with exit code $?"
+          echo "Checking if _site directory was created:"
+          ls -la _site/ || echo "_site directory not found"
+          exit 1
+        }
+        echo "Build completed successfully"
+        echo "Final _site directory contents:"
+        ls -la _site/
       env:
         ELEVENTY_ENV: production
         NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
