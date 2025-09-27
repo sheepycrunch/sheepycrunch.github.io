@@ -87,10 +87,21 @@ runs:
         
         # Upload each file
         current_file=0
+        dist_dir="${{ inputs.dist_dir }}"
+        echo "🔍 Debug: dist_dir = $dist_dir"
+        echo "🔍 Debug: file_list length = ${#file_list[@]}"
+        
         for file in "${file_list[@]}"; do
           ((current_file++))
-          relative_path=${file#${{ inputs.dist_dir }}/}
+          relative_path=${file#$dist_dir/}
           echo "📤 Uploading: $relative_path ($current_file/$total_files)"
+          
+          # Verify file exists before processing
+          if [ ! -f "$file" ]; then
+            echo "❌ File not found: $file"
+            ((error_count++))
+            continue
+          fi
           
           # Get directory path for the file
           dir_path=$(dirname "$relative_path")
