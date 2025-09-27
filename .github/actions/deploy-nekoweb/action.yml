@@ -111,14 +111,30 @@ runs:
             dir_path="/$dir_path"
           fi
           
-          # Use the upload endpoint for file uploads
-          # Try with full file path as pathname first
+          # Try different approaches for file upload
           file_path="/$relative_path"
+          
+          # First, try to create the file if it doesn't exist
+          echo "🔍 Creating file: $file_path"
+          create_response=$(curl -X POST \
+            -H "$AUTH_HEADER" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "pathname=$file_path&isFolder=false" \
+            "https://nekoweb.org/api/files/create" \
+            --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
+          
+          create_http_code=$(echo $create_response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+          create_body=$(echo $create_response | sed -e 's/HTTPSTATUS:.*//g')
+          
+          echo "📋 Create response (HTTP $create_http_code): $create_body"
+          
+          # Then edit the file with content
+          echo "📝 Editing file with content: $file_path"
           response=$(curl -X POST \
             -H "$AUTH_HEADER" \
             -F "pathname=$file_path" \
-            -F "files=@$file" \
-            "https://nekoweb.org/api/files/upload" \
+            -F "content=@$file" \
+            "https://nekoweb.org/api/files/edit" \
             --silent --show-error --write-out "HTTPSTATUS:%{http_code}")
           
           http_code=$(echo $response | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
@@ -128,13 +144,14 @@ runs:
             echo "✅ Uploaded: $relative_path"
             echo "📁 File path: $file_path"
             echo "📄 File size: $(stat -c%s "$file") bytes"
-            echo "📋 Response: $body"
+            echo "📋 Edit response: $body"
             ((upload_count+=1))
           else
             echo "❌ Failed to upload: $relative_path (HTTP $http_code)"
             echo "📁 File path: $file_path"
             echo "📄 File size: $(stat -c%s "$file") bytes"
-            echo "📋 Response: $body"
+            echo "📋 Create response: $create_body"
+            echo "📋 Edit response: $body"
             echo "🔍 Debug info:"
             echo "  - File exists: $([ -f "$file" ] && echo "Yes" || echo "No")"
             echo "  - File readable: $([ -r "$file" ] && echo "Yes" || echo "No")"
@@ -142,7 +159,8 @@ runs:
             echo "  - Relative path: $relative_path"
             echo "  - File path: $file_path"
             echo "  - Full file path: $file"
-            echo "  - API endpoint: https://nekoweb.org/api/files/upload"
+            echo "  - Create endpoint: https://nekoweb.org/api/files/create"
+            echo "  - Edit endpoint: https://nekoweb.org/api/files/edit"
             echo "  - Auth header: $AUTH_HEADER"
             ((error_count+=1))
           fi
