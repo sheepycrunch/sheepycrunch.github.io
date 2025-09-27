@@ -29,6 +29,7 @@ jobs:
         ELEVENTY_ENV: production
         NEOCITIES_URL: https://${{ secrets.NEOCITIES_SITE_NAME }}.neocities.org
         NEKOWEB_URL: https://${{ secrets.SITE_NAME }}.nekoweb.org
+        ADMIN_SECRET_KEY: ${{ secrets.ADMIN_SECRET_KEY }}
         
     - name: Deploy to Neocities
       uses: bcomnes/deploy-to-neocities@v1
