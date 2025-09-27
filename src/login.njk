@@ -29,23 +29,28 @@ permalink: "/login.html"
 // 관리자 인증 클래스
 class AdminAuth {
   constructor() {
-    // 환경변수에서 관리자 키 가져오기 (빌드 시점에 주입됨)
-    this.adminKey = window.ADMIN_SECRET_KEY || 'DEFAULT_FALLBACK_KEY';
+    // 프록시 API를 사용하므로 클라이언트에서는 키를 저장하지 않음
     this.sessionKey = 'admin_session';
     this.expiresKey = 'admin_expires';
   }
   
-  verifyAdminKey(inputKey) {
-    // 관리자 키가 설정되지 않은 경우 로그인 차단
-    if (!this.adminKey || this.adminKey.trim() === '') {
+  async verifyAdminKey(inputKey) {
+    try {
+      // 프록시 API를 통해 서버에서 인증
+      const response = await fetch('/api/neocities/admin/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: inputKey })
+      });
+      
+      const result = await response.json();
+      return result.success === true;
+    } catch (error) {
+      console.error('Admin verification error:', error);
       return false;
     }
-    
-    // 영어 키만 지원
-    const trimmedInput = inputKey ? inputKey.trim() : '';
-    const trimmedAdminKey = this.adminKey.trim();
-    
-    return trimmedInput === trimmedAdminKey;
   }
   
   setAdminSession() {
@@ -97,10 +102,10 @@ window.AdminAuth = AdminAuth;
     }
   
   // 로그인 버튼 이벤트
-  document.getElementById('login-btn').addEventListener('click', function() {
+  document.getElementById('login-btn').addEventListener('click', async function() {
     const inputKey = document.getElementById('admin-key').value;
     
-    if (adminAuth.verifyAdminKey(inputKey)) {
+    if (await adminAuth.verifyAdminKey(inputKey)) {
       adminAuth.setAdminSession();
       alert('Login successful!');
       window.location.href = '/';

@@ -596,12 +596,11 @@ module.exports = function(eleventyConfig) {
     return JSON.stringify(obj);
   });
   
-  // JavaScript 파일에 환경변수 주입 (토큰 제외)
+  // JavaScript 파일에 환경변수 주입 (보안상 모든 토큰 제외)
   eleventyConfig.addTransform("inject-admin-key", function(content, outputPath) {
     if (outputPath && outputPath.endsWith('.html')) {
-      // HTML 파일에서 JavaScript에 환경변수 주입 (보안상 토큰은 제외)
+      // HTML 파일에서 JavaScript에 환경변수 주입 (보안상 모든 토큰은 제외)
       const scriptTag = `<script>
-        window.ADMIN_SECRET_KEY = '${adminSecretKey || ''}';
         window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);

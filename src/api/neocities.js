@@ -7,6 +7,7 @@ const router = express.Router();
 // 환경변수에서 토큰 가져오기
 const neocitiesApiToken = process.env.NEOCITIES_API_KEY;
 const githubToken = process.env.AUTHOR_TOKEN;
+const adminSecretKey = process.env.ADMIN_SECRET_KEY;
 
 // Neocities API 프록시 엔드포인트
 router.post('/upload', async (req, res) => {
@@ -91,6 +92,26 @@ router.post('/github', async (req, res) => {
   } catch (error) {
     console.error('GitHub API error:', error);
     res.status(500).json({ error: 'GitHub API call failed' });
+  }
+});
+
+// 관리자 인증 프록시 엔드포인트
+router.post('/admin/verify', (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!adminSecretKey) {
+      return res.status(500).json({ error: 'Admin secret key not configured' });
+    }
+    
+    if (password === adminSecretKey) {
+      res.json({ success: true, message: 'Authentication successful' });
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid password' });
+    }
+  } catch (error) {
+    console.error('Admin verification error:', error);
+    res.status(500).json({ error: 'Verification failed' });
   }
 });
 

@@ -48,28 +48,28 @@ permalink: "/write.html"
 // AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
 class AdminAuth {
   constructor() {
-    // 환경변수에서 관리자 키 가져오기 (빌드 시점에 주입됨)
-    this.adminKey = window.ADMIN_SECRET_KEY || 'DEFAULT_FALLBACK_KEY';
+    // 프록시 API를 사용하므로 클라이언트에서는 키를 저장하지 않음
     this.sessionKey = 'admin_session';
     this.expiresKey = 'admin_expires';
   }
   
-  verifyAdminKey(inputKey) {
-    // 한글 키 지원을 위한 정규화
-    const normalizedInput = this.normalizeKey(inputKey);
-    const normalizedAdminKey = this.normalizeKey(this.adminKey);
-    
-    return normalizedInput === normalizedAdminKey;
-  }
-  
-  // 키 정규화 함수 (한글 키 지원)
-  normalizeKey(key) {
-    if (!key) return '';
-    
-    // 공백만 제거하고 특수문자는 유지 (느낌표 등이 키의 일부일 수 있음)
-    return key.toString()
-      .trim()                    // 앞뒤 공백 제거
-      .replace(/\s+/g, '');      // 중간 공백만 제거
+  async verifyAdminKey(inputKey) {
+    try {
+      // 프록시 API를 통해 서버에서 인증
+      const response = await fetch('/api/neocities/admin/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: inputKey })
+      });
+      
+      const result = await response.json();
+      return result.success === true;
+    } catch (error) {
+      console.error('Admin verification error:', error);
+      return false;
+    }
   }
   
   setAdminSession() {
