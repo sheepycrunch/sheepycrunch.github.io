@@ -33,28 +33,28 @@ async function loadDynamicPosts() {
     
     let response;
     if (isLocal) {
-      // 로컬 환경: Eleventy에서 주입된 JavaScript 변수 사용 (CORS 문제 해결)
-      console.log('Local environment detected. Using Eleventy JavaScript variable.');
+      // 로컬 환경: /posts.json 직접 fetch
+      console.log('Local environment detected. Fetching from /posts.json');
       
       try {
-        const posts = window.eleventyPosts || [];
-        
-        if (posts && posts.length > 0) {
-          // 모든 포스트 표시 (카테고리 필터링 제거)
-          // 최신 포스트부터 표시
-          posts.forEach(post => {
-            const postElement = createPostElement(post);
-            dynamicPostsContainer.appendChild(postElement);
-          });
-          
-          console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable.`);
-          return;
-        } else {
-          console.log('No saved posts found in Eleventy variable.');
-          return;
-        }
+        response = await fetch('/posts.json');
+        console.log('Local fetch response:', response.status);
       } catch (error) {
-        console.error('Error accessing posts data:', error);
+        console.error('Error fetching from /posts.json:', error);
+        // Eleventy 변수로 폴백 시도
+        try {
+          const posts = window.eleventyPosts || [];
+          if (posts && posts.length > 0) {
+            posts.forEach(post => {
+              const postElement = createPostElement(post);
+              dynamicPostsContainer.appendChild(postElement);
+            });
+            console.log(`Loaded ${posts.length} dynamic posts from Eleventy variable (fallback).`);
+            return;
+          }
+        } catch (fallbackError) {
+          console.error('Fallback to Eleventy variable also failed:', fallbackError);
+        }
         return;
       }
     } else {
@@ -70,20 +70,6 @@ async function loadDynamicPosts() {
       }
     }
     
-    // 로컬에서도 fetch를 시도해보기 (CORS 프록시 사용)
-    if (isLocal && (!window.eleventyPosts || window.eleventyPosts.length === 0)) {
-      console.log('No Eleventy data found, trying fetch with CORS proxy...');
-      
-      try {
-        // CORS 프록시를 통해 Neocities에서 시도
-        console.log('Fetching posts from Neocities via CORS proxy...');
-        response = await fetch(CONFIG.corsProxyUrl + encodeURIComponent(CONFIG.neocitiesPostsUrl));
-      } catch (error) {
-        console.warn('Failed to fetch from Neocities via proxy, trying Nekoweb...');
-        // Neocities 실패 시 Nekoweb에서 시도
-        response = await fetch(CONFIG.corsProxyUrl + encodeURIComponent(CONFIG.nekowebPostsUrl));
-      }
-    }
     
     
     if (response.ok) {
