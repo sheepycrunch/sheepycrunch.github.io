@@ -12,7 +12,6 @@ permalink: "/txt.html"
   <div class="post-list" id="post-list">
     <!-- 정적 포스트들 (빌드 시점) -->
     {% for item in posts.posts %}
-      {% if item.category == "txt" %}
       <div class="post-item">
         {% if item.image %}
         <div class="post-image">
@@ -35,7 +34,6 @@ permalink: "/txt.html"
           </div>
         </div>
       </div>
-      {% endif %}
     {% endfor %}
     
     <!-- 동적 포스트들 (JavaScript로 로드) -->
@@ -65,7 +63,8 @@ async function loadDynamicPosts() {
     
     if (response.ok) {
       const fileData = await response.json();
-      const content = atob(fileData.content);
+      // UTF-8 인코딩을 올바르게 처리
+      const content = decodeURIComponent(escape(atob(fileData.content)));
       const data = JSON.parse(content);
       const posts = data.posts || [];
       
@@ -74,16 +73,14 @@ async function loadDynamicPosts() {
         return;
       }
       
-      // txt 카테고리 포스트만 필터링
-      const txtPosts = posts.filter(post => post.category === 'txt');
-      
+      // 모든 포스트 표시 (카테고리 필터링 제거)
       // 최신 포스트부터 표시
-      txtPosts.forEach(post => {
+      posts.forEach(post => {
         const postElement = createPostElement(post);
         dynamicPostsContainer.appendChild(postElement);
       });
       
-      console.log(`${txtPosts.length}개의 동적 포스트를 로드했습니다.`);
+      console.log(`${posts.length}개의 동적 포스트를 로드했습니다.`);
     } else {
       console.warn('GitHub에서 포스트를 가져올 수 없습니다.');
       dynamicPostsContainer.innerHTML = '<p>포스트를 불러올 수 없습니다.</p>';

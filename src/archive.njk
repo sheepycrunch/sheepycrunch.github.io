@@ -11,7 +11,6 @@ permalink: "/archive.html"
   
   <div class="archive-list">
     {% for item in posts.posts %}
-      {% if item.category == "archive" %}
       <div class="archive-item">
         <div class="archive-thumbnail">
           {% if item.image %}
@@ -29,7 +28,6 @@ permalink: "/archive.html"
           </div>
         </div>
       </div>
-      {% endif %}
     {% endfor %}
   </div>
 </section>

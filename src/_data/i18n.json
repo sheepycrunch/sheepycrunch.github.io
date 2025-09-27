@@ -9,7 +9,7 @@
       "selfIntroduction": "자기소개",
       "aboutSite": "이 사이트에 대해",
       "snsLinks": "링크",
-      "content": "카테고리",
+      "content": "내용",
       "siteInfo": "사이트 정보",
       "latestUpdates": "최신 업데이트",
       "write": "글 작성",
@@ -51,7 +51,6 @@
       "description": "새로운 포스트를 작성하고 미리보기를 확인하세요.",
       "form": {
         "title": "포스트 작성",
-        "category": "카테고리",
         "image": "이미지",
         "content": "내용",
         "tags": "태그 (영어만)",
@@ -247,7 +246,6 @@
       "description": "新しいポストを作成してプレビューを確認してください。",
       "form": {
         "title": "ポスト作成",
-        "category": "カテゴリ",
         "image": "画像",
         "content": "内容",
         "tags": "タグ (英語のみ)",
@@ -406,7 +404,6 @@
       "description": "Create a new post and preview it.",
       "form": {
         "title": "Post Creation",
-        "category": "Category",
         "image": "Image",
         "content": "Content",
         "tags": "Tags (English only)",
