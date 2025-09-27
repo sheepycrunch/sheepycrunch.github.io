@@ -623,11 +623,7 @@ async function savePost() {
       console.log('📝 posts.json 파일 업데이트 중...');
       await updatePostsJsonFile(postsData);
       
-      // 3. Git에 커밋
-      console.log('📤 Git에 커밋 중...');
-      await commitToGit();
-      
-      showTopMessage('✅ 포스트가 저장되고 Git에 커밋되었습니다! GitHub Actions가 자동으로 배포합니다.');
+      showTopMessage('✅ 포스트가 저장되었습니다! 수동으로 posts.json을 업데이트해주세요.');
       
     } catch (error) {
       console.error('❌ 자동 저장 실패:', error);
