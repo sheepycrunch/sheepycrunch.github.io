@@ -73,6 +73,6 @@ jobs:
       uses: ./.github/actions/deploy-nekoweb
       with:
         api_key: ${{ secrets.NEKOWEB_API_KEY }}
-        site_name: ${{ secrets.SITE_NAME }}
+        site_name: ${{ secrets.NEKOWEB_SITE_NAME }}
         dist_dir: _site
         cleanup: false
