@@ -69,8 +69,26 @@ async function loadDynamicPosts() {
       
       console.log(`${posts.length}개의 포스트를 로드했습니다.`);
     } else {
-      console.warn('GitHub에서 포스트를 가져올 수 없습니다.');
-      dynamicPostsContainer.innerHTML = '<p>포스트를 불러올 수 없습니다.</p>';
+      console.warn('GitHub에서 포스트를 가져올 수 없습니다. 로컬 저장소에서 시도합니다.');
+      // 로컬 fallback 시도
+      try {
+        const localResponse = await fetch('/src/_data/posts.json');
+        if (localResponse.ok) {
+          const localData = await localResponse.json();
+          const localPosts = localData.posts || [];
+          if (localPosts.length > 0) {
+            localPosts.forEach(post => {
+              const postElement = createPostElement(post);
+              dynamicPostsContainer.appendChild(postElement);
+            });
+            console.log(`로컬에서 ${localPosts.length}개의 포스트를 로드했습니다.`);
+            return;
+          }
+        }
+      } catch (localError) {
+        console.warn('로컬에서도 포스트를 가져올 수 없습니다:', localError);
+      }
+      dynamicPostsContainer.innerHTML = '<p>포스트를 불러올 수 없습니다. GitHub Actions가 완료될 때까지 기다려주세요.</p>';
     }
   } catch (error) {
     console.error('포스트 로드 중 오류:', error);
