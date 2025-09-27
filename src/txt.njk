@@ -21,7 +21,7 @@ permalink: "/txt.html"
         </div>
         {% endif %}
         <div class="post-content">
-          <div class="post-text">{{ item.description | safe }}</div>
+          <div class="post-text" data-quill-content="{{ item.description | dump | safe }}"></div>
           <div class="post-footer">
             <div class="post-meta">{{ item.date }}</div>
             {% if item.tags %}
@@ -119,53 +119,74 @@ function createPostElement(post) {
 
 // Quill Delta를 HTML로 변환
 function convertQuillToHtml(quillContent) {
-  if (!quillContent || !quillContent.ops) {
+  // null이나 undefined인 경우
+  if (!quillContent) {
     return '<p>내용이 없습니다.</p>';
+  }
+  
+  // 문자열인 경우 그대로 반환
+  if (typeof quillContent === 'string') {
+    return quillContent.replace(/\n/g, '<br>');
+  }
+  
+  // 객체가 아닌 경우 JSON으로 변환
+  if (typeof quillContent !== 'object') {
+    return String(quillContent).replace(/\n/g, '<br>');
+  }
+  
+  // Quill Delta 형식이 아닌 경우 JSON으로 표시
+  if (!quillContent.ops || !Array.isArray(quillContent.ops)) {
+    return '<pre>' + JSON.stringify(quillContent, null, 2) + '</pre>';
   }
   
   let html = '';
   
-  quillContent.ops.forEach(op => {
-    if (op.insert) {
-      if (typeof op.insert === 'string') {
-        let text = op.insert;
-        
-        // 줄바꿈 처리
-        text = text.replace(/\n/g, '<br>');
-        
-        // 스타일 적용
-        if (op.attributes) {
-          if (op.attributes.bold) text = `<strong>${text}</strong>`;
-          if (op.attributes.italic) text = `<em>${text}</em>`;
-          if (op.attributes.underline) text = `<u>${text}</u>`;
-          if (op.attributes.strike) text = `<s>${text}</s>`;
+  try {
+    quillContent.ops.forEach(op => {
+      if (op && op.insert) {
+        if (typeof op.insert === 'string') {
+          let text = op.insert;
           
-          // 헤더 처리
-          if (op.attributes.header) {
-            const level = op.attributes.header;
-            text = `<h${level}>${text}</h${level}>`;
+          // 줄바꿈 처리
+          text = text.replace(/\n/g, '<br>');
+          
+          // 스타일 적용
+          if (op.attributes) {
+            if (op.attributes.bold) text = `<strong>${text}</strong>`;
+            if (op.attributes.italic) text = `<em>${text}</em>`;
+            if (op.attributes.underline) text = `<u>${text}</u>`;
+            if (op.attributes.strike) text = `<s>${text}</s>`;
+            
+            // 헤더 처리
+            if (op.attributes.header) {
+              const level = op.attributes.header;
+              text = `<h${level}>${text}</h${level}>`;
+            }
+            
+            // 색상 처리
+            if (op.attributes.color) {
+              text = `<span style="color: ${op.attributes.color}">${text}</span>`;
+            }
+            if (op.attributes.background) {
+              text = `<span style="background-color: ${op.attributes.background}">${text}</span>`;
+            }
           }
           
-          // 색상 처리
-          if (op.attributes.color) {
-            text = `<span style="color: ${op.attributes.color}">${text}</span>`;
-          }
-          if (op.attributes.background) {
-            text = `<span style="background-color: ${op.attributes.background}">${text}</span>`;
-          }
+          html += text;
+        } else if (op.insert && typeof op.insert === 'object' && op.insert.image) {
+          // 이미지 처리
+          html += `<img src="${op.insert.image}" alt="이미지" style="max-width: 100%; height: auto;">`;
         }
-        
-        html += text;
-      } else if (op.insert.image) {
-        // 이미지 처리
-        html += `<img src="${op.insert.image}" alt="이미지" style="max-width: 100%; height: auto;">`;
       }
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Quill 변환 오류:', error);
+    return '';
+  }
   
   // 빈 내용 처리
   if (!html.trim()) {
-    html = '<p>내용이 없습니다.</p>';
+    html = '';
   }
   
   return html;
@@ -196,8 +217,28 @@ function searchByTag(tag) {
   window.location.href = `/search.html?q=${encodeURIComponent(tag)}`;
 }
 
-// 페이지 로드 시 동적 포스트 로드
+// 정적 포스트의 Quill 콘텐츠 변환
+function convertStaticPosts() {
+  const staticPosts = document.querySelectorAll('.post-text[data-quill-content]');
+  staticPosts.forEach(postElement => {
+    const quillData = postElement.getAttribute('data-quill-content');
+    if (quillData) {
+      try {
+        const quillContent = JSON.parse(quillData);
+        const html = convertQuillToHtml(quillContent);
+        postElement.innerHTML = html;
+        postElement.removeAttribute('data-quill-content');
+      } catch (error) {
+        console.error('정적 포스트 변환 오류:', error);
+        postElement.innerHTML = '';
+      }
+    }
+  });
+}
+
+// 페이지 로드 시 정적 포스트 변환 및 동적 포스트 로드
 document.addEventListener('DOMContentLoaded', function() {
+  convertStaticPosts();
   loadDynamicPosts();
 });
 </script>

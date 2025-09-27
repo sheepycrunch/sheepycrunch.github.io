@@ -20,7 +20,7 @@ permalink: "/archive.html"
           </div>
         </div>
         <div class="archive-content">
-          <h3><a href="{{ item.description }}" class="archive-page-link" target="_blank">{{ item.description }}</a></h3>
+          <h3><a href="#" class="archive-page-link" target="_blank" data-quill-content="{{ item.description | dump | safe }}"></a></h3>
           <div class="archive-tags">
             {% for tag in item.tags %}
             <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
