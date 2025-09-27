@@ -113,14 +113,6 @@ function createPostElement(post) {
     `<button class="tag-button" onclick="searchByTag('${tag}')">#${tag}</button>`
   ).join('') : '';
   
-  // Admin 모드 확인
-  const isAdminMode = checkAdminMode();
-  console.log('포스트 요소 생성 중, Admin 모드:', isAdminMode, '포스트 ID:', post.id || post.date);
-  const adminButtons = isAdminMode ? `
-    <div class="admin-buttons">
-      <button class="delete-btn" onclick="deletePost('${post.id || post.date}')" title="글 삭제">✕</button>
-    </div>
-  ` : '';
   
   postDiv.innerHTML = `
     <div class="post-content">
@@ -128,7 +120,6 @@ function createPostElement(post) {
       <div class="post-footer">
         <div class="post-meta">${post.date}</div>
         ${post.tags ? `<div class="post-tags">${tagButtons}</div>` : ''}
-        ${adminButtons}
       </div>
     </div>
   `;
@@ -235,122 +226,7 @@ function searchByTag(tag) {
   window.location.href = `${CONFIG.searchPageUrl}${encodeURIComponent(tag)}`;
 }
 
-// Admin 모드 확인
-function checkAdminMode() {
-  console.log('Admin 모드 확인 중...');
-  
-  // 로컬 서버 접속 시에만 자동으로 admin 모드 활성화
-  const isLocal = window.location.hostname === 'localhost' || 
-                  window.location.hostname === '127.0.0.1' ||
-                  window.location.hostname === '::1';
-  
-  // 추가 보안: 포트도 확인 (8080, 3000 등 개발 포트만 허용)
-  const isDevPort = window.location.port === '8080' || 
-                    window.location.port === '3000' || 
-                    window.location.port === '8081' ||
-                    window.location.port === '';
-  
-  if (isLocal && isDevPort) {
-    console.log('로컬 개발 환경 감지 - 자동 admin 모드 활성화');
-    return true;
-  }
-  
-  // 프로덕션 환경에서는 절대 자동 admin 모드 활성화하지 않음
-  console.log('프로덕션 환경 - AdminAuth 로그인 필요');
-  
-  // AdminAuth를 통한 로그인 확인만 허용
-  if (typeof AdminAuth !== 'undefined') {
-    const adminAuth = new AdminAuth();
-    const isLoggedIn = adminAuth.isAdminLoggedIn();
-    console.log('AdminAuth 클래스 존재, 로그인 상태:', isLoggedIn);
-    return isLoggedIn;
-  }
-  
-  console.log('AdminAuth 클래스가 정의되지 않음 - admin 모드 비활성화');
-  return false;
-}
 
-// 포스트 삭제 함수
-async function deletePost(postId) {
-  console.log('deletePost 함수 호출됨, postId:', postId);
-  
-  if (!checkAdminMode()) {
-    console.log('관리자 권한이 없어서 삭제 중단');
-    alert('관리자 권한이 필요합니다.');
-    return;
-  }
-  
-  console.log('관리자 권한 확인됨, 삭제 진행');
-  
-  // 삭제 확인
-  if (!confirm('정말로 이 글을 삭제하시겠습니까?\n\n삭제된 글은 복구할 수 없습니다.\n\nNeocities에 직접 수정사항이 반영됩니다.')) {
-    return;
-  }
-  
-  // 로딩 상태 표시
-  const deleteBtn = event.target;
-  const originalText = deleteBtn.textContent;
-  deleteBtn.textContent = '삭제 중...';
-  deleteBtn.disabled = true;
-  
-  try {
-    // 1. Neocities에서 posts.json 직접 수정
-    console.log('Neocities에서 포스트 삭제 시작...');
-    await deletePostFromLocal(postId);
-    
-     // 2. 관련 이미지 삭제 (토큰이 있을 때만)
-     let imageDeleteResult = null;
-     const neocitiesApiToken = getNeocitiesApiToken();
-     if (neocitiesApiToken) {
-       try {
-         console.log('관련 이미지 삭제 시작...');
-         imageDeleteResult = await deletePostImages(postId);
-         if (imageDeleteResult && imageDeleteResult.deleted.length > 0) {
-           console.log(`이미지 ${imageDeleteResult.deleted.length}개가 삭제되었습니다.`);
-         }
-       } catch (error) {
-         console.warn('이미지 삭제 중 오류:', error);
-       }
-     } else {
-       console.log('Neocities API 토큰이 없어서 이미지 삭제를 건너뜁니다.');
-     }
-    
-    // 3. UI에서 즉시 제거
-    removePostFromUI(postId);
-    
-     // 4. 성공 메시지 표시
-     setTimeout(() => {
-       const neocitiesApiToken = getNeocitiesApiToken();
-       const message = neocitiesApiToken 
-         ? '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다'
-         : '글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities API 토큰이 필요합니다';
-       alert(message);
-     }, 100);
-    
-  } catch (error) {
-    console.error('포스트 삭제 중 오류 발생:', error);
-    
-    // 에러 타입별 메시지
-    let errorMessage = '포스트 삭제 중 오류가 발생했습니다.';
-    if (error.message.includes('Neocities API 토큰')) {
-      errorMessage = 'Neocities API 토큰이 필요합니다. 관리자에게 문의하세요.';
-    } else if (error.message.includes('posts.json을 가져올 수 없습니다')) {
-      errorMessage = '로컬에서 posts.json을 가져올 수 없습니다. 파일을 확인하세요.';
-    } else if (error.message.includes('업데이트 실패')) {
-      errorMessage = 'Neocities에 수정사항을 저장할 수 없습니다. API 토큰을 확인하세요.';
-    } else if (error.message.includes('삭제할 포스트를 찾을 수 없습니다')) {
-      errorMessage = '삭제할 포스트를 찾을 수 없습니다. 이미 삭제되었을 수 있습니다.';
-    } else {
-      errorMessage = `오류: ${error.message}`;
-    }
-    
-    alert(errorMessage);
-  } finally {
-    // 버튼 상태 복원
-    deleteBtn.textContent = originalText;
-    deleteBtn.disabled = false;
-  }
-}
 
 // 로컬 posts.json 수정 및 GitHub Actions 트리거
 async function deletePostFromLocal(postId) {
@@ -659,36 +535,8 @@ function convertStaticPosts() {
     }
   });
   
-  // 정적 포스트에 admin 버튼 추가
-  addAdminButtonsToStaticPosts();
 }
 
-// 정적 포스트에 admin 버튼 추가
-function addAdminButtonsToStaticPosts() {
-  if (!checkAdminMode()) return;
-  
-  const staticPostItems = document.querySelectorAll('.post-item:not([data-post-id])');
-  staticPostItems.forEach((postItem, index) => {
-    // 이미 admin 버튼이 있는지 확인
-    if (postItem.querySelector('.admin-buttons')) return;
-    
-    // 포스트 ID 생성 (날짜 기반)
-    const postMeta = postItem.querySelector('.post-meta');
-    const postDate = postMeta ? postMeta.textContent.trim() : `static-${index}`;
-    postItem.setAttribute('data-post-id', postDate);
-    
-    console.log(`정적 포스트 ID 생성: ${postDate}`);
-    
-    // Admin 버튼 추가
-    const postFooter = postItem.querySelector('.post-footer');
-    if (postFooter) {
-      const adminButtons = document.createElement('div');
-      adminButtons.className = 'admin-buttons';
-      adminButtons.innerHTML = `<button class="delete-btn" onclick="deletePost('${postDate}')" title="글 삭제">✕</button>`;
-      postFooter.appendChild(adminButtons);
-    }
-  });
-}
 
 // 페이지 로드 시 정적 포스트 변환 및 동적 포스트 로드
 document.addEventListener('DOMContentLoaded', function() {

@@ -43,6 +43,15 @@ module.exports = function(eleventyConfig) {
   }
   
   eleventyConfig.addGlobalData("postsData", postsData);
+
+  // write.njk을 프로덕션 빌드에서 제외 (로컬에서만 빌드)
+  // ELEVENTY_ENV가 production이면 write.njk 제외
+  if (process.env.ELEVENTY_ENV === 'production') {
+    eleventyConfig.ignores.add("src/write.njk");
+    console.log('Production build: write.njk excluded');
+  } else {
+    console.log('Local build: write.njk included');
+  }
   
   // 구글 서치콘솔 통계 초기화
   let searchConsoleStats = {

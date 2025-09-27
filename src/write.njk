@@ -41,313 +41,106 @@ permalink: "/write.html"
 <script src="/js/quill.min.js"></script>
 <link href="/css/quill.snow.css" rel="stylesheet">
 
+<!-- Message Utils -->
+<script src="/js/message-utils.js"></script>
 
-<!-- Neocities API를 사용한 이미지 업로드 -->
 
 <script>
-// AdminAuth 클래스 로드 (login.njk에서 정의된 것과 동일)
-class AdminAuth {
-  constructor() {
-    // 프록시 API를 사용하므로 클라이언트에서는 키를 저장하지 않음
-    this.sessionKey = 'admin_session';
-    this.expiresKey = 'admin_expires';
-  }
-  
-  async verifyAdminKey(inputKey) {
-    try {
-      // 프록시 API를 통해 서버에서 인증
-      const response = await fetch('/api/neocities/admin/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password: inputKey })
-      });
-      
-      const result = await response.json();
-      return result.success === true;
-    } catch (error) {
-      console.error('Admin verification error:', error);
-      return false;
-    }
-  }
-  
-  setAdminSession() {
-    const sessionToken = this.generateSessionToken();
-    const expires = Date.now() + (24 * 60 * 60 * 1000);
-    
-    localStorage.setItem(this.sessionKey, sessionToken);
-    localStorage.setItem(this.expiresKey, expires.toString());
-    
-    return sessionToken;
-  }
-  
-  generateSessionToken() {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2);
-    return btoa(`${timestamp}_${random}_ADMIN`).replace(/[+/=]/g, '');
-  }
-  
-  isAdminLoggedIn() {
-    const session = localStorage.getItem(this.sessionKey);
-    const expires = localStorage.getItem(this.expiresKey);
-    
-    if (!session || !expires) return false;
-    if (Date.now() > parseInt(expires)) {
-      this.logout();
-      return false;
-    }
-    return true;
-  }
-  
-  logout() {
-    localStorage.removeItem(this.sessionKey);
-    localStorage.removeItem(this.expiresKey);
-  }
-}
-
-// 전역으로 사용할 수 있도록 설정
-window.AdminAuth = AdminAuth;
-
 // i18n 데이터를 JavaScript에서 사용할 수 있도록 전역 변수 설정
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
-// GitHub API는 프록시를 통해 사용 (토큰은 서버에서 관리)
-window.githubToken = 'proxy';
-
-// Neocities API는 프록시를 통해 사용 (토큰은 서버에서 관리)
-const neocitiesApiToken = 'proxy';
-
-// Neocities API 설정 (프록시 사용)
-const NEOCITIES_CONFIG = {
-  apiUrl: '/api/neocities', // 프록시 API 사용
-  siteName: 'dakimakura', // Neocities 사이트 이름
-  apiToken: neocitiesApiToken
-};
-
-// 이미지 업로드 관련 변수
-let uploadInProgress = false;
-
-// 이미지 드래그 앤 드랍 기능
+// 이미지 업로드 기능
 function setupImageUpload() {
   const editorContainer = document.querySelector('.editor-container');
   const fileInput = document.getElementById('image-file-input');
   
-  console.log('setupImageUpload function called.');
-  console.log('editorContainer:', editorContainer);
-  console.log('fileInput:', fileInput);
-  
-  // 전체 페이지에 드래그 앤 드랍 이벤트 추가 (더 확실한 방법)
-  document.addEventListener('dragover', (e) => {
+  // 드래그 앤 드랍 이벤트
+  editorContainer.addEventListener('dragover', (e) => {
     e.preventDefault();
-    console.log('Page-wide drag over');
   });
   
-  document.addEventListener('drop', (e) => {
+  editorContainer.addEventListener('drop', (e) => {
     e.preventDefault();
-    console.log('Page-wide drop event');
-    
-    // 에디터 영역 내부인지 확인
-    const quillEditor = document.querySelector('.ql-editor');
-    if (quillEditor && quillEditor.contains(e.target)) {
-      console.log('Drop detected in editor area');
-      
-      const files = e.dataTransfer.files;
-      if (files.length > 0 && files[0].type.startsWith('image/')) {
-        console.log('Image file detected:', files[0].name);
-        handleImageFile(files[0]);
-      } else {
-        console.log('Non-image file detected.');
-        alert(i18nData?.write?.messages?.imageOnly || '이미지 파일만 업로드할 수 있습니다.');
-      }
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type.startsWith('image/')) {
+      handleImageFile(files[0]);
     }
   });
   
-  // Quill 에디터가 완전히 로드된 후에 클릭 이벤트 등록
-  function attachClickEvents() {
-    const quillEditor = document.querySelector('.ql-editor');
-    
-    if (!quillEditor) {
-      console.log('Quill editor not loaded yet. Retrying in 1 second.');
-      setTimeout(attachClickEvents, 1000);
-      return;
-    }
-    
-    console.log('Registering click events.');
-    
-    // 클릭으로 파일 선택 기능 비활성화 (드래그 앤 드랍만 사용)
-    // quillEditor.addEventListener('click', (e) => {
-    //   // 툴바 버튼 클릭이 아닌 경우에만 파일 선택 다이얼로그 열기
-    //   if (!e.target.closest('.ql-toolbar')) {
-    //     console.log('에디터 영역 클릭 - 파일 선택 다이얼로그 열기');
-    //     fileInput.click();
-    //   }
-    // });
-  }
+  // 클릭으로 파일 선택
+  editorContainer.addEventListener('click', () => {
+    fileInput.click();
+  });
   
-  // 파일 입력 이벤트
+  // 파일 선택 이벤트
   fileInput.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
-      console.log('File selected:', e.target.files[0].name);
       handleImageFile(e.target.files[0]);
     }
   });
+}
+
+// 이미지 파일 처리
+function handleImageFile(file) {
+  if (!file.type.startsWith('image/')) {
+    showTopMessage('이미지 파일만 업로드할 수 있습니다.');
+    return;
+  }
   
-  function handleImageFile(file) {
-    console.log('handleImageFile called:', file.name, file.type);
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // 로컬 파일 경로 생성 (실제로는 Base64 사용)
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const extension = file.name.split('.').pop();
+    const localPath = `images/uploaded/${timestamp}_${randomString}.${extension}`;
     
-    if (!file.type.startsWith('image/')) {
-      alert(i18nData.write.messages.imageOnly);
-      return;
-    }
+    // 에디터에 이미지 삽입 (Base64로 임시 저장)
+    insertImageToEditor(e.target.result, localPath);
+    showTopMessage('이미지가 추가되었습니다. 저장 후 upload-images.bat를 실행하세요.');
+  };
+  reader.readAsDataURL(file);
+}
+
+// 에디터에 이미지 삽입
+function insertImageToEditor(imageData, localPath) {
+  try {
+    const range = editor.getSelection();
+    const index = range ? range.index : editor.getLength();
     
-    console.log('Starting image file processing:', file.name);
-    
-    // 임시로 Base64로 저장 (포스트 저장 시 Neocities에 자동 업로드)
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      insertImageToEditor(e.target.result);
-      showTopMessage('이미지가 임시로 저장되었습니다. 포스트 저장 시 자동으로 업로드됩니다.');
+    // Base64 데이터와 로컬 경로를 함께 저장
+    const imageDataWithPath = {
+      base64: imageData,
+      localPath: localPath
     };
-    reader.readAsDataURL(file);
+    
+    editor.insertEmbed(index, 'image', imageDataWithPath);
+    editor.setSelection(index + 1);
+    
+    console.log('이미지가 에디터에 삽입되었습니다.');
+  } catch (error) {
+    console.error('이미지 삽입 오류:', error);
+    showTopMessage('이미지 삽입 중 오류가 발생했습니다.');
   }
+}
 
-
-  // 에디터에 이미지 삽입
-  function insertImageToEditor(imageUrl) {
+// 자동 배포 스크립트 실행
+function executeDeployScript() {
+  // 로컬 서버에서만 실행
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     try {
-      const range = editor.getSelection();
-      const index = range ? range.index : editor.getLength();
-      
-      editor.insertEmbed(index, 'image', imageUrl);
-      editor.setSelection(index + 1);
-      
-      console.log('Image successfully inserted.');
+      // WScript.Shell을 사용하여 bat 파일 실행
+      const shell = new ActiveXObject('WScript.Shell');
+      shell.Run('deploy-local.bat', 1, false);
+      showTopMessage('배포가 자동으로 시작되었습니다.');
     } catch (error) {
-      console.error('Error inserting image:', error);
-      alert('An error occurred while inserting the image.');
+      console.error('배포 실행 오류:', error);
+      showTopMessage('자동 실행에 실패했습니다. 수동으로 deploy-local.bat를 실행하세요.');
     }
+  } else {
+    showTopMessage('로컬 서버에서만 자동 배포가 가능합니다. 수동으로 deploy-local.bat를 실행하세요.');
   }
-
-
-  // Cloudinary에 이미지 업로드 (Transform API 사용)
-
-
-
-
-
-  
-  // 클릭 이벤트 등록 시작
-  attachClickEvents();
 }
-
-// Base64 이미지를 네오시티에 업로드하는 함수
-async function processBase64Images(content) {
-  if (!content || !content.ops) return content;
-  
-  const newOps = [];
-  
-  for (const op of content.ops) {
-    if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
-      try {
-        // Base64 이미지를 네오시티에 업로드
-        const imageUrl = await uploadBase64ImageToNeocities(op.insert.image);
-        
-        newOps.push({
-          insert: {
-            image: imageUrl
-          }
-        });
-        
-        console.log('Image uploaded to Neocities:', imageUrl);
-      } catch (error) {
-        console.error('Failed to upload image to Neocities:', error);
-        // 업로드 실패 시 원본 유지
-        newOps.push(op);
-      }
-    } else {
-      newOps.push(op);
-    }
-  }
-  
-  return { ...content, ops: newOps };
-}
-
-// Base64 이미지를 네오시티에 업로드 (자동 업로드 스크립트 사용)
-async function uploadBase64ImageToNeocities(base64Data) {
-  // 자동 업로드 스크립트가 처리하므로 Base64 데이터를 그대로 반환
-  console.log('이미지가 Base64로 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
-  return base64Data; // 원본 Base64 데이터 반환
-}
-
-// Neocities에 이미지 업로드 (기존 함수)
-async function uploadImageToNeocities(blob, mimeType) {
-  const apiToken = neocitiesApiToken;
-  const siteName = 'dakimakura';
-  
-  console.log('Neocities API Token:', apiToken ? 'Found' : 'Not found');
-  console.log('Site Name:', siteName);
-  
-  if (!apiToken) {
-    throw new Error('Neocities API token not found');
-  }
-  
-  // 고유한 파일명 생성
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 15);
-  const extension = mimeType.split('/')[1];
-  const fileName = `images/uploaded/${timestamp}_${randomString}.${extension}`;
-  
-  // FormData 생성
-  const formData = new FormData();
-  formData.append('file', blob, fileName);
-  
-  // 프록시 API 호출
-  console.log('Uploading to Neocities via proxy:', fileName);
-  const response = await fetch('/api/neocities/upload', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      file: base64Data,
-      filename: fileName
-    })
-  });
-  
-  console.log('Upload response status:', response.status);
-  
-  if (!response.ok) {
-    const errorData = await response.text();
-    console.error('Upload failed:', response.status, errorData);
-    throw new Error(`Upload failed: ${response.status} ${errorData}`);
-  }
-  
-  const result = await response.json();
-  console.log('Upload successful:', result);
-  return `https://${siteName}.neocities.org/${fileName}`;
-}
-
-// Base64 이미지가 있는지 확인
-function hasBase64Images(posts) {
-  for (const post of posts) {
-    if (post.description && post.description.ops) {
-      for (const op of post.description.ops) {
-        if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-
-
-
-
-
-
 
 // 임시저장 기능 (localStorage만 사용)
 async function saveDraft() {
@@ -527,8 +320,8 @@ async function savePost() {
       return;
     }
     
-    // Base64 이미지 처리 (네오시티에 직접 업로드)
-    const processedContent = await processBase64Images(content);
+    // Base64 이미지는 그대로 유지 (자동 업로드 스크립트가 처리)
+    const processedContent = content;
     
     // 기존 포스트들 가져오기
     const existingPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
@@ -540,7 +333,6 @@ async function savePost() {
       description: processedContent,
       tags: tags,
       createdAt: new Date().toISOString(),
-      title: extractTitleFromContent(processedContent) || '제목 없음'
     };
     
     // 새 포스트를 기존 포스트 목록에 추가
@@ -549,16 +341,35 @@ async function savePost() {
     // 로컬에 포스트 저장 (GitHub Actions가 처리)
     localStorage.setItem('hamster_posts', JSON.stringify(existingPosts));
     
-    // 로컬 파일에 저장 후 자동 업로드 안내
-    showTopMessage('포스트가 로컬에 저장되었습니다. 터미널에서 "npm run upload:posts"를 실행하세요.');
+    // posts.json 파일에 저장
+    const postsData = { posts: existingPosts };
+    const postsJson = JSON.stringify(postsData, null, 2);
     
-    // 로컬 스토리지에 업로드 요청 저장
-    const uploadRequest = {
-      timestamp: Date.now(),
-      action: 'upload_posts',
-      posts: existingPosts
-    };
-    localStorage.setItem('pending_upload', JSON.stringify(uploadRequest));
+    // 로컬 파일에 저장
+    try {
+      // Blob을 사용하여 파일 다운로드 시뮬레이션
+      const blob = new Blob([postsJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'posts.json';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showTopMessage('포스트가 저장되었습니다. 자동 배포를 시작합니다...');
+      
+      // 자동 배포 실행
+      setTimeout(() => {
+        executeDeployScript();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('파일 저장 오류:', error);
+      showTopMessage('파일 저장 중 오류가 발생했습니다. 수동으로 deploy-local.bat를 실행하세요.');
+    }
     
     // 오늘 날짜 기록 (하루 제한)
     const today = new Date().toDateString();
@@ -584,70 +395,6 @@ async function savePost() {
   }
 }
 
-// Quill 콘텐츠에서 제목 추출
-function extractTitleFromContent(content) {
-  if (!content || !content.ops) return null;
-  
-  // 첫 번째 텍스트 블록에서 제목 추출
-  for (const op of content.ops) {
-    if (op.insert && typeof op.insert === 'string') {
-      const text = op.insert.trim();
-      if (text.length > 0) {
-        // 첫 줄을 제목으로 사용 (50자 제한)
-        return text.split('\n')[0].substring(0, 50);
-      }
-    }
-  }
-  return null;
-}
-
-// Neocities API를 사용하여 posts.json 파일 업데이트 (자동 업로드 스크립트 사용)
-async function updateNeocitiesPostsJson(posts) {
-  // 자동 업로드 스크립트가 처리하므로 로컬 파일만 저장
-  console.log('posts.json이 로컬에 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
-  return;
-}
-
-// GitHub 관련 함수들은 더 이상 사용하지 않음 (Neocities API만 사용)
-
-
-
-// 상단 메시지 표시
-function showTopMessage(message) {
-  // 기존 메시지 제거
-  const existingMessage = document.getElementById('top-message');
-  if (existingMessage) {
-    existingMessage.remove();
-  }
-  
-  // 새 메시지 생성
-  const messageDiv = document.createElement('div');
-  messageDiv.id = 'top-message';
-  messageDiv.textContent = message;
-  
-  // body 맨 앞에 추가
-  document.body.insertBefore(messageDiv, document.body.firstChild);
-  
-  // 트랜지션을 위해 약간의 지연 후 show 클래스 추가
-  setTimeout(() => {
-    messageDiv.classList.add('show');
-  }, 10);
-  
-  // 1초 후 사라지는 애니메이션 시작
-  setTimeout(() => {
-    if (messageDiv.parentNode) {
-      messageDiv.classList.remove('show');
-      
-      // 트랜지션 완료 후 제거
-      setTimeout(() => {
-        if (messageDiv.parentNode) {
-          messageDiv.remove();
-        }
-      }, 300);
-    }
-  }, 2000);
-}
-
 // 자동 저장 기능 (1분 단위)
 function setupAutoSave() {
   let autoSaveInterval;
@@ -666,43 +413,7 @@ function setupAutoSave() {
   }, 60000); // 1분 = 60000ms
 }
 
-// 관리자 권한 체크 함수
-function checkAdminPermission() {
-  // 로컬 서버 접속 시에만 자동으로 admin 모드 활성화
-  const isLocal = window.location.hostname === 'localhost' || 
-                  window.location.hostname === '127.0.0.1' ||
-                  window.location.hostname === '::1';
-  
-  // 추가 보안: 포트도 확인 (8080, 3000 등 개발 포트만 허용)
-  const isDevPort = window.location.port === '8080' || 
-                    window.location.port === '3000' || 
-                    window.location.port === '8081' ||
-                    window.location.port === '';
-  
-  if (isLocal && isDevPort) {
-    console.log('로컬 개발 환경 감지 - 자동 admin 모드 활성화');
-    return true;
-  }
-  
-  // 프로덕션 환경에서는 절대 자동 admin 모드 활성화하지 않음
-  console.log('프로덕션 환경 - AdminAuth 로그인 필요');
-  
-  // AdminAuth를 통한 로그인 확인만 허용
-  if (typeof AdminAuth !== 'undefined') {
-    const adminAuth = new AdminAuth();
-    const isLoggedIn = adminAuth.isAdminLoggedIn();
-    console.log('AdminAuth 로그인 상태:', isLoggedIn);
-    return isLoggedIn;
-  }
-  
-  console.log('AdminAuth 클래스가 정의되지 않음 - admin 모드 비활성화');
-  return false;
-}
 
-// 권한이 없으면 404 페이지로 리다이렉트
-function redirectToLogin() {
-  window.location.href = '/login.html';
-}
 
 
 
@@ -744,11 +455,6 @@ function initializeQuillJS() {
 
 // 이벤트 리스너 설정
 document.addEventListener('DOMContentLoaded', function() {
-  // 관리자 권한 체크
-  if (!checkAdminPermission()) {
-    redirectToLogin();
-    return;
-  }
   
   // Quill.js 에디터 초기화 (약간의 지연을 두어 CDN 로딩 완료 후 실행)
   setTimeout(() => {

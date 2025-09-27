@@ -9,6 +9,7 @@
     "serve": "npx @11ty/eleventy --serve --port=8080",
     "upload": "node auto-upload.js",
     "upload:posts": "curl -u \"dakimakura:3d5c5a20afe79623ec87904e336d01a0\" -F \"posts.json=@src/posts.json\" \"https://neocities.org/api/upload\"",
+    "deploy:local": "deploy-local.bat",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -33,6 +34,7 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
-    "html-minifier-terser": "^7.2.0"
+    "html-minifier-terser": "^7.2.0",
+    "neocities": "^0.0.3"
   }
 }
