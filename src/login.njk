@@ -30,7 +30,7 @@ permalink: "/login.html"
 class AdminAuth {
   constructor() {
     // 환경변수에서 관리자 키 가져오기 (빌드 시점에 주입됨)
-    this.adminKey = '{{ adminSecretKey }}';
+    this.adminKey = window.ADMIN_SECRET_KEY || 'DEFAULT_FALLBACK_KEY';
     this.sessionKey = 'admin_session';
     this.expiresKey = 'admin_expires';
   }
