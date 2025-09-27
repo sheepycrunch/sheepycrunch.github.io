@@ -394,8 +394,7 @@ async function deletePostFromLocal(postId) {
 
 // GitHub 토큰 가져오기
 function getGitHubToken() {
-  const tokenElement = document.getElementById('github-token-data');
-  const token = tokenElement ? tokenElement.textContent.trim() : null;
+  const token = window.githubToken || null;
   console.log('GitHub 토큰 확인:', token ? '토큰 있음' : '토큰 없음');
   return token;
 }
@@ -565,9 +564,8 @@ async function deleteImageFromNeocities(imagePath) {
 
 // Neocities API 토큰 가져오기
 function getNeocitiesApiToken() {
-  const tokenElement = document.getElementById('neocities-api-token-data');
-  const token = tokenElement ? tokenElement.textContent.trim() : null;
-  console.log('Neocities API 토큰 확인:', token ? '토큰 있음' : '토큰 없음', token);
+  const token = window.neocitiesApiToken || null;
+  console.log('Neocities API 토큰 확인:', token ? '토큰 있음' : '토큰 없음');
   return token;
 }
 

@@ -10,8 +10,7 @@ permalink: "/write.html"
   <h2>{{ "글 작성" | t(lang) }}</h2>
   
   <div id="i18n-data" style="display: none;">{{ i18n | dump | safe }}</div>
-  <div id="github-token-data" style="display: none;">{{ githubToken }}</div>
-  <div id="neocities-api-token-data" style="display: none;">{{ neocitiesApiToken }}</div>
+  <!-- 토큰은 JavaScript에서 안전하게 주입됩니다 -->
   <div class="form-group">
     <label>{{ "내용" | t(lang) }}</label>
     
@@ -114,10 +113,10 @@ window.AdminAuth = AdminAuth;
 const i18nData = JSON.parse(document.getElementById('i18n-data').textContent);
 
 // GitHub 토큰을 JavaScript에서 사용할 수 있도록 전역 변수 설정
-window.githubToken = document.getElementById('github-token-data').textContent;
+window.githubToken = window.githubToken;
 
 // Neocities API 토큰을 JavaScript에서 사용할 수 있도록 전역 변수 설정
-const neocitiesApiToken = document.getElementById('neocities-api-token-data').textContent;
+const neocitiesApiToken = window.neocitiesApiToken;
 
 // Neocities API 설정
 const NEOCITIES_CONFIG = {

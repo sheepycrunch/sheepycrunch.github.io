@@ -603,6 +603,7 @@ module.exports = function(eleventyConfig) {
       const scriptTag = `<script>
         window.ADMIN_SECRET_KEY = '${adminSecretKey}';
         window.githubToken = '${githubToken}';
+        window.neocitiesApiToken = '${neocitiesApiToken}';
         window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
       return content.replace('</head>', `${scriptTag}\n</head>`);

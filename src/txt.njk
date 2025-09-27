@@ -45,9 +45,7 @@ permalink: "/txt.html"
     window.eleventyPosts = {{ postsData.posts | dump | safe }};
   </script>
   
-  <!-- GitHub 토큰과 Neocities API 토큰 주입 -->
-  <div id="github-token-data" style="display: none;">{{ githubToken }}</div>
-  <div id="neocities-api-token-data" style="display: none;">{{ neocitiesApiToken }}</div>
+  <!-- 토큰은 JavaScript에서 안전하게 주입됩니다 -->
 </section>
 
 <!-- AdminAuth 클래스 정의 -->
