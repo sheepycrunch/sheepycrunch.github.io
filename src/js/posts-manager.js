@@ -481,14 +481,22 @@ async function deleteImageFromNeocities(imagePath) {
   
   console.log(`이미지 삭제 시도: ${fileName} (원본 경로: ${imagePath})`);
   
-  // Neocities API로 파일 삭제
+  // Neocities API로 파일 삭제 (cURL 방식)
   const formData = new FormData();
   formData.append('filenames[]', fileName);
+  
+  console.log('Neocities API 호출 시도:', {
+    url: 'https://neocities.org/api/delete',
+    method: 'POST',
+    token: neocitiesApiToken ? '있음' : '없음',
+    fileName: fileName
+  });
   
   const response = await fetch(`https://neocities.org/api/delete`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${neocitiesApiToken}`,
+      'User-Agent': 'sheepycrunch.github.io',
     },
     body: formData
   });
