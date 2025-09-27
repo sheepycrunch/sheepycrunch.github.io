@@ -22,6 +22,169 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Process Base64 images
+      run: |
+        cat > process-images.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        const https = require('https');
+        
+        // Base64를 Buffer로 변환하는 함수
+        function base64ToBuffer(base64Data) {
+          const arr = base64Data.split(',');
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          
+          return Buffer.from(u8arr);
+        }
+        
+        // Neocities에 이미지 업로드
+        async function uploadToNeocities(buffer, fileName) {
+          return new Promise((resolve, reject) => {
+            const apiToken = process.env.NEOCITIES_API_KEY;
+            const siteName = process.env.SITE_NAME || 'dakimakura';
+            
+            const postData = JSON.stringify({
+              file: buffer.toString('base64'),
+              filename: fileName
+            });
+            
+            const options = {
+              hostname: 'neocities.org',
+              port: 443,
+              path: '/api/upload',
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+              }
+            };
+            
+            const req = https.request(options, (res) => {
+              let data = '';
+              res.on('data', (chunk) => {
+                data += chunk;
+              });
+              
+              res.on('end', () => {
+                if (res.statusCode === 200) {
+                  const result = JSON.parse(data);
+                  resolve(`https://${siteName}.neocities.org/${fileName}`);
+                } else {
+                  reject(new Error(`Upload failed: ${res.statusCode} ${data}`));
+                }
+              });
+            });
+            
+            req.on('error', (err) => {
+              reject(err);
+            });
+            
+            req.write(postData);
+            req.end();
+          });
+        }
+        
+        // 포스트 데이터 처리
+        async function processPosts() {
+          try {
+            const postsPath = 'src/_data/posts.json';
+            
+            if (!fs.existsSync(postsPath)) {
+              console.log('No posts.json file found, skipping image processing');
+              return;
+            }
+            
+            const postsData = fs.readFileSync(postsPath, 'utf8');
+            const posts = JSON.parse(postsData);
+            let updated = false;
+            
+            for (const post of posts) {
+              if (post.description && post.description.ops) {
+                const newOps = [];
+                
+                for (const op of post.description.ops) {
+                  if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
+                    try {
+                      console.log('Processing Base64 image...');
+                      
+                      // Base64를 Buffer로 변환
+                      const buffer = base64ToBuffer(op.insert.image);
+                      
+                      // 고유한 파일명 생성
+                      const timestamp = Date.now();
+                      const randomString = Math.random().toString(36).substring(2, 15);
+                      const mime = op.insert.image.match(/data:image\/([^;]+)/)[1];
+                      const fileName = `images/uploaded/${timestamp}_${randomString}.${mime}`;
+                      
+                      // Neocities에 업로드
+                      const neocitiesUrl = await uploadToNeocities(buffer, fileName);
+                      
+                      // 새로운 op 생성 (Neocities URL 사용)
+                      newOps.push({
+                        insert: {
+                          image: neocitiesUrl
+                        }
+                      });
+                      
+                      console.log(`Image uploaded: ${neocitiesUrl}`);
+                      updated = true;
+                      
+                    } catch (error) {
+                      console.error('Image upload failed:', error);
+                      // 실패한 경우 원본 유지
+                      newOps.push(op);
+                    }
+                  } else {
+                    newOps.push(op);
+                  }
+                }
+                
+                post.description.ops = newOps;
+              }
+            }
+            
+            if (updated) {
+              // 업데이트된 포스트를 저장
+              fs.writeFileSync(postsPath, JSON.stringify(posts, null, 2));
+              console.log('Posts updated with Neocities URLs');
+              
+              // Git에 변경사항 커밋
+              const { execSync } = require('child_process');
+              try {
+                execSync('git config --local user.email "action@github.com"');
+                execSync('git config --local user.name "GitHub Action"');
+                execSync('git add src/_data/posts.json');
+                execSync('git commit -m "Auto-update: Convert Base64 images to Neocities URLs"');
+                execSync('git push');
+                console.log('Changes committed and pushed to GitHub');
+              } catch (gitError) {
+                console.warn('Git operations failed:', gitError.message);
+              }
+            } else {
+              console.log('No Base64 images found to process');
+            }
+            
+          } catch (error) {
+            console.error('Error processing posts:', error);
+            // 에러가 발생해도 빌드는 계속 진행
+          }
+        }
+        
+        processPosts();
+        EOF
+        
+        node process-images.js
+      env:
+        NEOCITIES_API_KEY: ${{ secrets.NEOCITIES_API_KEY }}
+        SITE_NAME: ${{ secrets.SITE_NAME }}
+      
     - name: Check secrets
       run: |
         echo "Checking required secrets..."

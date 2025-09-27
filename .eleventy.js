@@ -14,11 +14,14 @@ module.exports = function(eleventyConfig) {
   
   // 환경변수에서 URL 정보 가져오기
   const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
-  const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
   
   // 전역 데이터로 추가
   eleventyConfig.addGlobalData("neocitiesUrl", neocitiesUrl);
-  eleventyConfig.addGlobalData("nekowebUrl", nekowebUrl);
+  
+  // Neocities API 토큰
+  const neocitiesApiToken = process.env.NEOCITIES_API_KEY;
+  
+  eleventyConfig.addGlobalData("neocitiesApiToken", neocitiesApiToken);
   
   // 구글 서치콘솔 통계 초기화
   let searchConsoleStats = {
@@ -33,8 +36,7 @@ module.exports = function(eleventyConfig) {
     try {
       const gsc = new GoogleSearchConsoleStats();
       const siteUrls = [
-        process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org',
-        process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org'
+        process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org'
       ];
       
       const stats = await gsc.getRecentStats(siteUrls);

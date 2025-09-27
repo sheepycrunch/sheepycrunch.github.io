@@ -1,11 +1,12 @@
-name: Upload Images to Neocities and Nekoweb
+name: Upload Images to Neocities
 
 on:
-  push:
-    paths:
-      - 'src/images/**'
-      - 'images/**'
-  workflow_dispatch: # 수동 실행 가능
+  workflow_dispatch:
+    inputs:
+      posts_data:
+        description: 'Posts JSON data with Base64 images'
+        required: true
+        type: string
 
 jobs:
   upload-images:
@@ -15,17 +16,163 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       
-    - name: Upload images to Neocities
-      uses: bcomnes/deploy-to-neocities@v1
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        api_token: ${{ secrets.NEOCITIES_API_KEY }}
-        cleanup: false # 기존 파일 유지
-        dist_dir: src/images # 이미지 폴더만 업로드
+        node-version: '18'
         
-    - name: Upload images to Nekoweb
-      uses: ./.github/actions/deploy-nekoweb
-      with:
-        api_key: ${{ secrets.NEKOWEB_API_KEY }}
-        site_name: ${{ secrets.SITE_NAME }}
-        dist_dir: src/images # 이미지 폴더만 업로드
-        cleanup: false
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Create image upload script
+      run: |
+        cat > upload-images.js << 'EOF'
+        const fs = require('fs');
+        const path = require('path');
+        const https = require('https');
+        
+        // Base64를 Blob으로 변환하는 함수
+        function base64ToBlob(base64Data) {
+          const arr = base64Data.split(',');
+          const mime = arr[0].match(/:(.*?);/)[1];
+          const bstr = atob(arr[1]);
+          let n = bstr.length;
+          const u8arr = new Uint8Array(n);
+          
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+          }
+          
+          return Buffer.from(u8arr);
+        }
+        
+        // Neocities에 이미지 업로드
+        async function uploadToNeocities(buffer, fileName) {
+          return new Promise((resolve, reject) => {
+            const apiToken = process.env.NEOCITIES_API_KEY;
+            const siteName = process.env.SITE_NAME || 'dakimakura';
+            
+            const postData = JSON.stringify({
+              file: buffer.toString('base64'),
+              filename: fileName
+            });
+            
+            const options = {
+              hostname: 'neocities.org',
+              port: 443,
+              path: '/api/upload',
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${apiToken}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+              }
+            };
+            
+            const req = https.request(options, (res) => {
+              let data = '';
+              res.on('data', (chunk) => {
+                data += chunk;
+              });
+              
+              res.on('end', () => {
+                if (res.statusCode === 200) {
+                  const result = JSON.parse(data);
+                  resolve(`https://${siteName}.neocities.org/${fileName}`);
+                } else {
+                  reject(new Error(`Upload failed: ${res.statusCode} ${data}`));
+                }
+              });
+            });
+            
+            req.on('error', (err) => {
+              reject(err);
+            });
+            
+            req.write(postData);
+            req.end();
+          });
+        }
+        
+        // 포스트 데이터 처리
+        async function processPosts() {
+          try {
+            const postsData = process.env.POSTS_DATA;
+            const posts = JSON.parse(postsData);
+            let updated = false;
+            
+            for (const post of posts) {
+              if (post.description && post.description.ops) {
+                const newOps = [];
+                
+                for (const op of post.description.ops) {
+                  if (op.insert && op.insert.image && op.insert.image.startsWith('data:image/')) {
+                    try {
+                      console.log('Processing Base64 image...');
+                      
+                      // Base64를 Buffer로 변환
+                      const buffer = base64ToBlob(op.insert.image);
+                      
+                      // 고유한 파일명 생성
+                      const timestamp = Date.now();
+                      const randomString = Math.random().toString(36).substring(2, 15);
+                      const mime = op.insert.image.match(/data:image\/([^;]+)/)[1];
+                      const fileName = `images/uploaded/${timestamp}_${randomString}.${mime}`;
+                      
+                      // Neocities에 업로드
+                      const neocitiesUrl = await uploadToNeocities(buffer, fileName);
+                      
+                      // 새로운 op 생성 (Neocities URL 사용)
+                      newOps.push({
+                        insert: {
+                          image: neocitiesUrl
+                        }
+                      });
+                      
+                      console.log(`Image uploaded: ${neocitiesUrl}`);
+                      updated = true;
+                      
+                    } catch (error) {
+                      console.error('Image upload failed:', error);
+                      // 실패한 경우 원본 유지
+                      newOps.push(op);
+                    }
+                  } else {
+                    newOps.push(op);
+                  }
+                }
+                
+                post.description.ops = newOps;
+              }
+            }
+            
+            if (updated) {
+              // 업데이트된 포스트를 GitHub에 저장
+              const fs = require('fs');
+              fs.writeFileSync('src/_data/posts.json', JSON.stringify(posts, null, 2));
+              console.log('Posts updated with Neocities URLs');
+            }
+            
+          } catch (error) {
+            console.error('Error processing posts:', error);
+            process.exit(1);
+          }
+        }
+        
+        processPosts();
+        EOF
+        
+    - name: Upload images to Neocities
+      run: node upload-images.js
+      env:
+        NEOCITIES_API_KEY: ${{ secrets.NEOCITIES_API_KEY }}
+        SITE_NAME: ${{ secrets.SITE_NAME }}
+        POSTS_DATA: ${{ github.event.inputs.posts_data }}
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add src/_data/posts.json
+        git commit -m "Update posts with Neocities image URLs" || exit 0
+        git push
