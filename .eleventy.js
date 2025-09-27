@@ -32,11 +32,11 @@ module.exports = function(eleventyConfig) {
       visitors: 0
     },
     navigation: [
-      { name: "txt", url: "/txt/" },
-      { name: "gallery", url: "/gallery/" },
-      { name: "links", url: "/archive/" },
-      { name: "search", url: "/search/" },
-      { name: "write", url: "/write/" },
+      { name: "txt", url: "/txt.html" },
+      { name: "gallery", url: "/gallery.html" },
+      { name: "links", url: "/archive.html" },
+      { name: "search", url: "/search.html" },
+      { name: "write", url: "/write.html" },
     ],
     authorInfo: {
       introduction: "이 블로그는 기존 상업 블로그의 대안으로 설립되었습니다."
@@ -545,7 +545,6 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("neocities.png");
-  eleventyConfig.addPassthroughCopy("google57bba735c19e8bd0.html");
 
   return {
     templateFormats: [
