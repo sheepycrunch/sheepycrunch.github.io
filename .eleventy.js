@@ -38,13 +38,6 @@ module.exports = function(eleventyConfig) {
 
   // Register ContentTools API endpoints - moved to serverOptions.middleware
 
-  // If ELEVENTY_ENV is production, exclude write.njk file
-  if (process.env.ELEVENTY_ENV === 'production') {
-    eleventyConfig.ignores.add("src/write.njk");
-    console.log('Production build: write.njk excluded');
-  } else {
-    console.log('Local build: write.njk included');
-  }
   
   // Initialize search console stats
   let searchConsoleStats = {
@@ -97,7 +90,6 @@ module.exports = function(eleventyConfig) {
       { name: "gallery", url: "/gallery.html" },
       { name: "links", url: "/archive.html" },
       { name: "search", url: "/search.html" },
-      { name: "write", url: "/write.html" },
     ],
     authorInfo: {
       introduction: "This blog was established as an alternative to existing commercial blogs."
@@ -116,8 +108,8 @@ module.exports = function(eleventyConfig) {
       count += collections.posts.length;
     }
     
-    // Basic pages (txt, gallery, archive, links, search, write, login)
-    const basicPages = ['txt', 'gallery', 'archive', 'links', 'search', 'write', 'login'];
+    // Basic pages 
+    const basicPages = ['txt', 'gallery', 'archive', 'links', 'search', 'login'];
     count += basicPages.length;
     
     return count;
@@ -145,7 +137,6 @@ module.exports = function(eleventyConfig) {
       content: "Categories",
       siteInfo: "Site Information",
       latestUpdates: "Latest Updates",
-      write: "Write Post",
       search: "Search"
     },
     author: {
@@ -173,10 +164,6 @@ module.exports = function(eleventyConfig) {
     gallery: {
       title: "Gallery",
       description: "Check out gallery images."
-    },
-    write: {
-      title: "Write Post",
-      description: "Write a new post."
     },
     banners: {
       title: "Banners",

@@ -64,44 +64,6 @@ module.exports = function(req, res) {
         });
         return;
       }
-
-      // 강제 배포 요청 확인
-      if (force) {
-        console.log('⚠️ 강제 배포 요청 감지');
-        deployLimiter.forceDeploy('API 강제 요청');
-      } else {
-        // 일반 배포 기록
-        deployLimiter.recordDeployment('API 요청');
-      }
-      
-      // 프로젝트 루트 디렉토리로 이동
-      const projectRoot = path.join(__dirname, '../../');
-      const batchFile = path.join(projectRoot, 'write-workflow.bat');
-      
-      console.log('배포 실행 중...');
-      console.log('배치 파일 경로:', batchFile);
-      
-      // 배치 파일 실행
-      exec(`"${batchFile}"`, { cwd: projectRoot }, (error, stdout, stderr) => {
-        if (error) {
-          console.error('배포 오류:', error);
-          res.status(500).json({ 
-            success: false, 
-            error: error.message,
-            stderr: stderr 
-          });
-          return;
-        }
-        
-        console.log('배포 완료');
-        console.log('출력:', stdout);
-        
-        res.status(200).json({ 
-          success: true, 
-          message: '배포가 성공적으로 완료되었습니다.',
-          output: stdout 
-        });
-      });
       return;
     }
     

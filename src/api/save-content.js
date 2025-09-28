@@ -1,8 +1,49 @@
-// ContentTools 편집 API 헬퍼
+﻿// ContentTools 편집 API 헬퍼
 const fs = require('fs');
 const path = require('path');
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+
+// _site/uploads에서 src/uploads로 이미지 동기화 함수
+function syncImagesToSrc(pageData) {
+  try {
+    const siteUploadDir = path.join(__dirname, '../../_site/uploads');
+    const srcUploadDir = path.join(__dirname, '../uploads');
+    
+    if (!fs.existsSync(siteUploadDir)) return;
+    
+    // src/uploads 디렉토리 생성
+    if (!fs.existsSync(srcUploadDir)) {
+      fs.mkdirSync(srcUploadDir, { recursive: true });
+    }
+    
+    // 페이지 데이터에서 이미지 URL 추출
+    const imageUrls = [];
+    if (pageData.content) {
+      const imgRegex = /<img[^>]+src="([^"]+)"/g;
+      let match;
+      while ((match = imgRegex.exec(pageData.content)) !== null) {
+        if (match[1].startsWith('/uploads/')) {
+          imageUrls.push(match[1]);
+        }
+      }
+    }
+    
+    // 각 이미지를 src/uploads로 복사
+    imageUrls.forEach(imageUrl => {
+      const fileName = path.basename(imageUrl);
+      const siteImagePath = path.join(siteUploadDir, fileName);
+      const srcImagePath = path.join(srcUploadDir, fileName);
+      
+      if (fs.existsSync(siteImagePath) && !fs.existsSync(srcImagePath)) {
+        fs.copyFileSync(siteImagePath, srcImagePath);
+        console.log(`이미지 동기화: ${fileName}`);
+      }
+    });
+  } catch (error) {
+    console.error('이미지 동기화 중 오류:', error);
+  }
+}
 
 module.exports = function(eleventyConfig) {
   return function(req, res, next) {
@@ -46,6 +87,9 @@ module.exports = function(eleventyConfig) {
           existingData[pageData.timestamp] = pageData;
 
           fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+
+          // 명시적 저장 시 이미지를 src/uploads로 동기화
+          syncImagesToSrc(pageData);
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
@@ -111,9 +155,10 @@ module.exports = function(eleventyConfig) {
             return res.end(JSON.stringify({ success: false, error: '이미지 크기는 5MB를 초과할 수 없습니다.' }));
           }
 
-          const uploadDir = path.join(__dirname, '../uploads');
-          if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
+          // _site/uploads에 직접 저장 (자동 새로고침 방지)
+          const siteUploadDir = path.join(__dirname, '../../_site/uploads');
+          if (!fs.existsSync(siteUploadDir)) {
+            fs.mkdirSync(siteUploadDir, { recursive: true });
           }
 
           const extensionFromName = path.extname(name || '').replace('.', '').toLowerCase();
@@ -124,7 +169,7 @@ module.exports = function(eleventyConfig) {
           const baseName = path.basename(name, path.extname(name || '')) || 'image';
           const safeBaseName = baseName.replace(/[^a-z0-9-_]/gi, '') || 'image';
           const fileName = `${safeBaseName}-${Date.now()}.${extension}`;
-          const filePath = path.join(uploadDir, fileName);
+          const filePath = path.join(siteUploadDir, fileName);
 
           fs.writeFileSync(filePath, buffer);
 
@@ -155,6 +200,54 @@ module.exports = function(eleventyConfig) {
       });
     }
     // 콘텐츠 로드 API
+    else if (req.url === '/api/list-uploads') {
+      if (req.method !== 'GET') {
+        res.writeHead(405, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: false, error: 'Method not allowed' }));
+      }
+
+      try {
+        const uploadDir = path.join(__dirname, '../uploads');
+        if (!fs.existsSync(uploadDir)) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ success: true, images: [] }));
+        }
+
+        const files = fs.readdirSync(uploadDir);
+        const images = files
+          .filter((name) => !name.startsWith('.'))
+          .map((name) => {
+            const filePath = path.join(uploadDir, name);
+            let stats;
+            try {
+              stats = fs.statSync(filePath);
+            } catch (error) {
+              console.error('이미지 파일 정보를 읽을 수 없습니다:', error);
+              return null;
+            }
+
+            if (!stats.isFile()) {
+              return null;
+            }
+
+            return {
+              name,
+              url: '/uploads/' + name,
+              size: stats.size,
+              modified: stats.mtime.toISOString()
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => new Date(b.modified) - new Date(a.modified));
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, images }));
+      } catch (error) {
+        console.error('이미지 목록을 불러오지 못했습니다:', error);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: '이미지 목록을 불러오는 중 오류가 발생했습니다.', details: error.message }));
+      }
+    }
     else if (req.url.startsWith('/api/load-content')) {
       if (req.method !== 'GET') {
         return res.writeHead(405, { 'Content-Type': 'application/json' });

@@ -61,7 +61,7 @@
         dialog.save(url);
       });
 
-      dialog.addEventListener('imageuploader.file', function(ev) {
+      dialog.addEventListener('imageuploader.fileready', function(ev) {
         const file = ev.detail().file;
         if (!file) {
           dialog.error('선택된 파일이 없습니다.');
@@ -79,22 +79,46 @@
         const reader = new FileReader();
         reader.onload = function(loadEvent) {
           const dataUrl = loadEvent.target.result;
+          const previewImage = new Image();
 
-          uploadImageToServer(file.name, file.type, dataUrl)
-            .then(result => {
-              dialog.progress(1);
-              dialog.save(result.url);
-            })
-            .catch(error => {
-              console.error('이미지 업로드 실패:', error);
-              dialog.state('failed');
-              dialog.error(error.message || '이미지 업로드에 실패했습니다.');
-              setTimeout(() => resetDialog(), 1500);
-            });
+          previewImage.onload = function() {
+            const imageSize = [previewImage.naturalWidth, previewImage.naturalHeight];
+
+            uploadImageToServer(file.name, file.type, dataUrl)
+              .then(result => {
+                dialog.progress(1);
+                dialog.populate(result.url, imageSize);   // 다이얼로그 상태를 일관성 있게 유지
+                dialog.save(result.url, imageSize);       // 이미지 크기 정보 전달
+                
+                // 이미지 업로드 후 현재 에디터 내용을 자동 저장
+                setTimeout(() => {
+                  if (window.ContentTools && window.ContentTools.EditorApp) {
+                    const editor = window.ContentTools.EditorApp.get();
+                    if (editor) {
+                      editor.save(true); // 자동 저장 실행
+                    }
+                  }
+                }, 100);
+              })
+              .catch(error => {
+                console.error('이미지 업로드 실패:', error);
+                dialog.state('failed');
+                showMessage(error.message || '이미지 업로드에 실패했습니다.', 'error');
+                setTimeout(() => resetDialog(), 1500);
+              });
+          };
+
+          previewImage.onerror = function() {
+            dialog.state('failed');
+            showMessage('이미지를 불러오지 못했습니다.', 'error');
+            setTimeout(() => resetDialog(), 1500);
+          };
+
+          previewImage.src = dataUrl;
         };
         reader.onerror = function() {
           dialog.state('failed');
-          dialog.error('이미지를 읽는 중 오류가 발생했습니다.');
+          showMessage('이미지를 읽는 중 오류가 발생했습니다.', 'error');
           setTimeout(() => resetDialog(), 1500);
         };
 
