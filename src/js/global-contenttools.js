@@ -6,6 +6,8 @@
   let isInitialized = false;
 
   const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+  const AUTO_SAVE_DELAY = 2000; // 2초 후 자동 저장
+  let autoSaveTimer = null;
   let isImageUploaderRegistered = false;
 
   // 갤러리 상태 관리
@@ -13,6 +15,17 @@
     items: [], 
     isLoaded: false 
   };
+
+  // 자동 저장 스케줄링 함수
+  function scheduleAutoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      if (editor && isInitialized) {
+        console.log('자동 저장 실행');
+        editor.save(true); // 이벤트만 발동시키므로 기존 handleSaveEvent 로직 재사용
+      }
+    }, AUTO_SAVE_DELAY);
+  }
 
   function uploadImageToServer(fileName, fileType, dataUrl) {
     return fetch('/api/upload-image', {
@@ -326,6 +339,10 @@ function initEditor() {
       editor.init('*[data-editable]', 'data-name');
       console.log('에디터 초기화 완료');
       
+      // 변경 감지 이벤트 추가 (자동 저장용)
+      const root = ContentEdit.Root.get();
+      root.bind('change', scheduleAutoSave);
+      
       // ContentTools 기본 동작에 맡김
       
       // 이미지 업로더 등록
@@ -347,6 +364,8 @@ function initEditor() {
       // 편집 이벤트 설정
       editor.addEventListener('start', function(ev) {
         console.log('편집 시작');
+        // 에디터가 시작된 후 콘텐츠 로드 (영역이 준비된 후)
+        setTimeout(loadContent, 0);
       });
 
       editor.addEventListener('stop', function(ev) {
@@ -356,8 +375,8 @@ function initEditor() {
       isInitialized = true;
       console.log('ContentTools 에디터가 초기화되었습니다.');
       
-      // 페이지 로드 시 최신 콘텐츠 불러오기
-      loadContent();
+      // 에디터 초기화 직후에는 영역이 준비되지 않을 수 있으므로 제거
+      // loadContent();
       
     } catch (error) {
       console.error('ContentTools 초기화 실패:', error);
@@ -398,12 +417,39 @@ function initEditor() {
   // 콘텐츠 로드 함수
   function loadContent() {
     const url = window.location.pathname;
+    console.log('loadContent 시작:', url);
     
     fetch(`/api/load-content?page=${encodeURIComponent(url)}`)
-    .then(response => response.json())
-    .catch(error => {
-      console.log('저장된 콘텐츠가 없거나 로드 실패:', error);
-    });
+      .then(res => res.json())
+      .then(result => {
+        console.log('API 응답:', result);
+        if (!result.success || !result.regions) {
+          console.log('저장된 콘텐츠가 없거나 실패');
+          return;
+        }
+
+        const editor = ContentTools.EditorApp.get();
+        const regions = editor.regions();
+        console.log('에디터 영역들:', regions);
+
+        Object.entries(result.regions).forEach(([name, html]) => {
+          console.log('적용 시도:', name, html);
+          const region = regions[name];
+          if (!region) {
+            console.log('영역을 찾을 수 없음:', name);
+            return;
+          }
+
+          console.log('영역 객체:', region, 'DOM 요소:', region.domElement());
+          region.domElement().innerHTML = html;
+          region._snapshot = html;      // 내부 스냅샷도 최신으로 맞춰줌
+          console.log('적용 완료:', name);
+        });
+
+        editor.syncRegions();           // 에디터 상태 갱신
+        console.log('콘텐츠 로드 완료');
+      })
+      .catch(console.error);
   }
 
   // 메시지 표시 함수
@@ -449,42 +495,6 @@ function initEditor() {
     }, 3000);
   }
 
-  // 다운로드 기능
-  function setupDownloadButton() {
-    const downloadBtn = document.getElementById('download-content');
-    if (downloadBtn) {
-      downloadBtn.addEventListener('click', function() {
-        const url = window.location.pathname;
-        
-        fetch(`/api/load-content?page=${encodeURIComponent(url)}`)
-        .then(response => response.json())
-        .then(result => {
-          if (result.success) {
-            // JSON 파일로 다운로드
-            const dataStr = JSON.stringify(result, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `content-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            showMessage('콘텐츠가 다운로드되었습니다.', 'success');
-          } else {
-            showMessage('다운로드에 실패했습니다.', 'error');
-          }
-        })
-        .catch(error => {
-          console.error('다운로드 오류:', error);
-          showMessage('다운로드 중 오류가 발생했습니다.', 'error');
-        });
-      });
-    }
-  }
 
 // DOM 로드 완료 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
@@ -506,7 +516,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       try {
         initEditor();
-        setupDownloadButton();
         console.log('ContentTools 초기화 완료!');
         return;
       } catch (error) {
@@ -532,7 +541,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('수동 초기화 시도...');
         try {
           initEditor();
-          setupDownloadButton();
           this.remove();
           console.log('수동 초기화 성공!');
         } catch (error) {

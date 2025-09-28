@@ -27,8 +27,6 @@ dist/
 Thumbs.db
 
 # Images (uploaded to Neocities only)
-src/images/
-images/
 *.jpg
 *.jpeg
 *.png
@@ -36,9 +34,9 @@ images/
 *.webp
 *.svg
 
-# Posts data (managed locally only - NEVER push to GitHub)
-src/posts.json
-posts.json
-
 # Environment variables (contains sensitive data)
 *.env
+
+# contents data
+src/contents/
+src/images/

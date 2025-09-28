@@ -4,15 +4,15 @@ const path = require('path');
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 
-// _site/uploads에서 src/uploads로 이미지 동기화 함수
+// _site/images에서 src/images로 이미지 동기화 함수
 function syncImagesToSrc(pageData) {
   try {
-    const siteUploadDir = path.join(__dirname, '../../_site/uploads');
-    const srcUploadDir = path.join(__dirname, '../uploads');
+    const siteUploadDir = path.join(__dirname, '../../_site/images');
+    const srcUploadDir = path.join(__dirname, '../images');
     
     if (!fs.existsSync(siteUploadDir)) return;
     
-    // src/uploads 디렉토리 생성
+    // src/images 디렉토리 생성
     if (!fs.existsSync(srcUploadDir)) {
       fs.mkdirSync(srcUploadDir, { recursive: true });
     }
@@ -23,13 +23,13 @@ function syncImagesToSrc(pageData) {
       const imgRegex = /<img[^>]+src="([^"]+)"/g;
       let match;
       while ((match = imgRegex.exec(pageData.content)) !== null) {
-        if (match[1].startsWith('/uploads/')) {
+        if (match[1].startsWith('/images/')) {
           imageUrls.push(match[1]);
         }
       }
     }
     
-    // 각 이미지를 src/uploads로 복사
+    // 각 이미지를 src/images로 복사
     imageUrls.forEach(imageUrl => {
       const fileName = path.basename(imageUrl);
       const siteImagePath = path.join(siteUploadDir, fileName);
@@ -67,7 +67,7 @@ module.exports = function(eleventyConfig) {
             return res.end(JSON.stringify({ success: false, error: '잘못된 요청입니다.' }));
           }
 
-          const contentDir = path.join(__dirname, '../content-data');
+          const contentDir = path.join(__dirname, '../contents');
           if (!fs.existsSync(contentDir)) {
             fs.mkdirSync(contentDir, { recursive: true });
           }
@@ -88,7 +88,12 @@ module.exports = function(eleventyConfig) {
 
           fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
 
-          // 명시적 저장 시 이미지를 src/uploads로 동기화
+          // _site/contents 동기화
+          const siteContentDir = path.join(__dirname, '../../_site/contents');
+          if (!fs.existsSync(siteContentDir)) fs.mkdirSync(siteContentDir, { recursive: true });
+          fs.writeFileSync(path.join(siteContentDir, fileName), JSON.stringify(existingData, null, 2));
+
+          // 명시적 저장 시 이미지를 src/images로 동기화
           syncImagesToSrc(pageData);
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -155,8 +160,8 @@ module.exports = function(eleventyConfig) {
             return res.end(JSON.stringify({ success: false, error: '이미지 크기는 5MB를 초과할 수 없습니다.' }));
           }
 
-          // _site/uploads에 직접 저장 (자동 새로고침 방지)
-          const siteUploadDir = path.join(__dirname, '../../_site/uploads');
+          // _site/images에 직접 저장 (자동 새로고침 방지)
+          const siteUploadDir = path.join(__dirname, '../../_site/images');
           if (!fs.existsSync(siteUploadDir)) {
             fs.mkdirSync(siteUploadDir, { recursive: true });
           }
@@ -173,8 +178,8 @@ module.exports = function(eleventyConfig) {
 
           fs.writeFileSync(filePath, buffer);
 
-          // src/uploads로도 복사 (개발 서버 리로드 없이 갤러리 목록 즉시 반영)
-          const srcUploadDir = path.join(__dirname, '../uploads');
+          // src/images로도 복사 (개발 서버 리로드 없이 갤러리 목록 즉시 반영)
+          const srcUploadDir = path.join(__dirname, '../images');
           if (!fs.existsSync(srcUploadDir)) {
             fs.mkdirSync(srcUploadDir, { recursive: true });
           }
@@ -184,7 +189,7 @@ module.exports = function(eleventyConfig) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: true,
-            url: `/uploads/${fileName}`,
+            url: `/images/${fileName}`,
             size: buffer.length,
             type: mimeType || type || `image/${extension}`
           }));
@@ -215,7 +220,7 @@ module.exports = function(eleventyConfig) {
       }
 
       try {
-        const uploadDir = path.join(__dirname, '../uploads');
+        const uploadDir = path.join(__dirname, '../images');
         if (!fs.existsSync(uploadDir)) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ success: true, images: [] }));
@@ -240,7 +245,7 @@ module.exports = function(eleventyConfig) {
 
             return {
               name,
-              url: '/uploads/' + name,
+              url: '/images/' + name,
               size: stats.size,
               modified: stats.mtime.toISOString()
             };
@@ -272,7 +277,7 @@ module.exports = function(eleventyConfig) {
       }
 
       try {
-        const contentDir = path.join(__dirname, '../content-data');
+        const contentDir = path.join(__dirname, '../contents');
         const fileName = page.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
         const filePath = path.join(contentDir, fileName);
 
@@ -319,7 +324,7 @@ module.exports = function(eleventyConfig) {
       }
 
       try {
-        const contentDir = path.join(__dirname, '../content-data');
+        const contentDir = path.join(__dirname, '../contents');
         const fileName = page.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
         const filePath = path.join(contentDir, fileName);
 
