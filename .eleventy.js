@@ -1,5 +1,6 @@
 ﻿const { DateTime } = require("luxon");
 const GoogleSearchConsoleStats = require('./src/_plugins/google-search-console');
+const contentRegions = require('./src/_plugins/contentRegions');
 const htmlmin = require('html-minifier-terser');
 const { JSDOM } = require('jsdom');
 const path = require('path');
@@ -119,6 +120,9 @@ module.exports = function(eleventyConfig) {
 
   // Add site data to global data
   eleventyConfig.addGlobalData("site", siteConfig);
+  
+  // Add contentRegions to global data
+  eleventyConfig.addGlobalData("contentRegions", contentRegions());
   
   // Add post count filter
   eleventyConfig.addFilter("postCount", function(collections) {
@@ -253,16 +257,23 @@ module.exports = function(eleventyConfig) {
     if (!outputPath || !outputPath.endsWith('.html')) return content;
 
     const pageUrl = this?.page?.url || '/';
-    const regions = this?.contentRegions?.[pageUrl];
+    // Transform에서 전역 데이터에 접근하는 올바른 방법
+    const contentRegionsData = contentRegions();
+    const regions = contentRegionsData[pageUrl];
+    console.log('inject-contents: Processing', pageUrl, 'regions:', regions ? Object.keys(regions) : 'none');
+    
     if (!regions) return content; // 저장된 콘텐츠가 없는 경우 그대로 둠
 
     const dom = new JSDOM(content);
     const document = dom.window.document;
 
     Object.entries(regions).forEach(([name, html]) => {
-      const el = document.querySelector(`[data-editable][data-name="${name}"]`);
+      const el = document.querySelector(`[data-editable][data-name="${name}"]`) ||
+                 document.querySelector(`[data-editable-placeholder][data-editable-name="${name}"]`);
+      console.log('inject-contents: Looking for', name, 'found:', !!el);
       if (!el) return;
       el.innerHTML = html;
+      console.log('inject-contents: Injected content for', name);
     });
 
     return dom.serialize();
@@ -298,6 +309,9 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/contents");
+  
+  // Add watch targets for content regions
+  eleventyConfig.addWatchTarget("src/contents");
 
 
   // HTML minify
