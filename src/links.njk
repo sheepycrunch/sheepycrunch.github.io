@@ -1,64 +1,68 @@
 ---
 layout: layout.njk
-title: "{{ i18n.sections.snsLinks | t(lang) }}"
-description: "{{ i18n.sections.snsLinks | t(lang) }}"
+title: "Links"
+description: "Useful links are collected here."
 lang: "en"
 permalink: "/links.html"
 ---
 
 <section id="content">
-  <h2>{{ i18n.sections.snsLinks | t(lang) }}</h2>
-  <p>{{ i18n.aboutSite.text2 | t(lang) }}</p>
+  <section data-editable data-name="links-header">
+    <h2>Links</h2>
+    <p>유용한 링크들을 모아놓았습니다.</p>
+  </section>
   
-  <div class="links-categories">
-    <div class="link-category">
-      <h3>개발</h3>
-      <ul class="link-list">
-        <li>
-          <a href="https://github.com" target="_blank" rel="noopener">
-            <strong>GitHub</strong>
-            <span>코드 저장소 및 협업 플랫폼</span>
-          </a>
-        </li>
-        <li>
-          <a href="https://stackoverflow.com" target="_blank" rel="noopener">
-            <strong>Stack Overflow</strong>
-            <span>개발자 Q&A 커뮤니티</span>
-          </a>
-        </li>
-      </ul>
+  <section data-editable data-name="links-content">
+    <div class="links-categories">
+      <div class="link-category">
+        <h3>개발</h3>
+        <ul class="link-list">
+          <li>
+            <a href="https://github.com" target="_blank" rel="noopener">
+              <strong>GitHub</strong>
+              <span>코드 저장소 및 협업 플랫폼</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://stackoverflow.com" target="_blank" rel="noopener">
+              <strong>Stack Overflow</strong>
+              <span>개발자 Q&A 커뮤니티</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="link-category">
+        <h3>디자인</h3>
+        <ul class="link-list">
+          <li>
+            <a href="https://dribbble.com" target="_blank" rel="noopener">
+              <strong>Dribbble</strong>
+              <span>디자인 포트폴리오 플랫폼</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.behance.net" target="_blank" rel="noopener">
+              <strong>Behance</strong>
+              <span>크리에이티브 포트폴리오</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="link-category">
+        <h3>기타</h3>
+        <ul class="link-list">
+          <li>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener">
+              <strong>YouTube</strong>
+              <span>동영상 플랫폼</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-    
-    <div class="link-category">
-      <h3>디자인</h3>
-      <ul class="link-list">
-        <li>
-          <a href="https://dribbble.com" target="_blank" rel="noopener">
-            <strong>Dribbble</strong>
-            <span>디자인 포트폴리오 플랫폼</span>
-          </a>
-        </li>
-        <li>
-          <a href="https://www.behance.net" target="_blank" rel="noopener">
-            <strong>Behance</strong>
-            <span>크리에이티브 포트폴리오</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-    
-    <div class="link-category">
-      <h3>기타</h3>
-      <ul class="link-list">
-        <li>
-          <a href="https://www.youtube.com" target="_blank" rel="noopener">
-            <strong>YouTube</strong>
-            <span>동영상 플랫폼</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
+  </section>
 </section>
 
 <style>

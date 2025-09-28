@@ -1,0 +1,122 @@
+/* ContentTools 관리 스타일 */
+
+/* 편집 가능한 영역 하이라이트 - 테두리 제거 */
+[data-editable] {
+  position: relative;
+  transition: all 0.1s ease;
+}
+
+/* 편집 중이 아닐 때는 테두리 없음 */
+[data-editable]:hover {
+  /* 테두리 제거 */
+  outline: none !important;
+  cursor: text !important;
+  user-select: text !important;
+}
+
+/* 편집 중일 때만 최소한의 표시 */
+[data-editable].ct-editable--editing {
+  outline: none !important;
+  background: rgba(76, 175, 80, 0.02);
+}
+
+/* 편집 가능한 영역 설정 */
+[data-editable] * {
+  cursor: text;
+  user-select: text;
+}
+
+[data-editable] *:hover {
+  outline: none;
+}
+
+#download-content {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#download-content:hover {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#download-content:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* Alignment helpers for ContentTools classes */
+[data-editable].text-left,
+[data-editable] .text-left {
+  text-align: left !important;
+}
+
+[data-editable].text-center,
+[data-editable] .text-center {
+  text-align: center !important;
+}
+
+[data-editable].text-right,
+[data-editable] .text-right {
+  text-align: right !important;
+}
+
+/* Image/video alignment tweaks */
+[data-editable] .align-left {
+  float: left;
+  margin: 0 1.5em 1em 0;
+}
+
+[data-editable] .align-right {
+  float: right;
+  margin: 0 0 1em 1.5em;
+}
+
+[data-editable] .align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Restore default list styling within editable content */
+[data-editable] ul {
+  list-style: disc !important;
+  margin-left: 1.5em;
+  padding-left: 0.5em;
+}
+
+[data-editable] ol {
+  list-style: decimal !important;
+  margin-left: 1.5em;
+  padding-left: 0.5em;
+}
+
+[data-editable] li {
+  margin-bottom: 0.4em;
+}
+
+/* Basic table styling so inserted tables are visible */
+[data-editable] table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+
+[data-editable] th,
+[data-editable] td {
+  border: 1px solid #d0d0d0;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+[data-editable] thead th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}

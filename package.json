@@ -5,7 +5,9 @@
     "build": "npx @11ty/eleventy",
     "build:prod": "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }} npx @11ty/eleventy",
     "serve": "npx @11ty/eleventy --serve --port=8080",
-    "deploy:local": "deploy-local.bat"
+    "deploy:local": "deploy-local.bat",
+    "sass:build": "sass --no-source-map src/scss/style.scss src/style.css",
+    "sass:watch": "sass --no-source-map --watch src/scss/style.scss:src/style.css"
   },
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "html-minifier-terser": "^7.2.0",
-    "neocities": "^0.0.3"
+    "neocities": "^0.0.3",
+    "sass": "^1.93.2"
   }
 }

@@ -7,24 +7,28 @@ permalink: "/search.html"
 ---
 
 <section id="content">
-  <h2>{{ i18n.sections.search | t(lang) }}</h2>
+  <section data-editable data-name="search-header">
+    <h2>Search</h2>
+  </section>
   
-  <div class="search-controls">
-    <input type="text" id="searchInput" placeholder="{{ i18n.search.placeholder | t(lang) }}" class="search-input">
-    <button onclick="clearSearch()" class="clear-button">{{ i18n.search.clearButton | t(lang) }}</button>
-  </div>
+  <section data-editable data-name="search-controls">
+    <div class="search-controls">
+      <input type="text" id="searchInput" placeholder="Search by tags or keywords..." class="search-input">
+      <button onclick="clearSearch()" class="clear-button">Clear</button>
+    </div>
+  </section>
   
-  <div class="search-results" id="searchResults">
-    <!-- 검색 결과가 여기에 표시됩니다 -->
-  </div>
+  <section data-editable data-name="search-results">
+    <div class="search-results" id="searchResults">
+      <!-- 검색 결과가 여기에 표시됩니다 -->
+    </div>
+  </section>
 </section>
 
 
 <script>
 // 포스트 데이터를 JSON으로 출력
 const postsData = {{ posts.posts | dump | safe }};
-// i18n 데이터를 JSON으로 출력
-const i18nData = {{ i18n | dump | safe }};
 
 let currentSearchTerm = '';
 
@@ -55,15 +59,15 @@ function displayResults(results) {
   const container = document.getElementById('searchResults');
   
   if (results.length === 0) {
-    container.innerHTML = '<div class="no-results">' + i18nData.search.noResults + '</div>';
+    container.innerHTML = '<div class="no-results">No search results found.</div>';
     return;
   }
   
   container.innerHTML = results.map(post => `
     <div class="search-item">
       <div class="search-thumbnail">
-        ${post.image ? `<img src="${post.image}" alt="${post.description}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-        <div class="thumbnail-placeholder" ${post.image ? 'style="display: none;"' : ''}>
+        ${post.image ? `<img src="${post.image}" alt="${post.description}" class="search-thumbnail-image" onerror="this.classList.add('is-hidden'); this.nextElementSibling.classList.remove('is-hidden');">` : ''}
+        <div class="thumbnail-placeholder ${post.image ? 'is-hidden' : ''}">
         </div>
       </div>
       <div class="search-content">

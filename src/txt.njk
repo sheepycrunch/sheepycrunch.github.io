@@ -7,38 +7,42 @@ permalink: "/txt.html"
 ---
 
 <section id="content">
-  <h2>{{ i18n.txt.title | t(lang) }}</h2>
+  <section data-editable data-name="txt-header">
+    <h2>Posts</h2>
+  </section>
   
-  <div class="post-list" id="post-list">
-    <!-- 정적 포스트들 (빌드 시점) -->
-    {% for item in posts.posts %}
-      <div class="post-item">
-        {% if item.image %}
-        <div class="post-image">
-          {{ item.image | dualImage | safe }}
-          <div class="image-placeholder" {% if item.image %}style="display: none;"{% endif %}>
-          </div>
-        </div>
-        {% endif %}
-        <div class="post-content">
-          <div class="post-text" data-quill-content="{{ item.description | dump | safe }}"></div>
-          <div class="post-footer">
-            <div class="post-meta">{{ item.date }}</div>
-            {% if item.tags %}
-            <div class="post-tags">
-              {% for tag in item.tags %}
-              <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
-              {% endfor %}
+  <section data-editable data-name="txt-content">
+    <div class="post-list" id="post-list">
+      <!-- 정적 포스트들 (빌드 시점) -->
+      {% for item in posts.posts %}
+        <div class="post-item">
+          {% if item.image %}
+          <div class="post-image">
+            {{ item.image | dualImage | safe }}
+            <div class="image-placeholder" {% if item.image %}style="display: none;"{% endif %}>
             </div>
-            {% endif %}
+          </div>
+          {% endif %}
+          <div class="post-content">
+            <div class="post-text" data-quill-content="{{ item.description | dump | safe }}"></div>
+            <div class="post-footer">
+              <div class="post-meta">{{ item.date }}</div>
+              {% if item.tags %}
+              <div class="post-tags">
+                {% for tag in item.tags %}
+                <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
           </div>
         </div>
-      </div>
-    {% endfor %}
-    
-    <!-- 동적 포스트들 (JavaScript로 로드) -->
-    <div id="dynamic-posts"></div>
-  </div>
+      {% endfor %}
+      
+      <!-- 동적 포스트들 (JavaScript로 로드) -->
+      <div id="dynamic-posts"></div>
+    </div>
+  </section>
   
   <!-- Eleventy posts 데이터를 JavaScript 변수로 주입 -->
   <script>

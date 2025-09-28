@@ -7,36 +7,42 @@ permalink: "/gallery.html"
 ---
 
 <section id="content">
-  <h2>{{ i18n.gallery.title | t(lang) }}</h2>
+  <section data-editable data-name="gallery-header">
+    <h2>Gallery</h2>
+  </section>
   
   <div class="gallery-content">
-    <div class="gallery-intro">
-      <p>이미지 갤러리입니다. 각 이미지를 클릭하여 자세히 볼 수 있습니다.</p>
-    </div>
-    
-    <div class="gallery-grid">
-    {% for item in posts.posts %}
-      <div class="gallery-item">
-        {% if item.image %}
-        <img src="{{ item.image }}" alt="{{ item.description }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        {% endif %}
-        <div class="image-placeholder" {% if item.image %}style="display: none;"{% endif %}>
-        </div>
-        {% if item.tags %}
-        <div class="gallery-tags">
-          {% if item.description %}
-          <div class="gallery-description" data-quill-content="{{ item.description | dump | safe }}"></div>
-          {% endif %}
-          <div class="tag-list">
-            {% for tag in item.tags %}
-            <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
+    <section data-editable data-name="gallery-intro">
+      <div class="gallery-intro">
+        <p>이미지 갤러리입니다. 각 이미지를 클릭하여 자세히 볼 수 있습니다.</p>
       </div>
-    {% endfor %}
-    </div>
+    </section>
+    
+    <section data-editable data-name="gallery-grid">
+      <div class="gallery-grid">
+      {% for item in posts.posts %}
+        <div class="gallery-item">
+          {% if item.image %}
+          <img src="{{ item.image }}" alt="{{ item.description }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          {% endif %}
+          <div class="image-placeholder" {% if item.image %}style="display: none;"{% endif %}>
+          </div>
+          {% if item.tags %}
+          <div class="gallery-tags">
+            {% if item.description %}
+            <div class="gallery-description" data-quill-content="{{ item.description | dump | safe }}"></div>
+            {% endif %}
+            <div class="tag-list">
+              {% for tag in item.tags %}
+              <button class="tag-button" onclick="searchByTag('{{ tag }}')">#{{ tag }}</button>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      </div>
+    </section>
   </div>
 </section>
 

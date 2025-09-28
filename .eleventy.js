@@ -1,26 +1,26 @@
-const { DateTime } = require("luxon");
+﻿const { DateTime } = require("luxon");
 const GoogleSearchConsoleStats = require('./src/_plugins/google-search-console');
 const htmlmin = require('html-minifier-terser');
 
 module.exports = function(eleventyConfig) {
   
   
-  // 환경변수에서 URL 정보 가져오기
+  // Get URL information from environment variables
   const siteName = process.env.USERNAME || 'dakimakura';
   const neocitiesUrl = process.env.NEOCITIES_URL || `https://${siteName}.neocities.org`;
   const nekowebUrl = process.env.NEKOWEB_URL || `https://${siteName}.nekoweb.org`;
   
-  // 전역 데이터로 추가
+  // Add global data
   eleventyConfig.addGlobalData("siteName", siteName);
   eleventyConfig.addGlobalData("neocitiesUrl", neocitiesUrl);
   eleventyConfig.addGlobalData("nekowebUrl", nekowebUrl);
   
-  // Neocities API 토큰
+  // Neocities API credentials
   const neocitiesApiToken = process.env.NEOCITIES_API_KEY;
   
   eleventyConfig.addGlobalData("neocitiesApiToken", neocitiesApiToken);
   
-  // Posts 데이터를 전역 데이터로 추가
+  // Add Posts data to global data
   let postsData = { posts: [] };
   try {
     const fs = require('fs');
@@ -36,8 +36,7 @@ module.exports = function(eleventyConfig) {
   
   eleventyConfig.addGlobalData("postsData", postsData);
 
-  // write.njk을 프로덕션 빌드에서 제외 (로컬에서만 빌드)
-  // ELEVENTY_ENV가 production이면 write.njk 제외
+  // If ELEVENTY_ENV is production, exclude write.njk file
   if (process.env.ELEVENTY_ENV === 'production') {
     eleventyConfig.ignores.add("src/write.njk");
     console.log('Production build: write.njk excluded');
@@ -45,7 +44,7 @@ module.exports = function(eleventyConfig) {
     console.log('Local build: write.njk included');
   }
   
-  // 구글 서치콘솔 통계 초기화
+  // Initialize search console stats
   let searchConsoleStats = {
     totalClicks: 0,
     totalImpressions: 0,
@@ -53,7 +52,7 @@ module.exports = function(eleventyConfig) {
     lastUpdated: new Date().toISOString()
   };
 
-  // 구글 서치콘솔 통계 가져오기 (비동기)
+  // Initialize search console stats
   const initSearchConsoleStats = async () => {
     try {
       const gsc = new GoogleSearchConsoleStats();
@@ -71,20 +70,20 @@ module.exports = function(eleventyConfig) {
         };
       }
     } catch (error) {
-      console.warn('구글 서치콘솔 통계 로드 실패:', error.message);
+      console.warn('Failed to initialize search console stats:', error.message);
     }
   };
 
-  // 통계 초기화 실행
+  // Initialize search console stats
   initSearchConsoleStats();
 
-  // 사이트 설정 데이터
+  // Add site config data
   const siteConfig = {
     title: "dakimakura",
     author: {
       name: "sheepycrunch",
     },
-    description: "개인 블로그",
+    description: "Personal Blog",
     social: {
     },
     stats: {
@@ -99,43 +98,43 @@ module.exports = function(eleventyConfig) {
       { name: "write", url: "/write.html" },
     ],
     authorInfo: {
-      introduction: "이 블로그는 기존 상업 블로그의 대안으로 설립되었습니다."
+      introduction: "This blog was established as an alternative to existing commercial blogs."
     },
     aboutSite: {
-      text: "하루 한 번 정기적인 글 작성을 목표로 하고 있습니다."
+      text: "Aiming for regular daily writing."
     }
   };
 
-  // 포스트 수 계산 함수
+  // Calculate post count
   const calculatePostCount = (collections) => {
     let count = 0;
     
-    // posts.json의 포스트 수
+    // If posts.json exists, add post count
     if (collections.posts) {
       count += collections.posts.length;
     }
     
-    // 기본 페이지들 (txt, gallery, archive, links, search, write, login)
+    // Basic pages (txt, gallery, archive, links, search, write, login)
     const basicPages = ['txt', 'gallery', 'archive', 'links', 'search', 'write', 'login'];
     count += basicPages.length;
     
     return count;
   };
 
-  // 사이트 데이터 추가
+  // Add site data to global data
   eleventyConfig.addGlobalData("site", siteConfig);
   
-  // 포스트 수 계산을 위한 컬렉션 필터
+  // Add post count filter
   eleventyConfig.addFilter("postCount", function(collections) {
     return calculatePostCount(collections);
   });
   
-  // 영어로 통일된 사이트 데이터
+  // Add site data to global data
   const siteData = {
     site: {
       title: siteConfig.title,
       author: siteConfig.author.name,
-      description: "Personal Blog"
+      description: "Personal Blog",
     },
     sections: {
       selfIntroduction: "About Me",
@@ -191,23 +190,23 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addGlobalData("i18n", siteData);
   
   
-  // 이미지 경로를 환경에 따라 변환하는 필터
+  // Add dualImage filter
   eleventyConfig.addFilter("dualImage", function(imagePath) {
     if (!imagePath) return "";
     
-    // 이미 절대 URL인 경우 그대로 반환
+    // If image path is already an absolute URL, return it
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
     
-    // 환경 변수로 배포 환경 확인
+    // Check if Neocities is deployed
     const isNeocitiesDeploy = process.env.NEOCITIES_DEPLOY === 'true';
     
     if (isNeocitiesDeploy) {
-      // 네오시티 배포: 상대 경로 사용
+      // If Neocities is deployed, return the image path
       return `<img src="${imagePath}" alt="" />`;
     } else {
-      // 로컬 개발: 절대 URL 사용 (네오시티와 네코웹 둘 다 시도)
+      // If Neocities is not deployed, return the image path with Neocities URL
       const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
       const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
       const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
@@ -218,38 +217,38 @@ module.exports = function(eleventyConfig) {
     }
   });
   
-  // 기존 neocitiesImage 필터도 유지 (하위 호환성)
+  // Add neocitiesImage filter
   eleventyConfig.addFilter("neocitiesImage", function(imagePath) {
     if (!imagePath) return "";
     
-    // 이미 절대 URL인 경우 그대로 반환
+    // If image path is already an absolute URL, return it
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
     
-    // 상대 경로를 Neocities URL로 변환
+    // If image path is a relative path, convert it to an absolute path
     const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
     const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
     return `${neocitiesUrl}/${cleanPath}`;
   });
   
-  // URL 로컬라이제이션 필터 추가
+  // Add localizedUrl filter
   eleventyConfig.addFilter("localizedUrl", function(url, lang) {
     if (!url) return "";
     if (lang === 'en') return url;
-    // 간단한 URL 변환 (실제로는 더 복잡한 로직 필요)
+    // If language is not English, return the URL
     return url;
   });
   
-  // JSON stringify 필터 추가
+  // Add stringify filter
   eleventyConfig.addFilter("stringify", function(obj) {
     return JSON.stringify(obj);
   });
   
-  // JavaScript 파일에 환경변수 주입 (보안상 모든 토큰 제외)
+  // Add inject-admin-key transform
   eleventyConfig.addTransform("inject-admin-key", function(content, outputPath) {
     if (outputPath && outputPath.endsWith('.html')) {
-      // HTML 파일에서 JavaScript에 환경변수 주입 (보안상 모든 토큰은 제외)
+      // If output path is an HTML file, inject the admin key
       const scriptTag = `<script>
         window.searchConsoleStats = ${JSON.stringify(searchConsoleStats)};
       </script>`;
@@ -258,39 +257,41 @@ module.exports = function(eleventyConfig) {
     return content;
   });
 
-  // 날짜 포맷팅
+  // Add readableDate filter
   eleventyConfig.addFilter("readableDate", dateObj => {
     return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat("dd LLL yyyy");
   });
 
-  // HTML 날짜 포맷팅
+  // Add htmlDateString filter
   eleventyConfig.addFilter('htmlDateString', (dateObj) => {
     return DateTime.fromJSDate(dateObj, {zone: 'utc'}).toFormat('yyyy-LL-dd');
   });
 
-  // 날짜 정렬
+  // Add sortByDate filter
   eleventyConfig.addFilter("sortByDate", function(collection) {
     return collection.sort((a, b) => {
       return new Date(b.date) - new Date(a.date);
     });
   });
 
-  // 콘텐츠 길이 제한
+  // Add limit filter
   eleventyConfig.addFilter("limit", function(array, limit) {
     return array.slice(0, limit);
   });
 
-  // 정적 파일 복사 설정
+  // Add passthrough copy
   eleventyConfig.addPassthroughCopy("deploy-history.json");
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/js");
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("src/posts.json");
+  eleventyConfig.addPassthroughCopy("src/content-data");
+  eleventyConfig.addPassthroughCopy("src/uploads");
   eleventyConfig.addPassthroughCopy("neocities.png");
 
 
-  // HTML 압축 설정 (프로덕션 빌드 시에만)
+  // HTML minify
   if (process.env.ELEVENTY_ENV === 'production') {
     eleventyConfig.addTransform('htmlmin', async function(content, outputPath) {
       if (outputPath && outputPath.endsWith('.html')) {
@@ -343,10 +344,10 @@ module.exports = function(eleventyConfig) {
       output: "_site"
     },
 
-    // 서버 설정
+    // Server options
     serverOptions: {
       port: 8080,
-      // API 라우트 추가
+      // API middleware
       middleware: [
         function(req, res, next) {
           if (req.url === '/api/execute-workflow') {
