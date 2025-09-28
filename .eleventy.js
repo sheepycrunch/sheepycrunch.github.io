@@ -1,6 +1,8 @@
 ﻿const { DateTime } = require("luxon");
 const GoogleSearchConsoleStats = require('./src/_plugins/google-search-console');
 const htmlmin = require('html-minifier-terser');
+const { JSDOM } = require('jsdom');
+const path = require('path');
 
 module.exports = function(eleventyConfig) {
   
@@ -244,6 +246,26 @@ module.exports = function(eleventyConfig) {
       return content.replace('</head>', `${scriptTag}\n</head>`);
     }
     return content;
+  });
+
+  // Add inject-contents transform
+  eleventyConfig.addTransform('inject-contents', function (content, outputPath) {
+    if (!outputPath || !outputPath.endsWith('.html')) return content;
+
+    const pageUrl = this?.page?.url || '/';
+    const regions = this?.contentRegions?.[pageUrl];
+    if (!regions) return content; // 저장된 콘텐츠가 없는 경우 그대로 둠
+
+    const dom = new JSDOM(content);
+    const document = dom.window.document;
+
+    Object.entries(regions).forEach(([name, html]) => {
+      const el = document.querySelector(`[data-editable][data-name="${name}"]`);
+      if (!el) return;
+      el.innerHTML = html;
+    });
+
+    return dom.serialize();
   });
 
   // Add readableDate filter

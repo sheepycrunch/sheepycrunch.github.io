@@ -365,7 +365,8 @@ function initEditor() {
       editor.addEventListener('start', function(ev) {
         console.log('편집 시작');
         // 에디터가 시작된 후 콘텐츠 로드 (영역이 준비된 후)
-        setTimeout(loadContent, 0);
+        // 이미 페이지 로드 시 콘텐츠가 주입되었지만, 에디터 영역 동기화를 위해 다시 실행
+        setTimeout(() => applyContentRegions(window.location.pathname), 0);
       });
 
       editor.addEventListener('stop', function(ev) {
@@ -414,12 +415,11 @@ function initEditor() {
     });
   }
 
-  // 콘텐츠 로드 함수
-  function loadContent() {
-    const url = window.location.pathname;
-    console.log('loadContent 시작:', url);
+  // 공용 콘텐츠 적용 함수 (ContentTools와 독립적으로 동작)
+  function applyContentRegions(pageUrl) {
+    console.log('applyContentRegions 시작:', pageUrl);
     
-    fetch(`/api/load-content?page=${encodeURIComponent(url)}`)
+    return fetch(`/api/load-content?page=${encodeURIComponent(pageUrl)}`)
       .then(res => res.json())
       .then(result => {
         console.log('API 응답:', result);
@@ -428,28 +428,34 @@ function initEditor() {
           return;
         }
 
-        const editor = ContentTools.EditorApp.get();
-        const regions = editor.regions();
-        console.log('에디터 영역들:', regions);
-
+        // 모든 모드에서 동일하게 DOM 요소에 직접 적용
         Object.entries(result.regions).forEach(([name, html]) => {
-          console.log('적용 시도:', name, html);
-          const region = regions[name];
-          if (!region) {
+          console.log('콘텐츠 적용 시도:', name, html);
+          const el = document.querySelector(`[data-editable][data-name="${name}"]`);
+          if (el) {
+            el.innerHTML = html;
+            console.log('콘텐츠 적용 완료:', name);
+          } else {
             console.log('영역을 찾을 수 없음:', name);
-            return;
           }
-
-          console.log('영역 객체:', region, 'DOM 요소:', region.domElement());
-          region.domElement().innerHTML = html;
-          region._snapshot = html;      // 내부 스냅샷도 최신으로 맞춰줌
-          console.log('적용 완료:', name);
         });
 
-        editor.syncRegions();           // 에디터 상태 갱신
+        // ContentTools 에디터가 활성화된 경우에만 추가 처리
+        if (typeof ContentTools !== 'undefined' && editor && editor.regions) {
+          console.log('에디터 모드 - 영역 동기화');
+          editor.syncRegions();
+        }
+        
         console.log('콘텐츠 로드 완료');
       })
-      .catch(console.error);
+      .catch(error => {
+        console.error('콘텐츠 로드 오류:', error);
+      });
+  }
+
+  // 기존 loadContent 함수 (에디터 전용, 하위 호환성 유지)
+  function loadContent() {
+    return applyContentRegions(window.location.pathname);
   }
 
   // 메시지 표시 함수
@@ -496,7 +502,15 @@ function initEditor() {
   }
 
 
-// DOM 로드 완료 시 초기화
+// 페이지 로드 시 무조건 콘텐츠 주입
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM 로드 완료, 콘텐츠 주입 시작...');
+  
+  // ContentTools 여부와 관계없이 콘텐츠 주입
+  applyContentRegions(window.location.pathname);
+});
+
+// DOM 로드 완료 시 ContentTools 초기화
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM 로드 완료, ContentTools 초기화 시작...');
   
@@ -558,6 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.ContentToolsManager = {
     init: initEditor,
     loadContent: loadContent,
+    applyContentRegions: applyContentRegions,
     saveContent: saveContent,
     showMessage: showMessage,
     isInitialized: () => isInitialized,
