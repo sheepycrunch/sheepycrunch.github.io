@@ -292,7 +292,12 @@ module.exports = function(eleventyConfig) {
 
   // Add passthrough copy
   eleventyConfig.addPassthroughCopy("deploy-history.json");
-  eleventyConfig.addPassthroughCopy("src");
+  eleventyConfig.addPassthroughCopy("src/api");
+  eleventyConfig.addPassthroughCopy("src/css");
+  eleventyConfig.addPassthroughCopy("src/js");
+  eleventyConfig.addPassthroughCopy("src/style.css");
+  eleventyConfig.addPassthroughCopy("src/images");
+  eleventyConfig.addPassthroughCopy("src/contents");
 
 
   // HTML minify
