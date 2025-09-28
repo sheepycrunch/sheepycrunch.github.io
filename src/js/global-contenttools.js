@@ -8,6 +8,12 @@
   const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
   let isImageUploaderRegistered = false;
 
+  // 갤러리 상태 관리
+  let galleryState = { 
+    items: [], 
+    isLoaded: false 
+  };
+
   function uploadImageToServer(fileName, fileType, dataUrl) {
     return fetch('/api/upload-image', {
       method: 'POST',
@@ -34,6 +40,84 @@
     });
   }
 
+  // 갤러리 이미지 목록 가져오기
+  function fetchGallery() {
+    return fetch('/api/list-uploads')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('갤러리 목록을 불러오지 못했습니다.');
+        }
+        return response.json();
+      })
+      .then(result => {
+        if (!result.success) {
+          throw new Error(result.error || '갤러리 목록을 불러오지 못했습니다.');
+        }
+        galleryState.items = result.images || [];
+        galleryState.isLoaded = true;
+        return galleryState.items;
+      });
+  }
+
+  // 갤러리 UI 빌드
+  function buildGallery(dialog) {
+    const domView = dialog._domView;
+    if (!domView) return;
+
+    // 기존 갤러리 제거
+    const existingGallery = domView.querySelector('.ct-image-gallery');
+    if (existingGallery) {
+      existingGallery.remove();
+    }
+
+    // 갤러리 컨테이너 생성
+    const galleryContainer = document.createElement('div');
+    galleryContainer.className = 'ct-image-gallery';
+
+    if (galleryState.items.length === 0) {
+      galleryContainer.innerHTML = '<p class="ct-gallery-empty">업로드된 이미지가 없습니다.</p>';
+    } else {
+      // 썸네일 그리드 생성
+      const grid = document.createElement('div');
+      grid.className = 'ct-gallery-grid';
+
+      galleryState.items.forEach(item => {
+        const thumbnail = document.createElement('div');
+        thumbnail.className = 'ct-gallery-thumbnail';
+
+        const img = document.createElement('img');
+        img.src = item.url;
+
+        // 클릭 시 이미지 선택
+        thumbnail.addEventListener('click', () => {
+          const img = new Image();
+          img.onload = () => {
+            const size = [img.naturalWidth, img.naturalHeight];
+            dialog.populate(item.url, size);
+            dialog.save(item.url, size);
+          };
+          img.onerror = () => {
+            dialog.state('failed');
+            showMessage('이미지 정보를 불러올 수 없습니다.', 'error');
+            setTimeout(() => {
+              dialog.state('empty');
+              dialog.progress(0);
+            }, 1500);
+          };
+          img.src = item.url;
+        });
+
+        thumbnail.appendChild(img);
+        grid.appendChild(thumbnail);
+      });
+
+      galleryContainer.appendChild(grid);
+    }
+
+    // 갤러리를 다이얼로그에 추가
+    domView.appendChild(galleryContainer);
+  }
+
   function registerImageUploader() {
     if (isImageUploaderRegistered) return;
     if (typeof ContentTools === 'undefined') return;
@@ -55,21 +139,47 @@
       dialog.addEventListener('imageuploader.url', function(ev) {
         const url = ev.detail().url;
         if (!url) {
-          dialog.error('URL을 입력해주세요.');
+          if (typeof dialog.error === 'function') {
+            dialog.error('URL을 입력해주세요.');
+          } else {
+            showMessage('URL을 입력해주세요.', 'error');
+          }
           return;
         }
         dialog.save(url);
       });
 
+      // 갤러리 마운트 이벤트 처리
+      dialog.addEventListener('imageuploader.mount', function() {
+        if (galleryState.isLoaded) {
+          buildGallery(dialog);
+        } else {
+          fetchGallery()
+            .then(() => buildGallery(dialog))
+            .catch(error => {
+              console.error('갤러리 로드 실패:', error);
+              showMessage('갤러리를 불러오지 못했습니다.', 'error');
+            });
+        }
+      });
+
       dialog.addEventListener('imageuploader.fileready', function(ev) {
         const file = ev.detail().file;
         if (!file) {
-          dialog.error('선택된 파일이 없습니다.');
+          if (typeof dialog.error === 'function') {
+            dialog.error('선택된 파일이 없습니다.');
+          } else {
+            showMessage('선택된 파일이 없습니다.', 'error');
+          }
           return;
         }
 
         if (file.size > MAX_IMAGE_SIZE) {
-          dialog.error('이미지 크기가 너무 큽니다. 최대 5MB 파일만 업로드할 수 있습니다.');
+          if (typeof dialog.error === 'function') {
+            dialog.error('이미지 크기가 너무 큽니다. 최대 5MB 파일만 업로드할 수 있습니다.');
+          } else {
+            showMessage('이미지 크기가 너무 큽니다. 최대 5MB 파일만 업로드할 수 있습니다.', 'error');
+          }
           return;
         }
 
@@ -87,18 +197,42 @@
             uploadImageToServer(file.name, file.type, dataUrl)
               .then(result => {
                 dialog.progress(1);
-                dialog.populate(result.url, imageSize);   // 다이얼로그 상태를 일관성 있게 유지
-                dialog.save(result.url, imageSize);       // 이미지 크기 정보 전달
                 
-                // 이미지 업로드 후 현재 에디터 내용을 자동 저장
-                setTimeout(() => {
-                  if (window.ContentTools && window.ContentTools.EditorApp) {
-                    const editor = window.ContentTools.EditorApp.get();
-                    if (editor) {
-                      editor.save(true); // 자동 저장 실행
+                // 이미지 크기를 다시 로드하여 정확한 크기 정보 전달
+                const img = new Image();
+                img.onload = () => {
+                  const size = [img.naturalWidth, img.naturalHeight];
+                  dialog.populate(result.url, size);
+                  dialog.save(result.url, size);
+                  
+                  // 갤러리 상태 업데이트 (새 이미지를 맨 앞에 추가)
+                  const newItem = {
+                    name: result.url.split('/').pop(),
+                    url: result.url,
+                    size: result.size,
+                    modified: new Date().toISOString()
+                  };
+                  galleryState.items.unshift(newItem);
+                  buildGallery(dialog);
+                  
+                  // 이미지 업로드 후 현재 에디터 내용을 자동 저장
+                  setTimeout(() => {
+                    if (window.ContentTools && window.ContentTools.EditorApp) {
+                      const editor = window.ContentTools.EditorApp.get();
+                      if (editor) {
+                        editor.save(true); // 자동 저장 실행
+                      }
                     }
-                  }
-                }, 100);
+                  }, 100);
+                };
+                
+                img.onerror = () => {
+                  dialog.state('failed');
+                  showMessage('이미지 정보를 불러올 수 없습니다.', 'error');
+                  setTimeout(() => resetDialog(), 1500);
+                };
+                
+                img.src = result.url;
               })
               .catch(error => {
                 console.error('이미지 업로드 실패:', error);

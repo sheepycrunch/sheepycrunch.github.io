@@ -53,18 +53,17 @@
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
 /* Alignment helpers for ContentTools classes */
-[data-editable].text-left,
-[data-editable] .text-left {
+
+[data-editable] .text-left{
   text-align: left !important;
 }
 
-[data-editable].text-center,
 [data-editable] .text-center {
   text-align: center !important;
 }
 
-[data-editable].text-right,
 [data-editable] .text-right {
   text-align: right !important;
 }
@@ -86,19 +85,16 @@
   margin-right: auto;
 }
 /* Restore default list styling within editable content */
-[data-editable] ul {
-  list-style: disc !important;
-  margin-left: 1.5em;
-  padding-left: 0.5em;
+[data-editable] ul, ol {
+  padding-inline-start: 1.5rem;  /* 좌측 여백 확보 */
+  margin-left: 1.5rem;
+  padding-left: 0.5rem;
 }
-
-[data-editable] ol {
-  list-style: decimal !important;
-  margin-left: 1.5em;
-  padding-left: 0.5em;
-}
+[data-editable] ol { list-style: decimal; }
+[data-editable] ul { list-style: disc; }
 
 [data-editable] li {
+	margin-block: 0.3rem 0;
   margin-bottom: 0.4em;
 }
 

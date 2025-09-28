@@ -173,6 +173,14 @@ module.exports = function(eleventyConfig) {
 
           fs.writeFileSync(filePath, buffer);
 
+          // src/uploads로도 복사 (개발 서버 리로드 없이 갤러리 목록 즉시 반영)
+          const srcUploadDir = path.join(__dirname, '../uploads');
+          if (!fs.existsSync(srcUploadDir)) {
+            fs.mkdirSync(srcUploadDir, { recursive: true });
+          }
+          const srcFilePath = path.join(srcUploadDir, fileName);
+          fs.copyFileSync(filePath, srcFilePath);
+
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: true,

@@ -275,3 +275,40 @@
     justify-content: center;
   }
 }
+
+/* 갤러리 스타일 */
+.ct-image-gallery {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.ct-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 4px;
+}
+
+.ct-gallery-thumbnail {
+  aspect-ratio: 1;
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+.ct-gallery-thumbnail:hover {
+  border-color: #007cba;
+}
+
+.ct-gallery-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ct-gallery-empty {
+  text-align: center;
+  color: #666;
+  margin: 10px 0;
+}

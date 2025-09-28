@@ -350,7 +350,8 @@ module.exports = function(eleventyConfig) {
           if (req.url.startsWith('/api/save-content') || 
               req.url.startsWith('/api/load-content') || 
               req.url.startsWith('/api/content-history') ||
-              req.url.startsWith('/api/upload-image')) {
+              req.url.startsWith('/api/upload-image') ||
+              req.url.startsWith('/api/list-uploads')) {
             const saveContent = require('./src/api/save-content');
             return saveContent(eleventyConfig)(req, res, next);
           }
