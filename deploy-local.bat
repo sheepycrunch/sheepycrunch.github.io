@@ -16,8 +16,8 @@ if %ERRORLEVEL% NEQ 0 (
 REM 프로덕션 빌드 환경변수 설정 
 set ELEVENTY_ENV=production
 
-echo 사이트: %SITE_NAME%
-echo 사용자명: %NEOCITIES_USERNAME%
+echo 사이트: %USERNAME%
+echo 사용자명: %USERNAME%
 echo.
 
 REM 1. Eleventy 빌드

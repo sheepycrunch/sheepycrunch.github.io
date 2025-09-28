@@ -1,5 +1,6 @@
 const { exec } = require('child_process');
 const path = require('path');
+const DeployLimiter = require('../../deploy-limiter');
 
 module.exports = function(req, res) {
   // CORS 헤더 설정
@@ -13,6 +14,33 @@ module.exports = function(req, res) {
   }
   
   if (req.method === 'POST') {
+    // 배포 빈도 제한 확인
+    const deployLimiter = new DeployLimiter();
+    const deployInfo = deployLimiter.canDeploy();
+    
+    if (!deployInfo.canDeploy) {
+      console.log(`배포 제한: 오늘 배포 횟수 초과 (${deployInfo.todayCount}/${deployInfo.maxCount})`);
+      res.status(429).json({ 
+        success: false, 
+        error: '배포 빈도 제한',
+        message: `오늘 배포 횟수를 초과했습니다. (${deployInfo.todayCount}/${deployInfo.maxCount})`,
+        remainingCount: deployInfo.remainingCount,
+        nextReset: deployInfo.nextReset
+      });
+      return;
+    }
+
+    // 강제 배포 요청 확인 (force=true 파라미터)
+    const forceDeploy = req.body.force === true || req.query.force === 'true';
+    
+    if (forceDeploy) {
+      console.log('⚠️ 강제 배포 요청 감지');
+      deployLimiter.forceDeploy('API 강제 요청');
+    } else {
+      // 일반 배포 기록
+      deployLimiter.recordDeployment('API 요청');
+    }
+    
     // 프로젝트 루트 디렉토리로 이동
     const projectRoot = path.join(__dirname, '../../');
     const batchFile = path.join(projectRoot, 'write-workflow.bat');
@@ -40,6 +68,15 @@ module.exports = function(req, res) {
         message: '워크플로우가 성공적으로 실행되었습니다.',
         output: stdout 
       });
+    });
+  } else if (req.method === 'GET') {
+    // 배포 상태 확인
+    const deployLimiter = new DeployLimiter();
+    const deployInfo = deployLimiter.getDeployInfo();
+    
+    res.status(200).json({
+      success: true,
+      deployInfo: deployInfo
     });
   } else {
     res.status(405).json({ success: false, error: 'Method not allowed' });

@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 
 // 환경변수
 const NEOCITIES_API_KEY = process.env.NEOCITIES_API_KEY || '3d5c5a20afe79623ec87904e336d01a0';
-const SITE_NAME = 'dakimakura';
+const USERNAME = 'dakimakura';
 
 // Node.js https로 Neocities에 업로드
 function uploadToNeocities(filePath, fileName) {

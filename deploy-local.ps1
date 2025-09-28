@@ -28,19 +28,19 @@ if (Test-Path "key.env") {
 }
 
 # 환경변수 확인
-if (-not $env:NEOCITIES_USERNAME -or -not $env:NEOCITIES_PASSWORD) {
-    Write-Host "ERROR: NEOCITIES_USERNAME 또는 NEOCITIES_PASSWORD 환경변수가 설정되지 않았습니다."
+if (-not $env:USERNAME -or -not $env:PASSWORD) {
+    Write-Host "ERROR: USERNAME 또는 PASSWORD 환경변수가 설정되지 않았습니다."
     Read-Host "Press Enter to continue"
     exit 1
 }
 
-if (-not $env:SITE_NAME) {
-    $env:SITE_NAME = "dakimakura"
+if (-not $env:USERNAME) {
+    $env:USERNAME = "dakimakura"
     Write-Host "SITE_NAME이 설정되지 않아 기본값 'dakimakura'를 사용합니다."
 }
 
-Write-Host "사이트: $env:SITE_NAME"
-Write-Host "사용자명: $env:NEOCITIES_USERNAME"
+Write-Host "사이트: $env:USERNAME"
+Write-Host "사용자명: $env:USERNAME"
 Write-Host ""
 
 # 1. 이미지 업로드

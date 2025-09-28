@@ -3,12 +3,12 @@ const fs = require('fs');
 const path = require('path');
 
 // 환경변수에서 사용자명과 비밀번호 가져오기
-const username = process.env.NEOCITIES_USERNAME;
-const password = process.env.NEOCITIES_PASSWORD;
-const siteName = process.env.SITE_NAME || 'dakimakura';
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
+const siteName = process.env.USERNAME || 'dakimakura';
 
 if (!username || !password) {
-    console.error('ERROR: NEOCITIES_USERNAME 또는 NEOCITIES_PASSWORD 환경변수가 설정되지 않았습니다.');
+    console.error('ERROR: USERNAME 또는 PASSWORD 환경변수가 설정되지 않았습니다.');
     process.exit(1);
 }
 

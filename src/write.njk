@@ -31,7 +31,11 @@ permalink: "/write.html"
     <div class="save-controls">
       <button id="save-draft-writer" class="button secondary">{{ "임시저장" | t(lang) }}</button>
       <button id="load-draft-writer" class="button secondary">{{ "임시저장 불러오기" | t(lang) }}</button>
+      <button id="check-deploy-status" class="button secondary">배포 상태 확인</button>
       <button id="save-post" class="button">{{ "저장" | t(lang) }}</button>
+    </div>
+    <div class="deploy-controls">
+      <button id="deploy-only" class="button deploy-button">배포만 실행</button>
     </div>
   </div>
 </section>
@@ -124,7 +128,7 @@ async function processBase64Images(content) {
       const byteCharacters = atob(base64String);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i = byteCharacters.charCodeAt(i);
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: `image/${extension}` });
@@ -162,34 +166,198 @@ function insertImageToEditor(imagePath, localPath) {
   }
 }
 
-// 자동 워크플로우 실행
-function executeWriteWorkflow() {
+// 배포 상태 확인 (로컬 파일 기반)
+async function checkDeployStatus() {
+  console.log('배포 상태 확인 시작...');
+  showTopMessage('배포 상태를 확인하는 중...');
+  
+  try {
+    // 로컬에서만 실행
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      showTopMessage('로컬 서버에서만 배포 상태 확인이 가능합니다.');
+      return null;
+    }
+    
+    // 배포 기록 파일을 직접 읽기
+    const response = await fetch('/deploy-history.json');
+    
+    if (!response.ok) {
+      // 파일이 없으면 초기 상태로 간주
+      showTopMessage('✓ 배포 기록이 없습니다. (0/1) - 배포 가능');
+      return {
+        todayCount: 0,
+        maxCount: 1,
+        remainingCount: 1,
+        canDeploy: true,
+        lastDeployment: null,
+        nextReset: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      };
+    }
+    
+    const history = await response.json();
+    console.log('배포 기록:', history);
+    
+    // 오늘 날짜 확인
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 하루가 지났는지 확인하고 기록 초기화
+    if (history.lastReset !== today) {
+      showTopMessage('✓ 새로운 날짜입니다. (0/1) - 배포 가능');
+      return {
+        todayCount: 0,
+        maxCount: 1,
+        remainingCount: 1,
+        canDeploy: true,
+        lastDeployment: null,
+        nextReset: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      };
+    }
+    
+    // 오늘 배포 횟수 계산
+    const todayDeployments = history.deployments.filter(
+      deploy => deploy.date === today
+    );
+    
+    const maxCount = 1;
+    const todayCount = todayDeployments.length;
+    const remainingCount = maxCount - todayCount;
+    const canDeploy = todayCount < maxCount;
+    
+    const statusMessage = `배포 상태: ${todayCount}/${maxCount} (남은 횟수: ${remainingCount})`;
+    
+    if (canDeploy) {
+      showTopMessage(`✓ ${statusMessage} - 배포 가능`);
+    } else {
+      showTopMessage(`⚠️ ${statusMessage} - 배포 제한됨 (다음 리셋: ${new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]})`);
+    }
+    
+    return {
+      todayCount,
+      maxCount,
+      remainingCount,
+      canDeploy,
+      lastDeployment: todayDeployments.length > 0 ? todayDeployments[todayDeployments.length - 1] : null,
+      nextReset: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    };
+    
+  } catch (error) {
+    console.error('배포 상태 확인 오류:', error);
+    showTopMessage(`배포 상태 확인 실패: ${error.message}`);
+  }
+  return null;
+}
+
+// 배포만 실행 (저장 없이)
+async function executeDeployOnly() {
   // 로컬 서버에서만 실행
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    // 먼저 배포 상태 확인
+    const deployInfo = await checkDeployStatus();
+    
+    if (deployInfo && !deployInfo.canDeploy) {
+      const forceDeploy = confirm(`오늘 배포 횟수를 초과했습니다. (${deployInfo.todayCount}/${deployInfo.maxCount})\n\n강제 배포를 실행하시겠습니까?`);
+      if (!forceDeploy) {
+        return;
+      }
+    }
+    
+    showTopMessage('배포만 실행합니다...');
+    
+    try {
+      const requestBody = {};
+      if (deployInfo && !deployInfo.canDeploy) {
+        requestBody.force = true;
+      }
+      
+      fetch('/api/execute-workflow', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            showTopMessage('배포가 성공적으로 완료되었습니다!');
+            console.log('배포 실행 결과:', data);
+            // 배포 상태 다시 확인
+            setTimeout(checkDeployStatus, 1000);
+          } else {
+            if (data.error === '배포 빈도 제한') {
+              showTopMessage(`배포 제한: ${data.message}`);
+            } else {
+              showTopMessage('배포 실행 중 오류가 발생했습니다: ' + (data.error || '알 수 없는 오류'));
+            }
+            console.error('배포 실행 오류:', data);
+          }
+        })
+        .catch((error) => {
+          console.error('배포 실행 오류:', error);
+          showTopMessage('배포 실행 중 네트워크 오류가 발생했습니다.');
+        });
+      
+    } catch (error) {
+      console.error('배포 실행 오류:', error);
+      showTopMessage('배포 실행에 실패했습니다.');
+    }
+  } else {
+    showTopMessage('로컬 서버에서만 실행 가능합니다. 수동으로 write-workflow.bat을 실행해주세요.');
+  }
+}
+
+// 자동 워크플로우 실행 (저장 + 배포)
+async function executeWriteWorkflow() {
+  // 로컬 서버에서만 실행
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    // 먼저 배포 상태 확인
+    const deployInfo = await checkDeployStatus();
+    
+    if (deployInfo && !deployInfo.canDeploy) {
+      const forceDeploy = confirm(`오늘 배포 횟수를 초과했습니다. (${deployInfo.todayCount}/${deployInfo.maxCount})\n\n강제 배포를 실행하시겠습니까?`);
+      if (!forceDeploy) {
+        return;
+      }
+    }
+    
     // 자동화된 배포 워크플로우 실행
-    // 사용자에게 수동 실행 안내
     showTopMessage('파일이 다운로드되었습니다. 자동으로 write-workflow.bat을 실행하도록 시도합니다.');
     
     // Node.js 서버를 통한 자동 실행
     try {
       showTopMessage('자동 워크플로우를 시작합니다...');
       
+      const requestBody = {};
+      if (deployInfo && !deployInfo.canDeploy) {
+        requestBody.force = true;
+      }
+      
       fetch('/api/execute-workflow', {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            showTopMessage('Auto workflow finished successfully.');
-            console.log('workflow output:', data.output);
+            showTopMessage('워크플로우가 성공적으로 실행되었습니다!');
+            console.log('워크플로우 실행 결과:', data);
+            // 배포 상태 다시 확인
+            setTimeout(checkDeployStatus, 1000);
           } else {
-            showTopMessage('Auto workflow failed. Check the terminal for details.');
-            console.error('workflow error:', data.error);
+            if (data.error === '배포 빈도 제한') {
+              showTopMessage(`배포 제한: ${data.message}`);
+            } else {
+              showTopMessage('워크플로우 실행 중 오류가 발생했습니다: ' + (data.error || '알 수 없는 오류'));
+            }
+            console.error('워크플로우 실행 오류:', data);
           }
         })
         .catch((error) => {
-          console.error('workflow request failed:', error);
-          showTopMessage('Could not reach the auto workflow API. Verify the Eleventy dev server.');
+          console.error('워크플로우 실행 오류:', error);
+          showTopMessage('워크플로우 실행 중 네트워크 오류가 발생했습니다.');
         });
       
     } catch (error) {
@@ -568,7 +736,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // 버튼 이벤트 연결
   document.getElementById('save-draft-writer').addEventListener('click', saveDraft);
   document.getElementById('load-draft-writer').addEventListener('click', loadDraft);
+  document.getElementById('check-deploy-status').addEventListener('click', checkDeployStatus);
   document.getElementById('save-post').addEventListener('click', savePost);
+  document.getElementById('deploy-only').addEventListener('click', executeDeployOnly);
   
   // 페이지 로드 시 임시저장 자동 불러오기
   const draft = JSON.parse(localStorage.getItem('write-draft') || '{}');

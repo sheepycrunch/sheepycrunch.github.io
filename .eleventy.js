@@ -14,7 +14,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addGlobalData("githubToken", githubToken);
   
   // 환경변수에서 URL 정보 가져오기
-  const siteName = process.env.SITE_NAME || 'dakimakura';
+  const siteName = process.env.USERNAME || 'dakimakura';
   const neocitiesUrl = process.env.NEOCITIES_URL || `https://${siteName}.neocities.org`;
   const nekowebUrl = process.env.NEKOWEB_URL || `https://${siteName}.nekoweb.org`;
   
@@ -639,13 +639,15 @@ module.exports = function(eleventyConfig) {
     return array.slice(0, limit);
   });
 
-  // CSS, JS, 이미지 파일 복사
+  // 정적 파일 복사 설정
+  eleventyConfig.addPassthroughCopy("deploy-history.json");
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/js");
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/style.css");
   eleventyConfig.addPassthroughCopy("src/posts.json");
   eleventyConfig.addPassthroughCopy("neocities.png");
+
 
   // HTML 압축 설정 (프로덕션 빌드 시에만)
   if (process.env.ELEVENTY_ENV === 'production') {
