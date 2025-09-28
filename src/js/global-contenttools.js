@@ -363,14 +363,19 @@ function initEditor() {
 
       // 편집 이벤트 설정
       editor.addEventListener('start', function(ev) {
-        console.log('편집 시작');
-        // 에디터가 시작된 후 콘텐츠 로드 (영역이 준비된 후)
-        // 이미 페이지 로드 시 콘텐츠가 주입되었지만, 에디터 영역 동기화를 위해 다시 실행
-        setTimeout(() => applyContentRegions(window.location.pathname), 0);
+        console.log('=== 편집 시작 이벤트 ===');
+        console.log('regions before start:', editor.regions());
+        
+        // 편집 모드에서는 콘텐츠를 다시 주입하지 않음
+        // ContentTools가 이미 DOM을 편집 가능한 상태로 변경했으므로
+        // 추가 콘텐츠 주입은 ContentTools 구조를 덮어쓰게 됨
+        console.log('편집 모드 - 콘텐츠 주입 건너뜀');
       });
 
       editor.addEventListener('stop', function(ev) {
         console.log('편집 중단');
+        // 편집 중단 후 콘텐츠 동기화 (필요시)
+        applyContentRegions(window.location.pathname);
       });
 
       isInitialized = true;
@@ -430,10 +435,12 @@ function initEditor() {
 
         // 모든 모드에서 동일하게 DOM 요소에 직접 적용
         Object.entries(result.regions).forEach(([name, html]) => {
-          console.log('콘텐츠 적용 시도:', name, html);
+          console.log('inject', name, html.length);
           const el = document.querySelector(`[data-editable][data-name="${name}"]`);
           if (el) {
+            console.log('DOM 요소 발견, innerHTML 변경 전:', el.innerHTML.length, '자');
             el.innerHTML = html;
+            console.log('DOM 요소 innerHTML 변경 후:', el.innerHTML.length, '자');
             console.log('콘텐츠 적용 완료:', name);
           } else {
             console.log('영역을 찾을 수 없음:', name);
@@ -588,6 +595,60 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('에디터 인스턴스:', editor);
     console.log('편집 가능한 요소들:', document.querySelectorAll('*[data-editable]').length);
     console.log('================================');
+  };
+
+  // DOM 변경 감시를 위한 MutationObserver 디버깅 함수
+  window.observeContentRegions = function() {
+    const regions = document.querySelectorAll('[data-editable]');
+    console.log('관찰할 영역 수:', regions.length);
+    
+    regions.forEach((region, index) => {
+      const observer = new MutationObserver((mutations) => {
+        console.log(`영역 ${index} (${region.getAttribute('data-name')}) DOM 변경 감지:`, mutations);
+        mutations.forEach(mutation => {
+          if (mutation.type === 'childList') {
+            console.log('자식 노드 변경:', mutation.addedNodes.length, '개 추가,', mutation.removedNodes.length, '개 제거');
+          }
+          if (mutation.type === 'attributes') {
+            console.log('속성 변경:', mutation.attributeName, mutation.target);
+          }
+        });
+      });
+      
+      observer.observe(region, { 
+        subtree: true, 
+        childList: true, 
+        attributes: true,
+        attributeFilter: ['contenteditable', 'class']
+      });
+      
+      console.log(`영역 ${index} 관찰 시작:`, region);
+    });
+    
+    return regions;
+  };
+
+  // 편집 버튼 클릭 시 영역 상태 확인 함수
+  window.checkRegionsAfterEdit = function() {
+    if (!editor) {
+      console.log('에디터가 초기화되지 않았습니다.');
+      return;
+    }
+    
+    console.log('=== 편집 후 영역 상태 확인 ===');
+    const regions = editor.regions();
+    console.log('editor.regions():', regions);
+    
+    Object.keys(regions).forEach(name => {
+      const region = regions[name];
+      const domElement = region.domElement();
+      const contentEditableElements = domElement.querySelectorAll('[contenteditable]');
+      console.log(`영역 ${name}:`, {
+        domElement: domElement,
+        contentEditableCount: contentEditableElements.length,
+        contentEditableElements: contentEditableElements
+      });
+    });
   };
 
 })();
