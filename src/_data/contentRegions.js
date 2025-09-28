@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = () => {
-  const dataDir = path.join(__dirname, '..', 'contents');
+  // _site/contents를 메인 저장소로 사용
+  const dataDir = path.join(__dirname, '..', '..', '_site', 'contents');
   if (!fs.existsSync(dataDir)) return {};
 
   const pages = {};

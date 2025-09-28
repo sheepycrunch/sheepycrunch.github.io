@@ -108,6 +108,11 @@
             const size = [img.naturalWidth, img.naturalHeight];
             dialog.populate(item.url, size);
             dialog.save(item.url, size);
+            
+            // 갤러리 이미지 선택 직후 속성 정리
+            requestAnimationFrame(() => {
+              cleanupImageAttributes();
+            });
           };
           img.onerror = () => {
             dialog.state('failed');
@@ -218,6 +223,11 @@
                   dialog.populate(result.url, size);
                   dialog.save(result.url, size);
                   
+                  // 이미지 업로드 직후 속성 정리
+                  requestAnimationFrame(() => {
+                    cleanupImageAttributes();
+                  });
+                  
                   // 갤러리 상태 업데이트 (새 이미지를 맨 앞에 추가)
                   const newItem = {
                     name: result.url.split('/').pop(),
@@ -281,6 +291,9 @@
 // 저장 이벤트 처리 함수 (ContentTools 공식 문서 방식)
 function handleSaveEvent(ev) {
   console.log('저장 이벤트 처리');
+  
+  // 저장 직전 이미지 속성 정리
+  cleanupImageAttributes();
   
   // 공식 문서에 따른 regions 가져오기
   const regions = ev.detail().regions;
@@ -366,16 +379,46 @@ function initEditor() {
         console.log('=== 편집 시작 이벤트 ===');
         console.log('regions before start:', editor.regions());
         
+        // placeholder를 data-editable로 변환
+        const placeholderElements = document.querySelectorAll('[data-editable-placeholder]');
+        placeholderElements.forEach(el => {
+          const name = el.getAttribute('data-editable-name');
+          if (name) {
+            el.setAttribute('data-editable', '');
+            el.setAttribute('data-name', name);
+            el.removeAttribute('data-editable-placeholder');
+            el.removeAttribute('data-editable-name');
+            console.log('placeholder → data-editable 변환:', name);
+          }
+        });
+        
         // 편집 모드에서는 콘텐츠를 다시 주입하지 않음
         // ContentTools가 이미 DOM을 편집 가능한 상태로 변경했으므로
         // 추가 콘텐츠 주입은 ContentTools 구조를 덮어쓰게 됨
         console.log('편집 모드 - 콘텐츠 주입 건너뜀');
+        
+        // 편집 모드 진입 시 이미지 속성 정리 재적용
+        cleanupImageAttributes();
       });
 
       editor.addEventListener('stop', function(ev) {
         console.log('편집 중단');
+        
+        // data-editable을 placeholder로 변환
+        const editableElements = document.querySelectorAll('[data-editable][data-name]');
+        editableElements.forEach(el => {
+          const name = el.getAttribute('data-name');
+          if (name) {
+            el.setAttribute('data-editable-placeholder', '');
+            el.setAttribute('data-editable-name', name);
+            el.removeAttribute('data-editable');
+            el.removeAttribute('data-name');
+            console.log('data-editable → placeholder 변환:', name);
+          }
+        });
+        
         // 편집 중단 후 콘텐츠 동기화 (필요시)
-        applyContentRegions(window.location.pathname);
+        // applyContentRegions(window.location.pathname);
       });
 
       isInitialized = true;
@@ -420,6 +463,14 @@ function initEditor() {
     });
   }
 
+  // 영역 요소 찾기 함수 (data-editable 또는 data-editable-placeholder)
+  function findRegionElement(name) {
+    return (
+      document.querySelector(`[data-editable][data-name="${name}"]`) ||
+      document.querySelector(`[data-editable-placeholder][data-editable-name="${name}"]`)
+    );
+  }
+
   // 공용 콘텐츠 적용 함수 (ContentTools와 독립적으로 동작)
   function applyContentRegions(pageUrl) {
     console.log('applyContentRegions 시작:', pageUrl);
@@ -436,7 +487,7 @@ function initEditor() {
         // 모든 모드에서 동일하게 DOM 요소에 직접 적용
         Object.entries(result.regions).forEach(([name, html]) => {
           console.log('inject', name, html.length);
-          const el = document.querySelector(`[data-editable][data-name="${name}"]`);
+          const el = findRegionElement(name);
           if (el) {
             console.log('DOM 요소 발견, innerHTML 변경 전:', el.innerHTML.length, '자');
             el.innerHTML = html;
@@ -453,6 +504,9 @@ function initEditor() {
           editor.syncRegions();
         }
         
+        // 이미지 속성 정리 (콘텐츠 주입 후)
+        cleanupImageAttributes();
+        
         console.log('콘텐츠 로드 완료');
       })
       .catch(error => {
@@ -463,6 +517,53 @@ function initEditor() {
   // 기존 loadContent 함수 (에디터 전용, 하위 호환성 유지)
   function loadContent() {
     return applyContentRegions(window.location.pathname);
+  }
+
+  // 이미지 속성 정리 함수 (width, height 속성과 인라인 스타일 제거)
+  function cleanupImageAttributes() {
+    console.log('이미지 속성 정리 시작');
+    const images = document.querySelectorAll('[data-editable] img, [data-editable-placeholder] img');
+    let cleanedCount = 0;
+    
+    images.forEach(img => {
+      let hasChanges = false;
+      
+      // 저장 전 이미지 상태 로깅
+      const beforeWidth = img.getAttribute('width');
+      const beforeHeight = img.getAttribute('height');
+      const beforeStyle = img.style.cssText;
+      
+      // width, height 속성 제거
+      // if (img.hasAttribute('width')) {
+      //   img.removeAttribute('width');
+      //   hasChanges = true;
+      // }
+      // if (img.hasAttribute('height')) {
+      //   img.removeAttribute('height');
+      //   hasChanges = true;
+      // }
+      
+      // 인라인 스타일에서 width, height 관련 속성 제거
+      // if (img.style.width || img.style.height || img.style.maxWidth || img.style.maxHeight) {
+      //   img.style.width = '';
+      //   img.style.height = '';
+      //   img.style.maxWidth = '';
+      //   img.style.maxHeight = '';
+      //   hasChanges = true;
+      // }
+      
+      if (hasChanges) {
+        cleanedCount++;
+        console.log('이미지 속성 정리됨:', {
+          src: img.src,
+          before: { width: beforeWidth, height: beforeHeight, style: beforeStyle },
+          after: { width: img.getAttribute('width'), height: img.getAttribute('height'), style: img.style.cssText }
+        });
+      }
+    });
+    
+    console.log(`이미지 속성 정리 완료: ${cleanedCount}개 이미지 처리됨`);
+    return cleanedCount;
   }
 
   // 메시지 표시 함수
@@ -582,6 +683,7 @@ document.addEventListener('DOMContentLoaded', function() {
     applyContentRegions: applyContentRegions,
     saveContent: saveContent,
     showMessage: showMessage,
+    cleanupImageAttributes: cleanupImageAttributes,
     isInitialized: () => isInitialized,
     editor: () => editor
   };

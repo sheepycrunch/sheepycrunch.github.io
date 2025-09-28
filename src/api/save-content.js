@@ -4,15 +4,15 @@ const path = require('path');
 
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
 
-// _site/images에서 src/images로 이미지 동기화 함수
+// _site/images/uploads에서 src/images/uploads로 이미지 동기화 함수
 function syncImagesToSrc(pageData) {
   try {
-    const siteUploadDir = path.join(__dirname, '../../_site/images');
-    const srcUploadDir = path.join(__dirname, '../images');
+    const siteUploadDir = path.join(__dirname, '../../_site/images/uploads');
+    const srcUploadDir = path.join(__dirname, '../images/uploads');
     
     if (!fs.existsSync(siteUploadDir)) return;
     
-    // src/images 디렉토리 생성
+    // src/images/uploads 디렉토리 생성
     if (!fs.existsSync(srcUploadDir)) {
       fs.mkdirSync(srcUploadDir, { recursive: true });
     }
@@ -23,13 +23,13 @@ function syncImagesToSrc(pageData) {
       const imgRegex = /<img[^>]+src="([^"]+)"/g;
       let match;
       while ((match = imgRegex.exec(pageData.content)) !== null) {
-        if (match[1].startsWith('/images/')) {
+        if (match[1].startsWith('/images/uploads/')) {
           imageUrls.push(match[1]);
         }
       }
     }
     
-    // 각 이미지를 src/images로 복사
+    // 각 이미지를 src/images/uploads로 복사
     imageUrls.forEach(imageUrl => {
       const fileName = path.basename(imageUrl);
       const siteImagePath = path.join(siteUploadDir, fileName);
@@ -67,18 +67,19 @@ module.exports = function(eleventyConfig) {
             return res.end(JSON.stringify({ success: false, error: '잘못된 요청입니다.' }));
           }
 
-          const contentDir = path.join(__dirname, '../contents');
-          if (!fs.existsSync(contentDir)) {
-            fs.mkdirSync(contentDir, { recursive: true });
+          // _site/contents를 메인 저장소로 사용
+          const siteContentDir = path.join(__dirname, '../../_site/contents');
+          if (!fs.existsSync(siteContentDir)) {
+            fs.mkdirSync(siteContentDir, { recursive: true });
           }
 
           const fileName = pageData.url.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
-          const filePath = path.join(contentDir, fileName);
+          const siteFilePath = path.join(siteContentDir, fileName);
 
           let existingData = {};
-          if (fs.existsSync(filePath)) {
+          if (fs.existsSync(siteFilePath)) {
             try {
-              existingData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+              existingData = JSON.parse(fs.readFileSync(siteFilePath, 'utf8'));
             } catch (error) {
               console.error('기존 데이터를 불러오는 데 실패했습니다:', error);
             }
@@ -86,14 +87,15 @@ module.exports = function(eleventyConfig) {
 
           existingData[pageData.timestamp] = pageData;
 
-          fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+          // _site/contents에 저장
+          fs.writeFileSync(siteFilePath, JSON.stringify(existingData, null, 2));
 
-          // _site/contents 동기화
-          const siteContentDir = path.join(__dirname, '../../_site/contents');
-          if (!fs.existsSync(siteContentDir)) fs.mkdirSync(siteContentDir, { recursive: true });
-          fs.writeFileSync(path.join(siteContentDir, fileName), JSON.stringify(existingData, null, 2));
+          // src/contents로 동기화
+          const srcContentDir = path.join(__dirname, '../contents');
+          if (!fs.existsSync(srcContentDir)) fs.mkdirSync(srcContentDir, { recursive: true });
+          fs.writeFileSync(path.join(srcContentDir, fileName), JSON.stringify(existingData, null, 2));
 
-          // 명시적 저장 시 이미지를 src/images로 동기화
+          // 명시적 저장 시 이미지를 src/images/uploads로 동기화
           syncImagesToSrc(pageData);
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -161,7 +163,7 @@ module.exports = function(eleventyConfig) {
           }
 
           // _site/images에 직접 저장 (자동 새로고침 방지)
-          const siteUploadDir = path.join(__dirname, '../../_site/images');
+          const siteUploadDir = path.join(__dirname, '../../_site/images/uploads');
           if (!fs.existsSync(siteUploadDir)) {
             fs.mkdirSync(siteUploadDir, { recursive: true });
           }
@@ -178,8 +180,8 @@ module.exports = function(eleventyConfig) {
 
           fs.writeFileSync(filePath, buffer);
 
-          // src/images로도 복사 (개발 서버 리로드 없이 갤러리 목록 즉시 반영)
-          const srcUploadDir = path.join(__dirname, '../images');
+          // src/images/uploads로도 복사 (개발 서버 리로드 없이 갤러리 목록 즉시 반영)
+          const srcUploadDir = path.join(__dirname, '../images/uploads');
           if (!fs.existsSync(srcUploadDir)) {
             fs.mkdirSync(srcUploadDir, { recursive: true });
           }
@@ -189,7 +191,7 @@ module.exports = function(eleventyConfig) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: true,
-            url: `/images/${fileName}`,
+            url: `/images/uploads/${fileName}`,
             size: buffer.length,
             type: mimeType || type || `image/${extension}`
           }));
@@ -220,7 +222,7 @@ module.exports = function(eleventyConfig) {
       }
 
       try {
-        const uploadDir = path.join(__dirname, '../images');
+        const uploadDir = path.join(__dirname, '../images/uploads');
         if (!fs.existsSync(uploadDir)) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ success: true, images: [] }));
@@ -245,7 +247,7 @@ module.exports = function(eleventyConfig) {
 
             return {
               name,
-              url: '/images/' + name,
+              url: '/images/uploads/' + name,
               size: stats.size,
               modified: stats.mtime.toISOString()
             };
@@ -277,16 +279,17 @@ module.exports = function(eleventyConfig) {
       }
 
       try {
-        const contentDir = path.join(__dirname, '../contents');
+        // _site/contents를 메인 저장소로 사용
+        const siteContentDir = path.join(__dirname, '../../_site/contents');
         const fileName = page.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
-        const filePath = path.join(contentDir, fileName);
+        const siteFilePath = path.join(siteContentDir, fileName);
 
-        if (!fs.existsSync(filePath)) {
+        if (!fs.existsSync(siteFilePath)) {
           return res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, content: null, regions: null, message: '저장된 콘텐츠가 없습니다.' }));
         }
 
-        const contentData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const contentData = JSON.parse(fs.readFileSync(siteFilePath, 'utf8'));
         const timestamps = Object.keys(contentData).sort().reverse();
         const latestContent = timestamps.length > 0 ? contentData[timestamps[0]] : null;
 

@@ -13,7 +13,7 @@ if exist "%DOWNLOADS%\posts.json" (
 REM 다운로드 폴더에서 이미지 파일들 찾기
 for %%f in ("%DOWNLOADS%\*.jpg" "%DOWNLOADS%\*.jpeg" "%DOWNLOADS%\*.png" "%DOWNLOADS%\*.gif" "%DOWNLOADS%\*.webp") do (
     if exist "%%f" (
-        copy "%%f" "src\images\uploaded\"
+        copy "%%f" "src\images\uploads\"
         echo 이미지 복사: %%~nxf
     )
 )

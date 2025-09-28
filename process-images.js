@@ -17,14 +17,14 @@ function processBase64Images(postsData) {
           const randomString = Math.random().toString(36).substring(2, 15);
           const extension = base64Data.split(';')[0].split('/')[1];
           const fileName = `${timestamp}_${randomString}.${extension}`;
-          const localPath = `images/uploaded/${fileName}`;
+          const localPath = `images/uploads/${fileName}`;
           
           // Base64를 Buffer로 변환
           const base64String = base64Data.split(',')[1];
           const buffer = Buffer.from(base64String, 'base64');
           
-          // src/images/uploaded 폴더에 저장
-          const uploadDir = path.join('src', 'images', 'uploaded');
+          // src/images/uploads 폴더에 저장
+          const uploadDir = path.join('src', 'images', 'uploads');
           if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
           }
