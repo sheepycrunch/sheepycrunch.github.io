@@ -1104,6 +1104,40 @@ table td {
   margin: 0.5em 0;
 }
 
+/* ContentTools 전용 스타일 */
+[data-editable] ul, [data-editable] ol {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+[data-editable] li {
+  margin: 0.5em 0;
+  position: relative;
+}
+
+/* ContentTools 들여쓰기 스타일 */
+[data-editable] li[data-indent="1"] {
+  margin-left: 1.5em;
+}
+
+[data-editable] li[data-indent="2"] {
+  margin-left: 3em;
+}
+
+[data-editable] li[data-indent="3"] {
+  margin-left: 4.5em;
+}
+
+[data-editable] li[data-indent="4"] {
+  margin-left: 6em;
+}
+
+/* ContentTools 리스트 중첩 스타일 */
+[data-editable] ul ul, [data-editable] ol ol, [data-editable] ul ol, [data-editable] ol ul {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
 /* 드래그 앤 드랍 스타일 */
 .editor-container.dragover {
   border: 2px dashed var(--accent-primary);

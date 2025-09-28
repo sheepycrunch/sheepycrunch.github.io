@@ -1,16 +1,91 @@
 ---
 layout: layout.njk
 title: "dakimakura"
-description: "dakimakura - 개인 블로그"
-showNavigation: false
+description: "dakimakura - Personal Blog"
+showNavigation: true
 css: "/style.css"
-lang: "en"
 permalink: "/"
 ---
 
-<!-- 빈 화면 -->
+<div id="home-content" class="home-content">
+  <h1>dakimakura</h1>
+  <p>Personal blog.</p>
+  
+  <div class="feature-links">
+    <a href="/write.html" class="feature-link">
+      <h3>Write Post</h3>
+      <p>Write posts with Quill editor</p>
+    </a>
+    
+    <a href="/visual-edit.html" class="feature-link">
+      <h3>Visual Edit</h3>
+      <p>Edit objects with ContentTools</p>
+    </a>
+    
+    <a href="/gallery.html" class="feature-link">
+      <h3>Gallery</h3>
+      <p>Check out image gallery</p>
+    </a>
+  </div>
+</div>
+
 <style>
-header h1 {
-  display: none;
+.home-content {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.home-content h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.home-content p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.feature-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.feature-link {
+  display: block;
+  padding: 30px 20px;
+  background: #f9f9f9;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.feature-link:hover {
+  background: #007cba;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,124,186,0.3);
+}
+
+.feature-link h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.3em;
+}
+
+.feature-link p {
+  margin: 0;
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+.feature-link:hover p {
+  opacity: 1;
 }
 </style>

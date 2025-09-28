@@ -9,7 +9,12 @@ permalink: "/archive.html"
 <section id="content">
   <h2>{{ i18n.links.title }}</h2>
   
-  <div class="archive-list">
+  <div class="archive-content">
+    <div class="archive-intro">
+      <p>모든 포스트의 아카이브입니다. 시간순으로 정렬되어 있습니다.</p>
+    </div>
+    
+    <div class="archive-list">
     {% for item in posts.posts %}
       <div class="archive-item">
         <div class="archive-thumbnail">
@@ -29,6 +34,7 @@ permalink: "/archive.html"
         </div>
       </div>
     {% endfor %}
+    </div>
   </div>
 </section>
 

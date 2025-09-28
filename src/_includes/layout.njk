@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' data: blob: https://neocities.org; font-src 'self' data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; connect-src 'self' data: blob: https://neocities.org; font-src 'self' data:;">
   <title>{{ title }} - {{ site.title }}</title>
   <link rel="icon" href="neocities.png">
   <link href="/css/reset.css" rel="stylesheet" type="text/css" media="all">
   <link href="/style.css" rel="stylesheet" type="text/css" media="all">
+  <link href="/css/contenttools-admin.css" rel="stylesheet" type="text/css" media="all">
   
   <!-- 환경 설정 변수들 -->
   <script>
@@ -37,15 +38,6 @@
         <span class="current-page">{{ page.url | replace("/", "") | replace(".html", "") | replace("index", "") or "home" }}</span>
       </h2>
       {% endif %}
-      {% if page.lang %}
-      <div class="language-switcher">
-        {% for lang in languageLinks(page.lang) %}
-        <a href="{{ lang.url }}" class="lang-link {% if lang.current %}current{% endif %}">
-          {{ lang.name }}
-        </a>
-        {% endfor %}
-      </div>
-      {% endif %}
     </header>
     
     {{ content | safe }}
@@ -71,6 +63,16 @@
   <script>{{ script | safe }}</script>
   {% endfor %}
   {% endif %}
+  
+  <!-- ContentTools 로컬 파일 -->
+  <link rel="stylesheet" href="/css/contenttools.min.css">
+  <script src="/js/contenttools.min.js"></script>
+  
+  <!-- Message Utils -->
+  <script src="/js/message-utils.js"></script>
+  
+  <!-- Global ContentTools -->
+  <script src="/js/global-contenttools.js"></script>
   
   <script>
   // 공통 태그 검색 함수
