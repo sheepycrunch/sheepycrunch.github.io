@@ -10,7 +10,7 @@
   <link href="/style.css" rel="stylesheet" type="text/css" media="all">
   <link href="/css/contenttools-admin.css" rel="stylesheet" type="text/css" media="all">
   
-  <!-- 환경 설정 변수들 -->
+  <!-- Environment configuration variables -->
   <script>
     window.USERNAME = '{{ siteName }}';
     window.NEOCITIES_URL = '{{ neocitiesUrl }}';
@@ -28,7 +28,7 @@
   <article data-name="main-article">
     <header class="bordered">
       {% if page.hideHeader %}
-      <!-- 헤더 숨김 -->
+      <!-- Hide header -->
       {% elif page.url == '/' or page.url == '/index.html' %}
       <h1>{{ site.title }}</h1>
       {% else %}
@@ -76,29 +76,29 @@
   <script src="/js/global-contenttools.js"></script>
   
   <script>
-  // 공통 태그 검색 함수
+  // Common tag search function
   function searchByTag(tag) {
-    // 검색 페이지로 이동하여 해당 태그로 검색
+    // Navigate to search page and search with the tag
     window.location.href = '/search/?tag=' + encodeURIComponent(tag);
   }
   
-  // ContentTools 디버깅 함수
+  // ContentTools debugging function
   window.debugContentTools = function() {
-    console.log('=== ContentTools 디버깅 정보 ===');
-    console.log('ContentTools 로드됨:', typeof ContentTools !== 'undefined');
-    console.log('ContentEdit 로드됨:', typeof ContentEdit !== 'undefined');
-    console.log('편집 가능한 요소들:', document.querySelectorAll('*[data-editable]').length);
+    console.log('=== ContentTools Debug Information ===');
+    console.log('ContentTools loaded:', typeof ContentTools !== 'undefined');
+    console.log('ContentEdit loaded:', typeof ContentEdit !== 'undefined');
+    console.log('Editable elements:', document.querySelectorAll('*[data-editable]').length);
     console.log('ContentToolsManager:', typeof window.ContentToolsManager);
     if (window.ContentToolsManager) {
-      console.log('에디터 초기화됨:', window.ContentToolsManager.isInitialized());
+      console.log('Editor initialized:', window.ContentToolsManager.isInitialized());
     }
     console.log('================================');
   };
   
-  // 페이지 로드 후 자동 디버깅
+  // Auto debugging after page load
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
-      console.log('페이지 로드 완료, ContentTools 상태 확인...');
+      console.log('Page load complete, checking ContentTools status...');
       debugContentTools();
     }, 1000);
   });

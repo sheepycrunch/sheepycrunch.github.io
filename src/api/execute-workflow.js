@@ -18,7 +18,7 @@ module.exports = function(req, res) {
     
     // 빌드만 실행하는 경우 (예외처리 없음)
     if (buildOnly) {
-      console.log('빌드만 실행 요청');
+      console.log('Build-only execution requested');
       
       // 프로젝트 루트 디렉토리로 이동
       const projectRoot = path.join(__dirname, '../../');
@@ -26,7 +26,7 @@ module.exports = function(req, res) {
       // Eleventy 빌드만 실행
       exec('npm run build', { cwd: projectRoot }, (error, stdout, stderr) => {
         if (error) {
-          console.error('빌드 오류:', error);
+          console.error('Build error:', error);
           res.status(500).json({ 
             success: false, 
             error: error.message,
@@ -35,8 +35,8 @@ module.exports = function(req, res) {
           return;
         }
         
-        console.log('빌드 완료');
-        console.log('출력:', stdout);
+        console.log('Build complete');
+        console.log('Output:', stdout);
         
         res.status(200).json({ 
           success: true, 
@@ -54,7 +54,7 @@ module.exports = function(req, res) {
       const deployInfo = deployLimiter.canDeploy();
       
       if (!deployInfo.canDeploy && !force) {
-        console.log(`배포 제한: 오늘 배포 횟수 초과 (${deployInfo.todayCount}/${deployInfo.maxCount})`);
+        console.log(`Deployment limit: daily deployment count exceeded (${deployInfo.todayCount}/${deployInfo.maxCount})`);
         res.status(429).json({ 
           success: false, 
           error: '배포 빈도 제한',
@@ -72,7 +72,7 @@ module.exports = function(req, res) {
     const deployInfo = deployLimiter.canDeploy();
     
     if (!deployInfo.canDeploy && !force) {
-      console.log(`배포 제한: 오늘 배포 횟수 초과 (${deployInfo.todayCount}/${deployInfo.maxCount})`);
+      console.log(`Deployment limit: daily deployment count exceeded (${deployInfo.todayCount}/${deployInfo.maxCount})`);
       res.status(429).json({ 
         success: false, 
         error: '배포 빈도 제한',
@@ -85,7 +85,7 @@ module.exports = function(req, res) {
 
     // 강제 배포 요청 확인
     if (force) {
-      console.log('⚠️ 강제 배포 요청 감지');
+      console.log('⚠️ Force deployment request detected');
       deployLimiter.forceDeploy('API 강제 요청');
     } else {
       // 일반 배포 기록
@@ -96,13 +96,13 @@ module.exports = function(req, res) {
     const projectRoot = path.join(__dirname, '../../');
     const batchFile = path.join(projectRoot, 'write-workflow.bat');
     
-    console.log('전체 워크플로우 실행 중...');
-    console.log('배치 파일 경로:', batchFile);
+    console.log('Executing full workflow...');
+    console.log('Batch file path:', batchFile);
     
     // 배치 파일 실행
     exec(`"${batchFile}"`, { cwd: projectRoot }, (error, stdout, stderr) => {
       if (error) {
-        console.error('실행 오류:', error);
+        console.error('Execution error:', error);
         res.status(500).json({ 
           success: false, 
           error: error.message,
@@ -111,8 +111,8 @@ module.exports = function(req, res) {
         return;
       }
       
-      console.log('워크플로우 실행 완료');
-      console.log('출력:', stdout);
+      console.log('Workflow execution complete');
+      console.log('Output:', stdout);
       
       res.status(200).json({ 
         success: true, 

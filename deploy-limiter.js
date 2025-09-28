@@ -21,7 +21,7 @@ class DeployLimiter {
         };
       }
     } catch (error) {
-      console.error('배포 기록 로드 오류:', error);
+      console.error('Deployment record load error:', error);
       this.history = {
         deployments: [],
         lastReset: new Date().toISOString().split('T')[0]
@@ -34,7 +34,7 @@ class DeployLimiter {
     try {
       fs.writeFileSync(this.historyFile, JSON.stringify(this.history, null, 2));
     } catch (error) {
-      console.error('배포 기록 저장 오류:', error);
+      console.error('Deployment record save error:', error);
     }
   }
 
@@ -47,7 +47,7 @@ class DeployLimiter {
   checkAndResetDaily() {
     const today = this.getToday();
     if (this.history.lastReset !== today) {
-      console.log(`새로운 날짜 감지: ${today}, 배포 기록 초기화`);
+      console.log(`New date detected: ${today}, initializing deployment records`);
       this.history.deployments = [];
       this.history.lastReset = today;
       this.saveHistory();
@@ -65,7 +65,7 @@ class DeployLimiter {
 
     const canDeploy = todayDeployments.length < this.maxDeploysPerDay;
     
-    console.log(`오늘 배포 횟수: ${todayDeployments.length}/${this.maxDeploysPerDay}`);
+    console.log(`Today's deployment count: ${todayDeployments.length}/${this.maxDeploysPerDay}`);
     
     return {
       canDeploy,
@@ -88,7 +88,7 @@ class DeployLimiter {
     this.history.deployments.push(deployment);
     this.saveHistory();
     
-    console.log(`배포 기록 추가: ${deployment.timestamp} (${deployment.reason})`);
+    console.log(`Deployment record added: ${deployment.timestamp} (${deployment.reason})`);
     return deployment;
   }
 
@@ -113,7 +113,7 @@ class DeployLimiter {
 
   // 강제 배포 (긴급 상황용)
   forceDeploy(reason = 'force') {
-    console.log(`⚠️ 강제 배포 실행: ${reason}`);
+    console.log(`⚠️ Force deployment executed: ${reason}`);
     return this.recordDeployment(`FORCE: ${reason}`);
   }
 }

@@ -13,7 +13,7 @@ permalink: "/txt.html"
   
   <section data-editable data-name="txt-content">
     <div class="post-list" id="post-list">
-      <!-- 정적 포스트들 (빌드 시점) -->
+      <!-- Static posts (build time) -->
       {% for item in posts.posts %}
         <div class="post-item">
           {% if item.image %}
@@ -39,21 +39,21 @@ permalink: "/txt.html"
         </div>
       {% endfor %}
       
-      <!-- 동적 포스트들 (JavaScript로 로드) -->
+      <!-- Dynamic posts (loaded via JavaScript) -->
       <div id="dynamic-posts"></div>
     </div>
   </section>
   
-  <!-- Eleventy posts 데이터를 JavaScript 변수로 주입 -->
+  <!-- Inject Eleventy posts data as JavaScript variable -->
   <script>
     window.eleventyPosts = {{ postsData.posts | dump | safe }};
   </script>
   
-  <!-- 토큰은 JavaScript에서 안전하게 주입됩니다 -->
+  <!-- Tokens are safely injected via JavaScript -->
 </section>
 
 
-<!-- 포스트 관리 헬퍼 스크립트 -->
+<!-- Post management helper script -->
 <script src="/js/posts-manager.js"></script>
 
 

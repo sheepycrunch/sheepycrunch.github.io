@@ -9,7 +9,7 @@ module.exports = function(eleventyConfig) {
   
   
   // Get URL information from environment variables
-  const siteName = process.env.USERNAME || 'dakimakura';
+  const siteName = process.env.USERNAME;
   const neocitiesUrl = process.env.NEOCITIES_URL || `https://${siteName}.neocities.org`;
   const nekowebUrl = process.env.NEKOWEB_URL || `https://${siteName}.nekoweb.org`;
   
@@ -55,7 +55,7 @@ module.exports = function(eleventyConfig) {
     try {
       const gsc = new GoogleSearchConsoleStats();
       const siteUrls = [
-        process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org'
+        process.env.NEOCITIES_URL
       ];
       
       const stats = await gsc.getRecentStats(siteUrls);
@@ -77,11 +77,11 @@ module.exports = function(eleventyConfig) {
 
   // Add site config data
   const siteConfig = {
-    title: "dakimakura",
+    title: "warawara",
     author: {
-      name: "sheepycrunch",
+      name: "warawara",
     },
-    description: "Personal Blog",
+    description: "warawara",
     social: {
     },
     stats: {
@@ -182,9 +182,6 @@ module.exports = function(eleventyConfig) {
     }
   };
 
-  eleventyConfig.addGlobalData("i18n", siteData);
-  
-  
   // Add dualImage filter
   eleventyConfig.addFilter("dualImage", function(imagePath) {
     if (!imagePath) return "";
@@ -203,8 +200,8 @@ module.exports = function(eleventyConfig) {
     } else {
       // If Neocities is not deployed, return the image path with Neocities URL
       const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
-      const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
-      const nekowebUrl = process.env.NEKOWEB_URL || 'https://dakimakura.nekoweb.org';
+      const neocitiesUrl = process.env.NEOCITIES_URL || '';
+      const nekowebUrl = process.env.NEKOWEB_URL || '';
       
       return `<img src="${neocitiesUrl}/${cleanPath}" 
                    onerror="this.onerror=null; this.src='${nekowebUrl}/${cleanPath}'" 
@@ -212,8 +209,8 @@ module.exports = function(eleventyConfig) {
     }
   });
   
-  // Add neocitiesImage filter
-  eleventyConfig.addFilter("neocitiesImage", function(imagePath) {
+  // Add relPath filter
+  eleventyConfig.addFilter("relPath", function(imagePath) {
     if (!imagePath) return "";
     
     // If image path is already an absolute URL, return it
@@ -223,7 +220,7 @@ module.exports = function(eleventyConfig) {
     
     // If image path is a relative path, convert it to an absolute path
     const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
-    const neocitiesUrl = process.env.NEOCITIES_URL || 'https://dakimakura.neocities.org';
+    const neocitiesUrl = process.env.NEOCITIES_URL || '';
     return `${neocitiesUrl}/${cleanPath}`;
   });
   

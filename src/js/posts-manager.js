@@ -232,7 +232,7 @@ function searchByTag(tag) {
 async function deletePostFromLocal(postId) {
   try {
     // 1. 현재 posts.json 내용 가져오기
-    console.log('현재 posts.json 가져오는 중...');
+    console.log('Loading current posts.json...');
     const response = await fetch('/posts.json');
     if (!response.ok) {
       throw new Error('posts.json을 불러올 수 없습니다.');
@@ -241,19 +241,19 @@ async function deletePostFromLocal(postId) {
     const data = await response.json();
     const existingPosts = data.posts || [];
     
-    console.log('현재 포스트들:', existingPosts.map(p => ({ id: p.id, date: p.date })));
-    console.log('삭제할 포스트 ID:', postId);
+    console.log('Current posts:', existingPosts.map(p => ({ id: p.id, date: p.date })));
+    console.log('Post ID to delete:', postId);
     
     // 포스트 찾기 및 삭제
     const filteredPosts = existingPosts.filter(post => {
       const postIdentifier = post.id || post.date;
       const postIdStr = String(postIdentifier);
       const targetIdStr = String(postId);
-      console.log(`포스트 비교: "${postIdStr}" !== "${targetIdStr}" = ${postIdStr !== targetIdStr}`);
+      console.log(`Post comparison: "${postIdStr}" !== "${targetIdStr}" = ${postIdStr !== targetIdStr}`);
       return postIdStr !== targetIdStr;
     });
     
-    console.log(`원본 포스트 수: ${existingPosts.length}, 필터링 후: ${filteredPosts.length}`);
+    console.log(`Original post count: ${existingPosts.length}, after filtering: ${filteredPosts.length}`);
     
     if (filteredPosts.length === existingPosts.length) {
       throw new Error(`삭제할 포스트를 찾을 수 없습니다. (ID: ${postId})`);
@@ -262,30 +262,30 @@ async function deletePostFromLocal(postId) {
      // 2. 로컬 스토리지에 업데이트된 포스트 저장
      const updatedContent = { posts: filteredPosts };
      localStorage.setItem('hamster_posts', JSON.stringify(filteredPosts));
-     console.log('로컬 스토리지에 업데이트된 포스트 저장됨');
+     console.log('Updated posts saved to local storage');
      
      // 3. Neocities에 직접 posts.json 업데이트 (토큰이 있을 때만)
      const neocitiesApiToken = getNeocitiesApiToken();
      if (neocitiesApiToken) {
        try {
          await updateNeocitiesPostsJson(filteredPosts);
-         console.log('Neocities에 posts.json이 업데이트되었습니다.');
+         console.log('posts.json has been updated on Neocities.');
        } catch (error) {
-         console.warn('Neocities 업데이트 실패:', error);
+         console.warn('Neocities update failed:', error);
          // Neocities 업데이트 실패해도 삭제는 계속 진행
        }
      } else {
-       console.log('Neocities API 토큰이 없어서 Neocities 업데이트를 건너뜁니다.');
-       console.log('로컬에서만 삭제되고, GitHub 푸시 시 Neocities에 자동 동기화됩니다.');
+       console.log('No Neocities API token, skipping Neocities update.');
+       console.log('Deleted locally only, will auto-sync to Neocities on GitHub push.');
      }
      
      // 4. Neocities API를 통한 직접 업데이트
      await triggerDeployment();
      
-     console.log('포스트 삭제가 완료되었습니다.');
+     console.log('Post deletion completed.');
     
   } catch (error) {
-    console.error('포스트 삭제 오류:', error);
+    console.error('Post deletion error:', error);
     throw error;
   }
 }
@@ -295,7 +295,7 @@ async function deletePostFromLocal(postId) {
 // Neocities API를 사용하여 posts.json 업데이트
 async function triggerDeployment() {
   try {
-    console.log('Neocities API를 사용하여 posts.json 업데이트 시도 중...');
+    console.log('Attempting to update posts.json using Neocities API...');
     
     // 로컬 posts.json 파일 업데이트
     const localPosts = JSON.parse(localStorage.getItem('hamster_posts') || '[]');
@@ -303,7 +303,7 @@ async function triggerDeployment() {
     // Neocities API 토큰 확인
     const neocitiesApiToken = getNeocitiesApiToken();
     if (!neocitiesApiToken) {
-      console.warn('Neocities API 토큰이 없어서 로컬에서만 업데이트합니다.');
+      console.warn('No Neocities API token, updating locally only.');
       
       // 로컬 스토리지에 삭제 요청 저장 (수동 푸시용)
       const deletionRequest = {
@@ -320,13 +320,13 @@ async function triggerDeployment() {
     try {
       // Neocities에 posts.json 업데이트
       await updateNeocitiesPostsJson(localPosts);
-      console.log('Neocities에 posts.json이 성공적으로 업데이트되었습니다.');
+      console.log('posts.json successfully updated on Neocities.');
       
       // 성공 메시지
       alert('글이 성공적으로 삭제되었습니다!\n\n✓ 로컬에서 포스트가 삭제되었습니다\n✓ Neocities에 직접 업데이트되었습니다');
       
     } catch (neocitiesError) {
-      console.warn('Neocities 업데이트 실패:', neocitiesError);
+      console.warn('Neocities update failed:', neocitiesError);
       
       // 로컬 스토리지에 삭제 요청 저장 (수동 푸시용)
       const deletionRequest = {
@@ -340,7 +340,7 @@ async function triggerDeployment() {
     }
     
   } catch (error) {
-    console.error('업데이트 실패:', error);
+    console.error('Update failed:', error);
     alert('업데이트 중 오류가 발생했습니다.');
   }
 }
@@ -353,7 +353,7 @@ async function deletePostImages(postId) {
     // 로컬 posts.json에서 포스트 데이터 가져오기
     const response = await fetch('/posts.json');
     if (!response.ok) {
-      console.warn('posts.json을 불러올 수 없어서 이미지 삭제를 건너뜁니다.');
+      console.warn('Cannot load posts.json, skipping image deletion.');
       return;
     }
     
@@ -362,16 +362,16 @@ async function deletePostImages(postId) {
     const post = posts.find(p => String(p.id || p.date) === String(postId));
     
     if (!post || !post.description) {
-      console.log('삭제할 포스트를 찾을 수 없습니다.');
+      console.log('Post to delete not found.');
       return;
     }
     
     // Quill 콘텐츠에서 이미지 경로 추출
     const imagePaths = extractImagePaths(post.description);
-    console.log('추출된 이미지 경로들:', imagePaths);
+    console.log('Extracted image paths:', imagePaths);
     
     if (imagePaths.length === 0) {
-      console.log('삭제할 이미지가 없습니다.');
+      console.log('No images to delete.');
       return;
     }
     
@@ -383,19 +383,19 @@ async function deletePostImages(postId) {
       try {
         await deleteImageFromNeocities(imagePath);
         deletedImages.push(imagePath);
-        console.log(`이미지 삭제 성공: ${imagePath}`);
+        console.log(`Image deletion successful: ${imagePath}`);
       } catch (error) {
         failedImages.push(imagePath);
-        console.warn(`이미지 삭제 실패: ${imagePath}`, error);
+        console.warn(`Image deletion failed: ${imagePath}`, error);
       }
     }
     
     // 삭제 결과 요약
     if (deletedImages.length > 0) {
-      console.log(`성공적으로 삭제된 이미지: ${deletedImages.length}개`);
+      console.log(`Successfully deleted images: ${deletedImages.length}`);
     }
     if (failedImages.length > 0) {
-      console.warn(`삭제 실패한 이미지: ${failedImages.length}개`);
+      console.warn(`Failed to delete images: ${failedImages.length}`);
     }
     
     return {
@@ -405,14 +405,14 @@ async function deletePostImages(postId) {
     };
     
   } catch (error) {
-    console.error('이미지 삭제 오류:', error);
+    console.error('Image deletion error:', error);
   }
 }
 
 // Neocities에서 이미지 삭제 (자동 업로드 스크립트 사용)
 async function deleteImageFromNeocities(imagePath) {
   // 자동 업로드 스크립트가 처리하므로 로컬에서만 삭제
-  console.log('이미지가 로컬에서 삭제되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  console.log('Images deleted locally. Auto-upload script will handle it.');
   return;
 }
 
@@ -421,17 +421,17 @@ function getNeocitiesApiToken() {
   // 환경변수에서 토큰 가져오기 (빌드 시 주입됨)
   const token = window.NEOCITIES_API_KEY;
   if (!token) {
-    console.error('Neocities API 토큰이 설정되지 않았습니다.');
+    console.error('Neocities API token is not set.');
     return null;
   }
-  console.log('Neocities API 직접 사용');
+  console.log('Using Neocities API directly');
   return token;
 }
 
 // Neocities에 posts.json 업데이트 (자동 업로드 스크립트 사용)
 async function updateNeocitiesPostsJson(posts) {
   // 자동 업로드 스크립트가 처리하므로 로컬 파일만 저장
-  console.log('posts.json이 로컬에 저장되었습니다. 자동 업로드 스크립트가 처리합니다.');
+  console.log('posts.json saved locally. Auto-upload script will handle it.');
   return;
 }
 
@@ -454,34 +454,34 @@ function extractImagePaths(quillContent) {
 
 // UI에서 포스트 제거
 function removePostFromUI(postId) {
-  console.log('UI에서 포스트 제거 시도:', postId);
+  console.log('Attempting to remove post from UI:', postId);
   
   // 동적 포스트에서 제거
   const dynamicPosts = document.querySelectorAll('#dynamic-posts .post-item[data-post-id="' + postId + '"]');
-  console.log('동적 포스트 찾음:', dynamicPosts.length);
+  console.log('Dynamic posts found:', dynamicPosts.length);
   dynamicPosts.forEach(post => {
-    console.log('동적 포스트 제거 중:', post);
+    console.log('Removing dynamic post:', post);
     post.remove();
   });
   
   // 모든 포스트에서 제거 (동적 + 정적)
   const allPosts = document.querySelectorAll('.post-item[data-post-id="' + postId + '"]');
-  console.log('모든 포스트 찾음:', allPosts.length);
+  console.log('All posts found:', allPosts.length);
   allPosts.forEach(post => {
-    console.log('포스트 제거 중:', post);
+    console.log('Removing post:', post);
     post.remove();
   });
   
   // 정적 포스트에서 제거 (페이지 새로고침 필요)
   const staticPosts = document.querySelectorAll('.post-item[data-post-id="' + postId + '"]');
-  console.log('정적 포스트 찾음:', staticPosts.length);
+  console.log('Static posts found:', staticPosts.length);
   
   if (staticPosts.length > 0) {
-    console.log('정적 포스트가 있으므로 페이지 새로고침');
+    console.log('Static posts exist, refreshing page');
     // 정적 포스트가 있는 경우 페이지 새로고침
     window.location.reload();
   } else {
-    console.log('정적 포스트가 없으므로 새로고침하지 않음');
+    console.log('No static posts, not refreshing');
   }
 }
 

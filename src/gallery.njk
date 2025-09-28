@@ -14,7 +14,7 @@ permalink: "/gallery.html"
   <div class="gallery-content">
     <section data-editable data-name="gallery-intro">
       <div class="gallery-intro">
-        <p>이미지 갤러리입니다. 각 이미지를 클릭하여 자세히 볼 수 있습니다.</p>
+        <p>Image gallery. Click on each image to view in detail.</p>
       </div>
     </section>
     
@@ -47,24 +47,24 @@ permalink: "/gallery.html"
 </section>
 
 <script>
-// Quill Delta를 HTML로 변환 (txt.njk와 동일한 함수)
+// Convert Quill Delta to HTML (same function as txt.njk)
 function convertQuillToHtml(quillContent) {
-  // null이나 undefined인 경우
+  // If null or undefined
   if (!quillContent) {
-    return '<p>내용이 없습니다.</p>';
+    return '<p>No content available.</p>';
   }
   
-  // 문자열인 경우 그대로 반환
+  // If string, return as is
   if (typeof quillContent === 'string') {
     return quillContent.replace(/\n/g, '<br>');
   }
   
-  // 객체가 아닌 경우 JSON으로 변환
+  // If not object, convert to JSON
   if (typeof quillContent !== 'object') {
     return String(quillContent).replace(/\n/g, '<br>');
   }
   
-  // Quill Delta 형식이 아닌 경우 JSON으로 표시
+  // If not Quill Delta format, display as JSON
   if (!quillContent.ops || !Array.isArray(quillContent.ops)) {
     return '<pre>' + JSON.stringify(quillContent, null, 2) + '</pre>';
   }
@@ -77,23 +77,23 @@ function convertQuillToHtml(quillContent) {
         if (typeof op.insert === 'string') {
           let text = op.insert;
           
-          // 줄바꿈 처리
+          // Handle line breaks
           text = text.replace(/\n/g, '<br>');
           
-          // 스타일 적용
+          // Apply styles
           if (op.attributes) {
             if (op.attributes.bold) text = `<strong>${text}</strong>`;
             if (op.attributes.italic) text = `<em>${text}</em>`;
             if (op.attributes.underline) text = `<u>${text}</u>`;
             if (op.attributes.strike) text = `<s>${text}</s>`;
             
-            // 헤더 처리
+            // Handle headers
             if (op.attributes.header) {
               const level = op.attributes.header;
               text = `<h${level}>${text}</h${level}>`;
             }
             
-            // 색상 처리
+            // Handle colors
             if (op.attributes.color) {
               text = `<span style="color: ${op.attributes.color}">${text}</span>`;
             }
@@ -104,8 +104,8 @@ function convertQuillToHtml(quillContent) {
           
           html += text;
         } else if (op.insert && typeof op.insert === 'object' && op.insert.image) {
-          // 이미지 처리
-          html += `<img src="${op.insert.image}" alt="이미지" style="max-width: 100%; height: auto;">`;
+          // Handle images
+          html += `<img src="${op.insert.image}" alt="Image" style="max-width: 100%; height: auto;">`;
         }
       }
     });
@@ -114,7 +114,7 @@ function convertQuillToHtml(quillContent) {
     return '';
   }
   
-  // 빈 내용 처리
+  // Handle empty content
   if (!html.trim()) {
     html = '';
   }
@@ -122,7 +122,7 @@ function convertQuillToHtml(quillContent) {
   return html;
 }
 
-// 정적 포스트의 Quill 콘텐츠 변환
+// Convert Quill content of static posts
 function convertStaticPosts() {
   const staticPosts = document.querySelectorAll('.gallery-description[data-quill-content]');
   staticPosts.forEach(postElement => {
@@ -141,13 +141,13 @@ function convertStaticPosts() {
   });
 }
 
-// 페이지 로드 시 정적 포스트 변환
+// Convert static posts on page load
 document.addEventListener('DOMContentLoaded', function() {
   convertStaticPosts();
 });
 
 function searchByTag(tag) {
-  // 검색 페이지로 이동하거나 현재 페이지에서 필터링
+  // Navigate to search page or filter on current page
   window.location.href = `/search.html?q=${encodeURIComponent(tag)}`;
 }
 </script>

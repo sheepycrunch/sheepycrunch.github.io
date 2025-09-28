@@ -21,7 +21,7 @@
     clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(() => {
       if (editor && isInitialized) {
-        console.log('자동 저장 실행');
+        console.log('Auto-save executed');
         editor.save(true); // 이벤트만 발동시키므로 기존 handleSaveEvent 로직 재사용
       }
     }, AUTO_SAVE_DELAY);
@@ -175,7 +175,7 @@
           fetchGallery()
             .then(() => buildGallery(dialog))
             .catch(error => {
-              console.error('갤러리 로드 실패:', error);
+              console.error('Gallery load failed:', error);
               showMessage('갤러리를 불러오지 못했습니다.', 'error');
             });
         }
@@ -258,7 +258,7 @@
                 img.src = result.url;
               })
               .catch(error => {
-                console.error('이미지 업로드 실패:', error);
+                console.error('Image upload failed:', error);
                 dialog.state('failed');
                 showMessage(error.message || '이미지 업로드에 실패했습니다.', 'error');
                 setTimeout(() => resetDialog(), 1500);
@@ -290,7 +290,7 @@
 
 // 저장 이벤트 처리 함수 (ContentTools 공식 문서 방식)
 function handleSaveEvent(ev) {
-  console.log('저장 이벤트 처리');
+  console.log('Processing save event');
   
   // 저장 직전 이미지 속성 정리
   cleanupImageAttributes();
@@ -300,11 +300,11 @@ function handleSaveEvent(ev) {
   
   // 변경사항이 있는지 확인
   if (Object.keys(regions).length === 0) {
-    console.log('변경사항이 없습니다.');
+    console.log('No changes detected.');
     return;
   }
   
-  console.log('저장할 regions:', regions);
+  console.log('Regions to save:', regions);
   
   // 에디터를 busy 상태로 설정
   editor.busy(true);
@@ -333,12 +333,12 @@ function initEditor() {
 
     // ContentTools가 로드되었는지 확인
     if (typeof ContentTools === 'undefined') {
-      console.error('ContentTools가 로드되지 않았습니다.');
+      console.error('ContentTools is not loaded.');
       return;
     }
 
     try {
-      console.log('ContentTools 초기화 시작...');
+      console.log('Starting ContentTools initialization...');
       
       // 에디터 인스턴스 생성
       editor = ContentTools.EditorApp.get();
@@ -346,11 +346,11 @@ function initEditor() {
         throw new Error('에디터 인스턴스를 생성할 수 없습니다.');
       }
       
-      console.log('에디터 인스턴스 생성됨:', editor);
+      console.log('Editor instance created:', editor);
       
       // 에디터 초기화 - 모든 요소 편집 가능하도록 설정
       editor.init('*[data-editable]', 'data-name');
-      console.log('에디터 초기화 완료');
+      console.log('Editor initialization complete');
       
       // 변경 감지 이벤트 추가 (자동 저장용)
       const root = ContentEdit.Root.get();
@@ -362,21 +362,21 @@ function initEditor() {
       registerImageUploader();
       
       // 에디터가 제대로 초기화되었는지 확인
-      console.log('에디터 프로토타입:', Object.getPrototypeOf(editor));
-      console.log('에디터 프로토타입의 속성들:', Object.getOwnPropertyNames(Object.getPrototypeOf(editor)));
+      console.log('Editor prototype:', Object.getPrototypeOf(editor));
+      console.log('Editor prototype properties:', Object.getOwnPropertyNames(Object.getPrototypeOf(editor)));
       
       // ContentTools 공식 문서에 따른 올바른 이벤트 바인딩
-      console.log('ContentTools 이벤트 바인딩 시도');
+      console.log('Attempting ContentTools event binding');
       
       // 공식 문서에 따르면 addEventListener를 사용해야 함
       editor.addEventListener('saved', function(ev) {
-        console.log('저장 이벤트 발생 (addEventListener)');
+        console.log('Save event triggered (addEventListener)');
         handleSaveEvent(ev);
       });
 
       // 편집 이벤트 설정
       editor.addEventListener('start', function(ev) {
-        console.log('=== 편집 시작 이벤트 ===');
+        console.log('=== Edit start event ===');
         console.log('regions before start:', editor.regions());
         
         // placeholder를 data-editable로 변환
@@ -388,21 +388,21 @@ function initEditor() {
             el.setAttribute('data-name', name);
             el.removeAttribute('data-editable-placeholder');
             el.removeAttribute('data-editable-name');
-            console.log('placeholder → data-editable 변환:', name);
+            console.log('placeholder → data-editable conversion:', name);
           }
         });
         
         // 편집 모드에서는 콘텐츠를 다시 주입하지 않음
         // ContentTools가 이미 DOM을 편집 가능한 상태로 변경했으므로
         // 추가 콘텐츠 주입은 ContentTools 구조를 덮어쓰게 됨
-        console.log('편집 모드 - 콘텐츠 주입 건너뜀');
+        console.log('Edit mode - skipping content injection');
         
         // 편집 모드 진입 시 이미지 속성 정리 재적용
         cleanupImageAttributes();
       });
 
       editor.addEventListener('stop', function(ev) {
-        console.log('편집 중단');
+        console.log('Edit cancelled');
         
         // data-editable을 placeholder로 변환
         const editableElements = document.querySelectorAll('[data-editable][data-name]');
@@ -413,7 +413,7 @@ function initEditor() {
             el.setAttribute('data-editable-name', name);
             el.removeAttribute('data-editable');
             el.removeAttribute('data-name');
-            console.log('data-editable → placeholder 변환:', name);
+            console.log('data-editable → placeholder conversion:', name);
           }
         });
         
@@ -422,14 +422,14 @@ function initEditor() {
       });
 
       isInitialized = true;
-      console.log('ContentTools 에디터가 초기화되었습니다.');
+      console.log('ContentTools editor has been initialized.');
       
       // 에디터 초기화 직후에는 영역이 준비되지 않을 수 있으므로 제거
       // loadContent();
       
     } catch (error) {
-      console.error('ContentTools 초기화 실패:', error);
-      console.log('오류 상세:', error.message);
+      console.error('ContentTools initialization failed:', error);
+      console.log('Error details:', error.message);
     }
   }
 
@@ -451,14 +451,14 @@ function initEditor() {
     .then(response => response.json())
     .then(result => {
       if (result.success) {
-        console.log('저장 성공:', result);
+        console.log('Save successful:', result);
         return result;
       } else {
         throw new Error(result.details || result.error || '저장 실패');
       }
     })
     .catch(error => {
-      console.error('저장 오류:', error);
+      console.error('Save error:', error);
       throw error;
     });
   }
@@ -473,14 +473,14 @@ function initEditor() {
 
   // 공용 콘텐츠 적용 함수 (ContentTools와 독립적으로 동작)
   function applyContentRegions(pageUrl) {
-    console.log('applyContentRegions 시작:', pageUrl);
+    console.log('Starting applyContentRegions:', pageUrl);
     
     return fetch(`/api/load-content?page=${encodeURIComponent(pageUrl)}`)
       .then(res => res.json())
       .then(result => {
-        console.log('API 응답:', result);
+        console.log('API response:', result);
         if (!result.success || !result.regions) {
-          console.log('저장된 콘텐츠가 없거나 실패');
+          console.log('No saved content or failed');
           return;
         }
 
@@ -489,28 +489,28 @@ function initEditor() {
           console.log('inject', name, html.length);
           const el = findRegionElement(name);
           if (el) {
-            console.log('DOM 요소 발견, innerHTML 변경 전:', el.innerHTML.length, '자');
+            console.log('DOM element found, innerHTML before change:', el.innerHTML.length, 'chars');
             el.innerHTML = html;
-            console.log('DOM 요소 innerHTML 변경 후:', el.innerHTML.length, '자');
-            console.log('콘텐츠 적용 완료:', name);
+            console.log('DOM element innerHTML after change:', el.innerHTML.length, 'chars');
+            console.log('Content applied successfully:', name);
           } else {
-            console.log('영역을 찾을 수 없음:', name);
+            console.log('Region not found:', name);
           }
         });
 
         // ContentTools 에디터가 활성화된 경우에만 추가 처리
         if (typeof ContentTools !== 'undefined' && editor && editor.regions) {
-          console.log('에디터 모드 - 영역 동기화');
+          console.log('Editor mode - region synchronization');
           editor.syncRegions();
         }
         
         // 이미지 속성 정리 (콘텐츠 주입 후)
         cleanupImageAttributes();
         
-        console.log('콘텐츠 로드 완료');
+        console.log('Content load complete');
       })
       .catch(error => {
-        console.error('콘텐츠 로드 오류:', error);
+        console.error('Content load error:', error);
       });
   }
 
@@ -521,7 +521,7 @@ function initEditor() {
 
   // 이미지 속성 정리 함수 (width, height 속성과 인라인 스타일 제거)
   function cleanupImageAttributes() {
-    console.log('이미지 속성 정리 시작');
+    console.log('Starting image attribute cleanup');
     const images = document.querySelectorAll('[data-editable] img, [data-editable-placeholder] img');
     let cleanedCount = 0;
     
@@ -554,7 +554,7 @@ function initEditor() {
       
       if (hasChanges) {
         cleanedCount++;
-        console.log('이미지 속성 정리됨:', {
+        console.log('Image attributes cleaned:', {
           src: img.src,
           before: { width: beforeWidth, height: beforeHeight, style: beforeStyle },
           after: { width: img.getAttribute('width'), height: img.getAttribute('height'), style: img.style.cssText }
@@ -562,7 +562,7 @@ function initEditor() {
       }
     });
     
-    console.log(`이미지 속성 정리 완료: ${cleanedCount}개 이미지 처리됨`);
+    console.log(`Image attribute cleanup complete: ${cleanedCount} images processed`);
     return cleanedCount;
   }
 
@@ -612,7 +612,7 @@ function initEditor() {
 
 // 페이지 로드 시 무조건 콘텐츠 주입
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM 로드 완료, 콘텐츠 주입 시작...');
+  console.log('DOM load complete, starting content injection...');
   
   // ContentTools 여부와 관계없이 콘텐츠 주입
   applyContentRegions(window.location.pathname);
@@ -620,53 +620,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // DOM 로드 완료 시 ContentTools 초기화
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM 로드 완료, ContentTools 초기화 시작...');
+  console.log('DOM load complete, starting ContentTools initialization...');
   
   // ContentTools 로드 확인을 위한 재시도 로직
   let retryCount = 0;
   const maxRetries = 30;
   
   function tryInit() {
-    console.log(`ContentTools 로드 확인 시도 ${retryCount + 1}/${maxRetries}`);
+    console.log(`ContentTools load check attempt ${retryCount + 1}/${maxRetries}`);
     console.log('ContentTools:', typeof ContentTools);
     console.log('ContentEdit:', typeof ContentEdit);
     
     if (typeof ContentTools !== 'undefined' && typeof ContentEdit !== 'undefined') {
-      console.log('ContentTools 로드 확인됨, 초기화 진행...');
-      console.log('ContentTools 객체:', ContentTools);
-      console.log('ContentEdit 객체:', ContentEdit);
+      console.log('ContentTools load confirmed, proceeding with initialization...');
+      console.log('ContentTools object:', ContentTools);
+      console.log('ContentEdit object:', ContentEdit);
       
       try {
         initEditor();
-        console.log('ContentTools 초기화 완료!');
+        console.log('ContentTools initialization complete!');
         return;
       } catch (error) {
-        console.error('ContentTools 초기화 중 오류:', error);
-        console.log('오류 상세:', error.message);
-        console.log('스택:', error.stack);
+        console.error('Error during ContentTools initialization:', error);
+        console.log('Error details:', error.message);
+        console.log('Stack:', error.stack);
       }
     }
     
     if (retryCount < maxRetries) {
       retryCount++;
-      console.log(`ContentTools 로드 대기 중... (${retryCount}/${maxRetries})`);
+      console.log(`Waiting for ContentTools to load... (${retryCount}/${maxRetries})`);
       setTimeout(tryInit, 300);
     } else {
-      console.error('ContentTools 로드 실패: 최대 재시도 횟수 초과');
-      console.log('수동 초기화를 시도해보세요: window.ContentToolsManager.init()');
+      console.error('ContentTools load failed: maximum retry attempts exceeded');
+      console.log('Try manual initialization: window.ContentToolsManager.init()');
       
       // 수동 초기화 버튼 추가
       const manualInitButton = document.createElement('button');
       manualInitButton.textContent = '수동 ContentTools 초기화';
       manualInitButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff6b6b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
       manualInitButton.onclick = function() {
-        console.log('수동 초기화 시도...');
+        console.log('Attempting manual initialization...');
         try {
           initEditor();
           this.remove();
-          console.log('수동 초기화 성공!');
+          console.log('Manual initialization successful!');
         } catch (error) {
-          console.error('수동 초기화 실패:', error);
+          console.error('Manual initialization failed:', error);
         }
       };
       document.body.appendChild(manualInitButton);
@@ -690,29 +690,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 디버깅을 위한 전역 함수
   window.debugContentTools = function() {
-    console.log('=== ContentTools 디버깅 정보 ===');
-    console.log('ContentTools 로드됨:', typeof ContentTools !== 'undefined');
-    console.log('ContentEdit 로드됨:', typeof ContentEdit !== 'undefined');
-    console.log('에디터 초기화됨:', isInitialized);
-    console.log('에디터 인스턴스:', editor);
-    console.log('편집 가능한 요소들:', document.querySelectorAll('*[data-editable]').length);
+    console.log('=== ContentTools Debug Information ===');
+    console.log('ContentTools loaded:', typeof ContentTools !== 'undefined');
+    console.log('ContentEdit loaded:', typeof ContentEdit !== 'undefined');
+    console.log('Editor initialized:', isInitialized);
+    console.log('Editor instance:', editor);
+    console.log('Editable elements:', document.querySelectorAll('*[data-editable]').length);
     console.log('================================');
   };
 
   // DOM 변경 감시를 위한 MutationObserver 디버깅 함수
   window.observeContentRegions = function() {
     const regions = document.querySelectorAll('[data-editable]');
-    console.log('관찰할 영역 수:', regions.length);
+    console.log('Number of regions to observe:', regions.length);
     
     regions.forEach((region, index) => {
       const observer = new MutationObserver((mutations) => {
-        console.log(`영역 ${index} (${region.getAttribute('data-name')}) DOM 변경 감지:`, mutations);
+        console.log(`Region ${index} (${region.getAttribute('data-name')}) DOM change detected:`, mutations);
         mutations.forEach(mutation => {
           if (mutation.type === 'childList') {
-            console.log('자식 노드 변경:', mutation.addedNodes.length, '개 추가,', mutation.removedNodes.length, '개 제거');
+            console.log('Child node changes:', mutation.addedNodes.length, 'added,', mutation.removedNodes.length, 'removed');
           }
           if (mutation.type === 'attributes') {
-            console.log('속성 변경:', mutation.attributeName, mutation.target);
+            console.log('Attribute change:', mutation.attributeName, mutation.target);
           }
         });
       });
@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function() {
         attributeFilter: ['contenteditable', 'class']
       });
       
-      console.log(`영역 ${index} 관찰 시작:`, region);
+      console.log(`Starting observation of region ${index}:`, region);
     });
     
     return regions;
@@ -733,11 +733,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // 편집 버튼 클릭 시 영역 상태 확인 함수
   window.checkRegionsAfterEdit = function() {
     if (!editor) {
-      console.log('에디터가 초기화되지 않았습니다.');
+      console.log('Editor is not initialized.');
       return;
     }
     
-    console.log('=== 편집 후 영역 상태 확인 ===');
+    console.log('=== Post-edit region status check ===');
     const regions = editor.regions();
     console.log('editor.regions():', regions);
     
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const region = regions[name];
       const domElement = region.domElement();
       const contentEditableElements = domElement.querySelectorAll('[contenteditable]');
-      console.log(`영역 ${name}:`, {
+      console.log(`Region ${name}:`, {
         domElement: domElement,
         contentEditableCount: contentEditableElements.length,
         contentEditableElements: contentEditableElements

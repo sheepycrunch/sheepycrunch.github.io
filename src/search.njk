@@ -1,7 +1,7 @@
 ---
 layout: layout.njk
-title: "{{ i18n.sections.search | t(lang) }}"
-description: "{{ i18n.sections.search | t(lang) }}"
+title: "Search"
+description: "Search"
 lang: "en"
 permalink: "/search.html"
 ---
@@ -20,14 +20,14 @@ permalink: "/search.html"
   
   <section data-editable data-name="search-results">
     <div class="search-results" id="searchResults">
-      <!-- 검색 결과가 여기에 표시됩니다 -->
+      <!-- Search results will be displayed here -->
     </div>
   </section>
 </section>
 
 
 <script>
-// 포스트 데이터를 JSON으로 출력
+// Output post data as JSON
 const postsData = {{ posts.posts | dump | safe }};
 
 let currentSearchTerm = '';
@@ -80,13 +80,13 @@ function displayResults(results) {
   `).join('');
 }
 
-// URL 파라미터에서 태그 가져오기
+// Get tag from URL parameters
 function getTagFromURL() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('tag');
 }
 
-// 초기 로드 시 모든 포스트 표시
+// Display all posts on initial load
 document.addEventListener('DOMContentLoaded', function() {
   const tagFromURL = getTagFromURL();
   if (tagFromURL) {
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
     displayResults(postsData);
   }
   
-  // 검색 입력 이벤트 리스너
+  // Search input event listener
   document.getElementById('searchInput').addEventListener('input', searchPosts);
 });
 </script>

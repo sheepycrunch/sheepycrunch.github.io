@@ -37,11 +37,11 @@ function syncImagesToSrc(pageData) {
       
       if (fs.existsSync(siteImagePath) && !fs.existsSync(srcImagePath)) {
         fs.copyFileSync(siteImagePath, srcImagePath);
-        console.log(`이미지 동기화: ${fileName}`);
+        console.log(`Image sync: ${fileName}`);
       }
     });
   } catch (error) {
-    console.error('이미지 동기화 중 오류:', error);
+    console.error('Error during image sync:', error);
   }
 }
 
@@ -81,7 +81,7 @@ module.exports = function(eleventyConfig) {
             try {
               existingData = JSON.parse(fs.readFileSync(siteFilePath, 'utf8'));
             } catch (error) {
-              console.error('기존 데이터를 불러오는 데 실패했습니다:', error);
+              console.error('Failed to load existing data:', error);
             }
           }
 
@@ -105,7 +105,7 @@ module.exports = function(eleventyConfig) {
             timestamp: pageData.timestamp
           }));
         } catch (error) {
-          console.error('콘텐츠 저장 중 오류:', error);
+          console.error('Error during content save:', error);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: false,
@@ -196,7 +196,7 @@ module.exports = function(eleventyConfig) {
             type: mimeType || type || `image/${extension}`
           }));
         } catch (error) {
-          console.error('이미지 업로드 오류:', error);
+          console.error('Image upload error:', error);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             success: false,
@@ -208,7 +208,7 @@ module.exports = function(eleventyConfig) {
 
       req.on('error', (error) => {
         if (!aborted) {
-          console.error('이미지 업로드 스트림 오류:', error);
+          console.error('Image upload stream error:', error);
           res.writeHead(500, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: false, error: '이미지 업로드 스트림 오류가 발생했습니다.' }));
         }
@@ -237,7 +237,7 @@ module.exports = function(eleventyConfig) {
             try {
               stats = fs.statSync(filePath);
             } catch (error) {
-              console.error('이미지 파일 정보를 읽을 수 없습니다:', error);
+              console.error('Cannot read image file info:', error);
               return null;
             }
 
@@ -258,7 +258,7 @@ module.exports = function(eleventyConfig) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, images }));
       } catch (error) {
-        console.error('이미지 목록을 불러오지 못했습니다:', error);
+        console.error('Failed to load image list:', error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: '이미지 목록을 불러오는 중 오류가 발생했습니다.', details: error.message }));
       }
@@ -301,7 +301,7 @@ module.exports = function(eleventyConfig) {
           message: '콘텐츠가 로드되었습니다.'
         }));
       } catch (error) {
-        console.error('콘텐츠 로드 오류:', error);
+        console.error('Content load error:', error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: false,
@@ -349,7 +349,7 @@ module.exports = function(eleventyConfig) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, history, message: '히스토리가 로드되었습니다.' }));
       } catch (error) {
-        console.error('히스토리 로드 오류:', error);
+        console.error('History load error:', error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           success: false,
