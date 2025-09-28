@@ -36,6 +36,8 @@ module.exports = function(eleventyConfig) {
   
   eleventyConfig.addGlobalData("postsData", postsData);
 
+  // Register ContentTools API endpoints - moved to serverOptions.middleware
+
   // If ELEVENTY_ENV is production, exclude write.njk file
   if (process.env.ELEVENTY_ENV === 'production') {
     eleventyConfig.ignores.add("src/write.njk");
@@ -356,10 +358,12 @@ module.exports = function(eleventyConfig) {
           }
           next();
         },
+        // ContentTools API middleware
         function(req, res, next) {
           if (req.url.startsWith('/api/save-content') || 
               req.url.startsWith('/api/load-content') || 
-              req.url.startsWith('/api/content-history')) {
+              req.url.startsWith('/api/content-history') ||
+              req.url.startsWith('/api/upload-image')) {
             const saveContent = require('./src/api/save-content');
             return saveContent(eleventyConfig)(req, res, next);
           }
@@ -369,3 +373,5 @@ module.exports = function(eleventyConfig) {
     }
   };
 };
+
+
