@@ -8,7 +8,6 @@
   <link rel="icon" href="neocities.png">
   <link href="/css/reset.css" rel="stylesheet" type="text/css" media="all">
   <link href="/style.css" rel="stylesheet" type="text/css" media="all">
-  <link href="/css/contenttools-admin.css" rel="stylesheet" type="text/css" media="all">
   
   <!-- Environment configuration variables -->
   <script>
@@ -65,15 +64,8 @@
   {% endfor %}
   {% endif %}
   
-  <!-- ContentTools 로컬 파일 -->
-  <link rel="stylesheet" href="/css/contenttools.min.css">
-  <script src="/js/contenttools.min.js"></script>
-  
   <!-- Message Utils -->
   <script src="/js/message-utils.js"></script>
-  
-  <!-- Global ContentTools -->
-  <script src="/js/global-contenttools.js"></script>
   
   <script>
   // Common tag search function
@@ -81,27 +73,6 @@
     // Navigate to search page and search with the tag
     window.location.href = '/search/?tag=' + encodeURIComponent(tag);
   }
-  
-  // ContentTools debugging function
-  window.debugContentTools = function() {
-    console.log('=== ContentTools Debug Information ===');
-    console.log('ContentTools loaded:', typeof ContentTools !== 'undefined');
-    console.log('ContentEdit loaded:', typeof ContentEdit !== 'undefined');
-    console.log('Editable elements:', document.querySelectorAll('*[data-editable]').length);
-    console.log('ContentToolsManager:', typeof window.ContentToolsManager);
-    if (window.ContentToolsManager) {
-      console.log('Editor initialized:', window.ContentToolsManager.isInitialized());
-    }
-    console.log('================================');
-  };
-  
-  // Auto debugging after page load
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-      console.log('Page load complete, checking ContentTools status...');
-      debugContentTools();
-    }, 1000);
-  });
   </script>
 </body>
 </html>

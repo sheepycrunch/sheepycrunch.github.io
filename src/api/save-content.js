@@ -1,4 +1,4 @@
-﻿// ContentTools 편집 API 헬퍼
+﻿// 편집 API 헬퍼
 const fs = require('fs');
 const path = require('path');
 
