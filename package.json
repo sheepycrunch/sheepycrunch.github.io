@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "npx @11ty/eleventy",
-    "build:prod": "ADMIN_SECRET_KEY=${{ secrets.ADMIN_SECRET_KEY }} npx @11ty/eleventy",
-    "serve": "npx @11ty/eleventy --serve --port=8080",
-    "deploy:local": "deploy-local.bat",
-    "sass:build": "sass --no-source-map src/scss/style.scss src/style.css",
-    "sass:watch": "sass --no-source-map --watch src/scss/style.scss:src/style.css"
+    "serve": "npx @11ty/eleventy --serve --port=8080"
   },
   "repository": {
     "type": "git",
@@ -15,19 +11,9 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "@11ty/eleventy-img": "^6.0.4",
-    "@11ty/eleventy-plugin-bundle": "^3.0.7",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "form-data": "^4.0.4",
-    "googleapis": "^160.0.0",
-    "node-fetch": "^3.3.2"
+    "@11ty/eleventy": "^3.1.2"
   },
   "devDependencies": {
-    "html-minifier-terser": "^7.2.0",
-    "jsdom": "^27.0.0",
-    "neocities": "^0.0.3",
-    "sass": "^1.93.2"
+    "html-minifier-terser": "^7.2.0"
   }
 }

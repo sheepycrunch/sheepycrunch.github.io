@@ -1,0 +1,88 @@
+---
+layout: legal.njk
+title: "BeeRef Pinterest Helper"
+description: "About BeeRef Pinterest Helper — a desktop tool for importing Pinterest reference images into BeeRef"
+updated: "2026-02-21"
+permalink: "/app.html"
+---
+
+<section>
+  <h2>About</h2>
+  <p>
+    <strong>BeeRef Pinterest Helper</strong> is a companion tool for
+    <a href="https://beeref.org" target="_blank" rel="noopener">BeeRef</a>,
+    the open-source reference image viewer. It connects BeeRef to the Pinterest API,
+    letting artists and designers browse their Pinterest boards and selectively import
+    reference images directly into their BeeRef canvas.
+  </p>
+</section>
+
+<section>
+  <h2>How It Works</h2>
+  <ol>
+    <li>A lightweight local Flask server handles Pinterest OAuth 2.0 authentication.</li>
+    <li>You browse your Pinterest boards and pins inside a review dialog within BeeRef.</li>
+    <li>Thumbnail previews are loaded asynchronously for quick browsing.</li>
+    <li>You select the images you want, and they are inserted into your BeeRef scene.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Features</h2>
+  <ul>
+    <li>Pinterest board and pin browsing via the official Pinterest API v5.</li>
+    <li>Review dialog with async thumbnail loading, Select All/None, and selection count.</li>
+    <li>Single-input dialog for streamlined authentication flow.</li>
+    <li>Automatic session cleanup with TTL and max-session limits.</li>
+    <li>All processing happens locally — no cloud, no tracking.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Architecture</h2>
+  <p>The tool consists of two components:</p>
+
+  <h3>BeeRef Plugin (Python/Qt)</h3>
+  <p>
+    Adds a "Pinterest → Import from Pinterest" menu action to BeeRef.
+    Manages the review dialog UI where you browse, preview, and select images.
+  </p>
+
+  <h3>Helper Server (Flask)</h3>
+  <p>
+    A local HTTP server that handles the Pinterest OAuth flow and API requests.
+    Runs on <code>localhost</code> only. Provides endpoints for session creation,
+    approval, and image URL retrieval.
+  </p>
+</section>
+
+<section>
+  <h2>Source Code</h2>
+  <ul>
+    <li>
+      BeeRef (with Pinterest integration):
+      <a href="https://github.com/sheepycrunch/beeref-custom" target="_blank" rel="noopener">sheepycrunch/beeref-custom</a>
+    </li>
+    <li>
+      Pinterest Helper Server:
+      <a href="https://github.com/sheepycrunch/beeref-pinterest-helper" target="_blank" rel="noopener">sheepycrunch/beeref-pinterest-helper</a>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>Requirements</h2>
+  <ul>
+    <li>Python 3.9+</li>
+    <li>BeeRef 0.3.x</li>
+    <li>A Pinterest developer account with an approved app (see <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Service</a>)</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Related Pages</h2>
+  <ul>
+    <li><a href="/privacy.html">Privacy Policy</a></li>
+    <li><a href="/terms.html">Terms of Service</a></li>
+  </ul>
+</section>

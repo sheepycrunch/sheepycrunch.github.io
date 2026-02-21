@@ -1,0 +1,100 @@
+---
+layout: legal.njk
+title: "Privacy Policy"
+description: "Privacy Policy for BeeRef Pinterest Helper"
+updated: "2026-02-21"
+permalink: "/privacy.html"
+---
+
+<section>
+  <h2>Overview</h2>
+  <p>
+    This Privacy Policy describes how BeeRef Pinterest Helper ("we", "our", "the Application")
+    collects, uses, and protects information when you use our desktop application and local helper server.
+  </p>
+  <p>
+    BeeRef Pinterest Helper is a personal, open-source tool that integrates
+    <a href="https://beeref.org" target="_blank" rel="noopener">BeeRef</a> with the
+    <a href="https://developers.pinterest.com/" target="_blank" rel="noopener">Pinterest API</a>
+    to allow artists and designers to browse and import reference images directly into their workspace.
+  </p>
+</section>
+
+<section>
+  <h2>Information We Collect</h2>
+
+  <h3>Pinterest Account Data</h3>
+  <p>
+    When you connect your Pinterest account via OAuth 2.0, we receive a limited-scope access token.
+    This token is used solely to fetch your boards and pins. We do <strong>not</strong> access your
+    Pinterest password, profile details, or any data outside the granted scopes.
+  </p>
+
+  <h3>Pin and Board Metadata</h3>
+  <p>
+    We retrieve pin image URLs, board names, and pin descriptions from the Pinterest API
+    to display candidates for import. This data is held in memory during your session only.
+  </p>
+
+  <h3>No Personal Data Storage</h3>
+  <p>
+    The Application does not collect, store, or transmit any personally identifiable information (PII).
+    No analytics, cookies, tracking pixels, or third-party SDKs are used.
+  </p>
+</section>
+
+<section>
+  <h2>How We Use Information</h2>
+  <ul>
+    <li>Display your Pinterest boards and pins within BeeRef for review and selection.</li>
+    <li>Download selected pin images to insert into your BeeRef canvas.</li>
+    <li>Maintain a temporary local server session to manage the OAuth flow and API calls.</li>
+  </ul>
+  <p>We do not use your data for advertising, profiling, or any purpose other than the features described above.</p>
+</section>
+
+<section>
+  <h2>Data Storage and Security</h2>
+  <ul>
+    <li>All data processing occurs <strong>locally on your machine</strong>.</li>
+    <li>The helper server runs on <code>localhost</code> and is not exposed to the internet.</li>
+    <li>OAuth tokens are stored in memory only and are discarded when the server stops.</li>
+    <li>Sessions have a configurable TTL and are automatically cleaned up.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Third-Party Services</h2>
+  <p>
+    The Application communicates only with the
+    <a href="https://developers.pinterest.com/docs/api/v5/" target="_blank" rel="noopener">Pinterest API v5</a>.
+    No other third-party services are contacted.
+    Please review <a href="https://policy.pinterest.com/en/privacy-policy" target="_blank" rel="noopener">Pinterest's Privacy Policy</a>
+    for how Pinterest handles your data.
+  </p>
+</section>
+
+<section>
+  <h2>Children's Privacy</h2>
+  <p>
+    The Application is not directed at children under the age of 13.
+    We do not knowingly collect information from children.
+  </p>
+</section>
+
+<section>
+  <h2>Changes to This Policy</h2>
+  <p>
+    We may update this Privacy Policy from time to time.
+    Changes will be posted on this page with an updated revision date.
+  </p>
+</section>
+
+<section>
+  <h2>Contact</h2>
+  <div class="contact-info">
+    If you have questions about this policy, please open an issue on our
+    <a href="https://github.com/sheepycrunch/beeref-pinterest-helper" target="_blank" rel="noopener">GitHub repository</a>
+    or contact us at the repository's discussions page.
+  </div>
+</section>

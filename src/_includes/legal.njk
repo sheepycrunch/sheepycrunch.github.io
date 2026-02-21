@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title }} - {{ site.title }}</title>
+  <title>{{ title }}</title>
   {% if description %}
   <meta name="description" content="{{ description }}">
   {% endif %}
@@ -74,9 +74,6 @@
       line-height: 1;
       letter-spacing: -0.04em;
     }
-    .site-title a {
-      text-decoration: none;
-    }
     .site-nav {
       margin-top: 6px;
       font-size: 11px;
@@ -100,6 +97,12 @@
       background-color: var(--color-sub);
       padding: 1px 6px;
       margin-bottom: 12px;
+    }
+
+    .last-updated {
+      font-size: 11px;
+      color: var(--color-secondary);
+      margin-bottom: 16px;
     }
 
     h2 {
@@ -145,6 +148,15 @@
       border-bottom: none;
     }
 
+    /* contact info */
+    .contact-info {
+      background: #f8f8f8;
+      border: 1px solid var(--color-tertiary);
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 12px;
+    }
+
     /* footer */
     .site-footer {
       padding: 8px 16px;
@@ -173,7 +185,7 @@
 <body>
   <div id="wrapper">
     <header class="site-header">
-      <div class="site-title"><a href="/">{{ site.title }}</a></div>
+      <div class="site-title">sheepycrunch</div>
       <nav class="site-nav">
         <a href="/">home</a>
         <a href="/app.html">app</a>
@@ -183,8 +195,9 @@
     </header>
 
     <main class="content">
-      {% if title %}
       <div class="page-title">{{ title }}</div>
+      {% if updated %}
+      <div class="last-updated">last updated: {{ updated }}</div>
       {% endif %}
 
       {{ content | safe }}
