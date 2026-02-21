@@ -8,12 +8,13 @@ yarn-error.log*
 _site/
 dist/
 
-# Environment variables
+# Environment variables (contains sensitive data)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.env
 
 # IDE
 .vscode/
@@ -26,17 +27,16 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Images (uploaded to Neocities only)
+# Images (managed separately)
 *.jpg
 *.jpeg
 *.png
 *.gif
 *.webp
 *.svg
+# Exception: keep favicon
+!neocities.png
 
-# Environment variables (contains sensitive data)
-*.env
-
-# contents data
+# Contents data
 src/contents/
 src/images/
