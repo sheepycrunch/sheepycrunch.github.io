@@ -21,7 +21,6 @@ dist/
 .idea/
 *.swp
 *.swo
-.github/
 
 # OS
 .DS_Store
@@ -36,10 +35,6 @@ Thumbs.db
 *.svg
 # Exception: keep favicon
 !neocities.png
-
-# Contents data
-src/contents/
-src/images/
 
 # References
 .ref/
