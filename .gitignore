@@ -38,6 +38,7 @@ Thumbs.db
 
 # References
 .ref/
+.docs/
 
 # Agents docs
-AGENTS.md
+copilot-instructions.md
