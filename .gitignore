@@ -21,7 +21,7 @@ dist/
 .idea/
 *.swp
 *.swo
-.cursor/
+.github/
 
 # OS
 .DS_Store
