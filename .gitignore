@@ -40,3 +40,6 @@ Thumbs.db
 # Contents data
 src/contents/
 src/images/
+
+# References
+.ref/
