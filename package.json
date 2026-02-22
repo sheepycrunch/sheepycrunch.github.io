@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "build": "npx @11ty/eleventy",
-    "serve": "npx @11ty/eleventy --serve --port=8080"
+    "serve": "npx @11ty/eleventy --serve --port=8080",
+    "sync:notion:ref": "node scripts/sync-notion-ref.mjs",
+    "sync:notion:ref:dry": "node scripts/sync-notion-ref.mjs --dry-run",
+    "sync:notion:ref:wsl": "bash scripts/run-notion-sync-wsl.sh",
+    "sync:notion:ref:wsl:dry": "bash scripts/run-notion-sync-wsl.sh --dry-run"
   },
   "repository": {
     "type": "git",
